@@ -1,0 +1,9 @@
+{
+  "[project]/frontend-nextjs/components/WorkstationMap.tsx [app-client] (ecmascript, next/dynamic entry)": {
+    "id": "[project]/frontend-nextjs/components/WorkstationMap.tsx [app-client] (ecmascript, next/dynamic entry)",
+    "files": [
+      "static/chunks/1yvi_leaflet_dist_leaflet-src_0_9y2aa.js",
+      "static/chunks/frontend-nextjs_components_WorkstationMap_tsx_1y_sp1n._.js"
+    ]
+  }
+}

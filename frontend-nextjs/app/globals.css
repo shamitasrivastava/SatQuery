@@ -1,0 +1,161 @@
+@import 'leaflet/dist/leaflet.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand-blue: #0284c7;   /* Primary logo blue */
+  --brand-orange: #f37021; /* Primary logo orange */
+  --card-bg: #ffffff;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #020617;
+  color: #0f172a;
+}
+
+/* Ambient canvas background for Page 2 */
+.canvas-bg-mesh {
+  background-color: #fbfcfe;
+  background-image: 
+    radial-gradient(circle at 10% 45%, rgba(186, 230, 253, 0.45) 0%, rgba(255, 255, 255, 0) 45%),
+    radial-gradient(circle at 88% 50%, rgba(254, 215, 170, 0.45) 0%, rgba(255, 255, 255, 0) 50%);
+  background-attachment: fixed;
+}
+
+/* Leaflet GIS Map Container */
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  background: #020617 !important;
+  z-index: 1;
+}
+
+/* Reposition Leaflet Zoom Controls below top toolbar */
+.leaflet-top.leaflet-left {
+  top: 55px !important;
+  left: 16px !important;
+}
+
+.leaflet-control-zoom {
+  border: 1px solid rgba(51, 65, 85, 0.8) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5) !important;
+}
+
+.leaflet-control-zoom-in, 
+.leaflet-control-zoom-out {
+  background-color: rgba(15, 23, 42, 0.92) !important;
+  color: #38bdf8 !important;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.8) !important;
+}
+
+.leaflet-control-zoom-in:hover, 
+.leaflet-control-zoom-out:hover {
+  background-color: #1e293b !important;
+  color: #ffffff !important;
+}
+
+/* Leaflet Custom HUD Tooltips */
+.custom-leaflet-tooltip {
+  background-color: rgba(15, 23, 42, 0.95) !important;
+  border: 1px solid #06b6d4 !important;
+  color: #f8fafc !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  font-size: 11px !important;
+  padding: 3px 8px !important;
+  border-radius: 6px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+}
+
+.custom-leaflet-tooltip:before {
+  display: none !important;
+}
+
+/* Custom Minimal Scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.3);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.5);
+}
+
+.animated-bg {
+  position: relative;
+  background: linear-gradient(135deg, #fff3e6, #eaf6ff, #fff3e6);
+  background-size: 300% 300%;
+  animation: bgShift 12s ease-in-out infinite;
+}
+
+@keyframes bgShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(100px);
+  pointer-events: none;
+  opacity: 0.18; /* same opacity across all blobs */
+  z-index: 0;
+}
+
+.blob-orange {
+  top: 10%;
+  left: 5%;
+  width: 26rem;
+  height: 26rem;
+  background: #f97316;
+  animation: floatA 14s ease-in-out infinite;
+}
+
+.blob-blue {
+  top: 45%;
+  left: 45%;
+  width: 30rem;
+  height: 30rem;
+  background: #0284c7;
+  animation: floatB 16s ease-in-out infinite;
+}
+
+.blob-orange-2 {
+  bottom: 8%;
+  right: 8%;
+  width: 24rem;
+  height: 24rem;
+  background: #fb923c;
+  animation: floatC 18s ease-in-out infinite;
+}
+
+@keyframes floatA {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(60px, 40px) scale(1.1); }
+}
+@keyframes floatB {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(-50px, -60px) scale(1.05); }
+}
+@keyframes floatC {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(-40px, 30px) scale(1.08); }
+}

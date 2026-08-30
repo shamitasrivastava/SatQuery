@@ -1,0 +1,38 @@
+﻿# Virtual Environment
+backend_env/
+env/
+venv/
+ENV/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+
+# Django Local State & Database
+*.sqlite3
+db.sqlite3
+*.log
+local_settings.py
+
+# Media & Uploads
+media/uploads/*
+!media/uploads/.gitkeep
+
+# Pytest & Testing Cache
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# IDE & OS Specific
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+.env
