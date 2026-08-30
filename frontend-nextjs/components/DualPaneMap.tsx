@@ -54,7 +54,7 @@ export default function DualPaneMap({
       const buffer = await file.arrayBuffer();
       const tiff = await GeoTIFF.fromArrayBuffer(buffer);
       const image = await tiff.getImage();
-      const rgb = await image.readRGB();
+      const rgb = (await image.readRGB({ interleave: true })) as any;
 
       const canvas = document.createElement('canvas');
       canvas.width = image.getWidth();
@@ -62,11 +62,11 @@ export default function DualPaneMap({
       const ctx = canvas.getContext('2d');
       if (ctx) {
         const imgData = ctx.createImageData(image.getWidth(), image.getHeight());
-        for (let i = 0, j = 0; i < rgb.length; i += 3, j += 4) {
-          imgData.data[j] = rgb[i];
-          imgData.data[j + 1] = rgb[i + 1];
-          imgData.data[j + 2] = rgb[i + 2];
-          imgData.data[j + 3] = 255;
+        for (let i = 0, j = 0; i < imgData.data.length; i += 4, j += 3) {
+          imgData.data[i] = Number(rgb[j]) || 0;
+          imgData.data[i + 1] = Number(rgb[j + 1]) || 0;
+          imgData.data[i + 2] = Number(rgb[j + 2]) || 0;
+          imgData.data[i + 3] = 255;
         }
         ctx.putImageData(imgData, 0, 0);
         return canvas.toDataURL();
