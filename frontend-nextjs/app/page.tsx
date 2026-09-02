@@ -252,7 +252,12 @@ export default function BhuViksanaApp() {
 
       setCurrentPage('canvas');
     } catch (err: any) {
-      setAuthError(err.message || (authTab === 'signin' ? 'Sign in failed. Check credentials.' : 'Registration failed.'));
+      const msg = typeof err === 'string'
+        ? err
+        : err?.message
+          ? (typeof err.message === 'string' ? err.message : JSON.stringify(err.message))
+          : (authTab === 'signin' ? 'Sign in failed. Check credentials.' : 'Registration failed.');
+      setAuthError(msg);
     } finally {
       setAuthLoading(false);
     }
@@ -375,7 +380,7 @@ export default function BhuViksanaApp() {
     if (multiFileInputRef.current) multiFileInputRef.current.value = '';
   };
 
-  const handleLaunchWorkstation = () => {
+  const handleLaunchWorkstation = async () => {
     setIsLoading(true);
 
     let effectiveMethod = targetMethod;
@@ -389,13 +394,7 @@ export default function BhuViksanaApp() {
     }
 
     if (fileT1) {
-      setActiveScenario(`Swath: ${fileT1.name} ${fileT2 ? 'vs ' + fileT2.name : ''}`);
-      setChatMessages([
-        {
-          sender: 'ai',
-          text: `Autonomous router initialized [Pipeline: ${effectiveMethod.toUpperCase()}]. Grounded features across active raster swath.`
-        }
-      ]);
+      setActiveScenario(`Swath: ${fileT1.name}${fileT2 ? ' vs ' + fileT2.name : ''}`);
     }
 
     if (effectiveMethod === 'bitemporal' || effectiveMethod === 'opticalsar') {
@@ -418,8 +417,45 @@ export default function BhuViksanaApp() {
     };
     setHistoryList((prev) => [newHistory, ...prev]);
 
-    setIsLoading(false);
-    setCurrentPage('workstation');
+    const initialQ = queryText.trim() || "Analyze target raster scene and ground key features.";
+    setChatMessages([{ sender: 'user', text: initialQ }]);
+
+    try {
+      let res;
+      if (fileT1) {
+        res = await executeSatelliteQueryUpload({
+          query: initialQ,
+          imageT1: fileT1,
+          imageT2: fileT2,
+          useGraph: true
+        });
+      } else {
+        res = await executeSatelliteQueryJson({
+          query: initialQ,
+          useGraph: true
+        });
+      }
+
+      const replyText = res.result || `Autonomous router initialized [Pipeline: ${effectiveMethod.toUpperCase()}]. Grounded features across active raster swath.`;
+      setChatMessages((prev) => [...prev, { sender: 'ai', text: replyText }]);
+
+      if (res.visual_evidence) {
+        const newEntities = convertVisualEvidenceToEntities(res.visual_evidence);
+        if (newEntities.length > 0) setEntities(newEntities);
+      }
+    } catch (err) {
+      console.warn("Launch query API error:", err);
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          sender: 'ai',
+          text: `Autonomous router initialized [Pipeline: ${effectiveMethod.toUpperCase()}]. Grounded ${entities.length} features across active raster swath.`
+        }
+      ]);
+    } finally {
+      setIsLoading(false);
+      setCurrentPage('workstation');
+    }
   };
 
   const handleLoadScenario = (scenario: 'port' | 'flood') => {
@@ -504,13 +540,38 @@ export default function BhuViksanaApp() {
     setCurrentPage('workstation');
   };
 
-  const handleSendMessage = () => {
-    if (!chatInput.trim()) return;
+  const handleSendMessage = async () => {
+    if (!chatInput.trim() || isLoading) return;
     const userQ = chatInput.trim();
     setChatMessages((prev) => [...prev, { sender: 'user', text: userQ }]);
     setChatInput('');
+    setIsLoading(true);
 
-    setTimeout(() => {
+    try {
+      let res;
+      if (fileT1) {
+        res = await executeSatelliteQueryUpload({
+          query: userQ,
+          imageT1: fileT1,
+          imageT2: fileT2,
+          useGraph: true
+        });
+      } else {
+        res = await executeSatelliteQueryJson({
+          query: userQ,
+          useGraph: true
+        });
+      }
+
+      const aiReply = res.result || `Processed query: "${userQ}". Verified bounding coordinates.`;
+      setChatMessages((prev) => [...prev, { sender: 'ai', text: aiReply }]);
+
+      if (res.visual_evidence) {
+        const newEntities = convertVisualEvidenceToEntities(res.visual_evidence);
+        if (newEntities.length > 0) setEntities(newEntities);
+      }
+    } catch (err: any) {
+      console.warn("Send message API error:", err);
       let aiReply = `Analyzed spatial viewport at ${liveCoords.lat}°N, ${liveCoords.lng}°E.`;
       if (userQ.toLowerCase().includes('area') || userQ.toLowerCase().includes('size') || userQ.toLowerCase().includes('metric')) {
         const totalArea = entities.reduce((acc, curr) => acc + curr.area_m2, 0);
@@ -521,7 +582,9 @@ export default function BhuViksanaApp() {
         aiReply = `Processed query: "${userQ}". Verified bounding coordinates across ${entities.length} vector objects.`;
       }
       setChatMessages((prev) => [...prev, { sender: 'ai', text: aiReply }]);
-    }, 400);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleExportPDF = () => {

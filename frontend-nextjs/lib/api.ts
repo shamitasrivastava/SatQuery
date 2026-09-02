@@ -55,6 +55,33 @@ export interface AuthResponse {
   user: UserProfileInfo;
 }
 
+function parseApiErrorMessage(errorText: string, fallback: string): string {
+  try {
+    const parsed = JSON.parse(errorText);
+    if (typeof parsed.detail === 'string') {
+      return parsed.detail;
+    }
+    if (Array.isArray(parsed.detail)) {
+      return parsed.detail.map((item: any) => {
+        if (typeof item === 'string') return item;
+        const loc = item.loc ? item.loc.join('.') : '';
+        return `${loc ? loc + ': ' : ''}${item.msg || item.message || JSON.stringify(item)}`;
+      }).join(' | ');
+    }
+    if (typeof parsed.detail === 'object' && parsed.detail !== null) {
+      return parsed.detail.msg || parsed.detail.message || JSON.stringify(parsed.detail);
+    }
+    if (typeof parsed.message === 'string') {
+      return parsed.message;
+    }
+  } catch {
+    if (errorText && typeof errorText === 'string') {
+      return errorText;
+    }
+  }
+  return fallback;
+}
+
 export async function loginUser(emailOrUsername: string, password: string): Promise<AuthResponse> {
   const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
     method: 'POST',
@@ -64,13 +91,7 @@ export async function loginUser(emailOrUsername: string, password: string): Prom
 
   if (!res.ok) {
     const errorText = await res.text();
-    let message = 'Login failed';
-    try {
-      const parsed = JSON.parse(errorText);
-      message = parsed.detail || message;
-    } catch {
-      message = errorText || message;
-    }
+    const message = parseApiErrorMessage(errorText, 'Login failed');
     throw new Error(message);
   }
 
@@ -103,13 +124,7 @@ export async function signUpUser(
 
   if (!res.ok) {
     const errorText = await res.text();
-    let message = 'Sign up failed';
-    try {
-      const parsed = JSON.parse(errorText);
-      message = parsed.detail || message;
-    } catch {
-      message = errorText || message;
-    }
+    const message = parseApiErrorMessage(errorText, 'Sign up failed');
     throw new Error(message);
   }
 
