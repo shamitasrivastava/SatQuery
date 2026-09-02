@@ -238,6 +238,8 @@ export interface QueryUploadParams {
   temperature?: number;
   maxNewTokens?: number;
   useGraph?: boolean;
+  threadId?: string;
+  title?: string;
 }
 
 /**
@@ -250,7 +252,9 @@ export async function executeSatelliteQueryUpload({
   imageT2,
   temperature = 0.7,
   maxNewTokens = 768,
-  useGraph = true
+  useGraph = true,
+  threadId,
+  title
 }: QueryUploadParams): Promise<QueryResponseSchema> {
   const endpoint = useGraph
     ? `${API_BASE_URL}/api/query/graph/upload`
@@ -264,6 +268,8 @@ export async function executeSatelliteQueryUpload({
   }
   formData.append('temperature', temperature.toString());
   formData.append('max_new_tokens', maxNewTokens.toString());
+  if (threadId) formData.append('thread_id', threadId);
+  if (title) formData.append('title', title);
 
   try {
     const res = await fetch(endpoint, {
@@ -281,7 +287,9 @@ export async function executeSatelliteQueryUpload({
           imageT2,
           temperature,
           maxNewTokens,
-          useGraph: false
+          useGraph: false,
+          threadId,
+          title
         });
       }
       const errText = await res.text();
@@ -298,7 +306,9 @@ export async function executeSatelliteQueryUpload({
         imageT2,
         temperature,
         maxNewTokens,
-        useGraph: false
+        useGraph: false,
+        threadId,
+        title
       });
     }
     throw err;
@@ -311,6 +321,8 @@ export interface QueryJsonParams {
   temperature?: number;
   maxNewTokens?: number;
   useGraph?: boolean;
+  threadId?: string;
+  title?: string;
 }
 
 /**
@@ -321,7 +333,9 @@ export async function executeSatelliteQueryJson({
   imagePaths = [],
   temperature = 0.7,
   maxNewTokens = 768,
-  useGraph = true
+  useGraph = true,
+  threadId,
+  title
 }: QueryJsonParams): Promise<QueryResponseSchema> {
   const endpoint = useGraph
     ? `${API_BASE_URL}/api/query/graph`
@@ -332,7 +346,9 @@ export async function executeSatelliteQueryJson({
     parameters: {
       images: imagePaths,
       temperature,
-      max_new_tokens: maxNewTokens
+      max_new_tokens: maxNewTokens,
+      thread_id: threadId,
+      title
     }
   };
 
@@ -348,5 +364,50 @@ export async function executeSatelliteQueryJson({
   }
 
   return await res.json() as QueryResponseSchema;
+}
+
+export interface MessageExchange {
+  id: number;
+  query: string;
+  model_reply: string;
+  task: string;
+  request_id: string;
+  created_at: string;
+}
+
+export interface ChatThread {
+  thread_id: string;
+  title: string;
+  task: string;
+  created_at: string;
+  updated_at: string;
+  message_count: number;
+  messages: MessageExchange[];
+}
+
+export interface ThreadedHistoryResponse {
+  user_id: number;
+  total_threads: number;
+  threads: ChatThread[];
+}
+
+/**
+ * Fetches grouped ChatGPT-style conversation threads linked to the user ID.
+ */
+export async function fetchUserChatThreads(): Promise<ThreadedHistoryResponse> {
+  const token = getAuthToken();
+  if (!token) throw new Error('Not authenticated');
+
+  const res = await fetch(`${API_BASE_URL}/api/history/threads`, {
+    method: 'GET',
+    headers: getAuthHeaders({ 'Accept': 'application/json' })
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Failed to fetch chat threads (${res.status}): ${errText}`);
+  }
+
+  return await res.json() as ThreadedHistoryResponse;
 }
 

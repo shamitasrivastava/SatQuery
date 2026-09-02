@@ -53,6 +53,8 @@ import {
   loginUser,
   signUpUser,
   fetchUserChatHistory,
+  fetchUserChatThreads,
+  ChatThread,
   getAuthToken,
   removeAuthToken
 } from '../lib/api';
@@ -221,6 +223,30 @@ export default function BhuViksanaApp() {
     });
   };
 
+  const [activeThreadId, setActiveThreadId] = useState<string>(() => `thread_${Date.now()}`);
+  const [userThreads, setUserThreads] = useState<ChatThread[]>([]);
+
+  const loadThreadsFromBackend = async () => {
+    try {
+      const data = await fetchUserChatThreads();
+      if (data.threads && data.threads.length > 0) {
+        setUserThreads(data.threads);
+        const convertedHistory: HistoryItem[] = data.threads.map((t) => ({
+          id: t.thread_id,
+          title: t.title || "Conversation Thread",
+          timestamp: new Date(t.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          method: t.task === 'change_detection' ? 'bitemporal' : 'single',
+          pipeline: t.task === 'change_detection' ? 'Open-CD (Bi-Temporal Siamese)' : 'GEOCHAT-7B VQA & GROUNDING',
+          entitiesCount: t.message_count,
+          coordinates: { lat: 17.6965, lng: 83.2980 }
+        }));
+        setHistoryList(convertedHistory);
+      }
+    } catch (err) {
+      console.warn("Could not load user chat threads:", err);
+    }
+  };
+
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
@@ -236,19 +262,8 @@ export default function BhuViksanaApp() {
         await signUpUser(username, loginEmail, loginPassword, agencyCode, signupFullName);
       }
 
-      // 3. Load user's saved chat history
-      try {
-        const historyData = await fetchUserChatHistory();
-        if (historyData.history && historyData.history.length > 0) {
-          const loadedMessages: Array<{ sender: 'user' | 'ai'; text: string }> = historyData.history.flatMap((item) => [
-            { sender: 'user', text: item.query },
-            { sender: 'ai', text: item.model_reply }
-          ]);
-          setChatMessages(loadedMessages);
-        }
-      } catch (histErr) {
-        console.warn("Could not load user chat history:", histErr);
-      }
+      // 3. Load user's saved chat history & threads
+      await loadThreadsFromBackend();
 
       setCurrentPage('canvas');
     } catch (err: any) {
@@ -417,6 +432,9 @@ export default function BhuViksanaApp() {
     };
     setHistoryList((prev) => [newHistory, ...prev]);
 
+    const newThreadId = `thread_${Date.now()}`;
+    setActiveThreadId(newThreadId);
+
     const initialQ = queryText.trim() || "Analyze target raster scene and ground key features.";
     setChatMessages([{ sender: 'user', text: initialQ }]);
 
@@ -427,12 +445,16 @@ export default function BhuViksanaApp() {
           query: initialQ,
           imageT1: fileT1,
           imageT2: fileT2,
-          useGraph: true
+          useGraph: true,
+          threadId: newThreadId,
+          title: activeScenario
         });
       } else {
         res = await executeSatelliteQueryJson({
           query: initialQ,
-          useGraph: true
+          useGraph: true,
+          threadId: newThreadId,
+          title: activeScenario
         });
       }
 
@@ -554,12 +576,16 @@ export default function BhuViksanaApp() {
           query: userQ,
           imageT1: fileT1,
           imageT2: fileT2,
-          useGraph: true
+          useGraph: true,
+          threadId: activeThreadId,
+          title: activeScenario
         });
       } else {
         res = await executeSatelliteQueryJson({
           query: userQ,
-          useGraph: true
+          useGraph: true,
+          threadId: activeThreadId,
+          title: activeScenario
         });
       }
 
@@ -995,8 +1021,19 @@ export default function BhuViksanaApp() {
                   key={item.id}
                   onClick={() => {
                     setActiveScenario(item.title);
+                    setActiveThreadId(item.id);
                     setMapCenter([item.coordinates.lat, item.coordinates.lng]);
                     setLiveCoords({ lat: item.coordinates.lat, lng: item.coordinates.lng, zoom: 15 });
+
+                    const matchedThread = userThreads.find((t) => t.thread_id === item.id);
+                    if (matchedThread && matchedThread.messages && matchedThread.messages.length > 0) {
+                      const loadedMessages: Array<{ sender: 'user' | 'ai'; text: string }> = matchedThread.messages.flatMap((m) => [
+                        { sender: 'user' as const, text: m.query },
+                        { sender: 'ai' as const, text: m.model_reply }
+                      ]);
+                      setChatMessages(loadedMessages);
+                    }
+
                     setCurrentPage('workstation');
                   }}
                   className="p-3 rounded-2xl border border-slate-100 hover:border-[#1a73e8] bg-white hover:bg-[#f8fafd] transition cursor-pointer shadow-sm group"
