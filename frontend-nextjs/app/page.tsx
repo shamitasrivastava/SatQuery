@@ -46,7 +46,12 @@ import {
 import {
   checkBackendHealth,
   executeSatelliteQueryUpload,
-  executeSatelliteQueryJson
+  executeSatelliteQueryJson,
+  loginUser,
+  signUpUser,
+  fetchUserChatHistory,
+  getAuthToken,
+  removeAuthToken
 } from '../lib/api';
 import {
   convertVisualEvidenceToEntities,
@@ -196,8 +201,51 @@ export default function BhuViksanaApp() {
     });
   };
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!loginEmail || !loginPassword) {
+      setCurrentPage('canvas');
+      return;
+    }
+
+    try {
+      // 1. Attempt login via Django Ninja API
+      await loginUser(loginEmail, loginPassword);
+    } catch {
+      // 2. Auto register account if user doesn't exist yet
+      try {
+        const username = loginEmail.includes('@') ? loginEmail.split('@')[0] : loginEmail;
+        await signUpUser(username, loginEmail, loginPassword, agencyCode);
+      } catch (signupErr) {
+        console.warn("Sign up fallback error:", signupErr);
+      }
+    }
+
+    // 3. Retrieve user's past chat history linked to their User ID
+    try {
+      const historyData = await fetchUserChatHistory();
+      if (historyData.history && historyData.history.length > 0) {
+        const loadedMessages: ChatMessage[] = historyData.history.flatMap((item, idx) => [
+          {
+            id: `hist-q-${idx}-${item.id}`,
+            sender: 'user',
+            text: item.query,
+            timestamp: new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          },
+          {
+            id: `hist-r-${idx}-${item.id}`,
+            sender: 'assistant',
+            text: item.model_reply,
+            timestamp: new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            modelUsed: item.task === 'change_detection' ? 'BIT-CD-LEVIR' : 'Falcon-0.7B-RS'
+          }
+        ]);
+        setChatMessages(loadedMessages);
+      }
+    } catch (histErr) {
+      console.warn("Could not load user chat history:", histErr);
+    }
+
     setCurrentPage('canvas');
   };
 
