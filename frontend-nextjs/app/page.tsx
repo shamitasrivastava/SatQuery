@@ -126,26 +126,7 @@ export default function BhuViksanaApp() {
   const [isLoading, setIsLoading] = useState(false);
 
   // History Store
-  const [historyList, setHistoryList] = useState<HistoryItem[]>([
-    {
-      id: 'hist-1',
-      title: 'Visakhapatnam Port Berth Recon',
-      timestamp: 'Today, 11:42 AM',
-      method: 'single',
-      pipeline: 'Falcon-0.7B-RS (Single RS-VQA)',
-      entitiesCount: 3,
-      coordinates: { lat: 17.6965, lng: 83.2980 }
-    },
-    {
-      id: 'hist-2',
-      title: 'Assam Flood Basin Delta Inundation',
-      timestamp: 'Yesterday, 04:15 PM',
-      method: 'bitemporal',
-      pipeline: 'Open-CD (Bi-Temporal Siamese)',
-      entitiesCount: 1,
-      coordinates: { lat: 26.1900, lng: 91.7300 }
-    }
-  ]);
+  const [historyList, setHistoryList] = useState<HistoryItem[]>([]);
 
   // Map Center & Target Scenarios
   const [mapCenter, setMapCenter] = useState<[number, number]>([17.6965, 83.2980]);
@@ -209,12 +190,7 @@ export default function BhuViksanaApp() {
     }
   ]);
 
-  const [chatMessages, setChatMessages] = useState<Array<{ sender: 'user' | 'ai'; text: string }>>([
-    {
-      sender: 'ai',
-      text: 'Visual Question Answering initialized with Falcon-0.7B-RS. Grounded 3 assets in target viewport.'
-    }
-  ]);
+  const [chatMessages, setChatMessages] = useState<Array<{ sender: 'user' | 'ai'; text: string }>>([]);
 
   const fileInputT1Ref = useRef<HTMLInputElement>(null);
   const fileInputT2Ref = useRef<HTMLInputElement>(null);
@@ -246,6 +222,22 @@ export default function BhuViksanaApp() {
           coordinates: { lat: 17.6965, lng: 83.2980 }
         }));
         setHistoryList(convertedHistory);
+
+        // Restore latest active thread messages into chat window!
+        const latestThread = data.threads[0];
+        if (latestThread && latestThread.messages && latestThread.messages.length > 0) {
+          setActiveThreadId(latestThread.thread_id);
+          setActiveScenario(latestThread.title);
+          const loadedMsgs: Array<{ sender: 'user' | 'ai'; text: string }> = latestThread.messages.flatMap((m) => [
+            { sender: 'user' as const, text: m.query },
+            { sender: 'ai' as const, text: m.model_reply }
+          ]);
+          setChatMessages(loadedMsgs);
+        }
+      } else {
+        setUserThreads([]);
+        setHistoryList([]);
+        setChatMessages([]);
       }
     } catch (err) {
       console.warn("Could not load user chat threads:", err);
