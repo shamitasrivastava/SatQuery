@@ -93,8 +93,12 @@ export default function BhuViksanaApp() {
     setIsClient(true);
     const token = getAuthToken();
     if (token) {
-      setCurrentPage('canvas');
-      loadThreadsFromBackend();
+      const savedPage = typeof window !== 'undefined' ? (localStorage.getItem('satquery_current_page') as 'canvas' | 'workstation' | null) : null;
+      const targetPage = (savedPage === 'canvas' || savedPage === 'workstation') ? savedPage : 'canvas';
+      setCurrentPage(targetPage);
+
+      const savedThreadId = typeof window !== 'undefined' ? (localStorage.getItem('satquery_active_thread_id') || undefined) : undefined;
+      loadThreadsFromBackend(savedThreadId);
     }
   }, []);
 
@@ -207,7 +211,7 @@ export default function BhuViksanaApp() {
   const [activeThreadId, setActiveThreadId] = useState<string>(() => `thread_${Date.now()}`);
   const [userThreads, setUserThreads] = useState<ChatThread[]>([]);
 
-  const loadThreadsFromBackend = async () => {
+  const loadThreadsFromBackend = async (targetThreadId?: string) => {
     try {
       const data = await fetchUserChatThreads();
       if (data.threads && data.threads.length > 0) {
@@ -223,12 +227,19 @@ export default function BhuViksanaApp() {
         }));
         setHistoryList(convertedHistory);
 
-        // Restore latest active thread messages into chat window!
-        const latestThread = data.threads[0];
-        if (latestThread && latestThread.messages && latestThread.messages.length > 0) {
-          setActiveThreadId(latestThread.thread_id);
-          setActiveScenario(latestThread.title);
-          const loadedMsgs: Array<{ sender: 'user' | 'ai'; text: string }> = latestThread.messages.flatMap((m) => [
+        // Find target thread (by targetThreadId or fallback to 1st/latest thread)
+        let selectedThread = targetThreadId ? data.threads.find((t) => t.thread_id === targetThreadId) : null;
+        if (!selectedThread) {
+          selectedThread = data.threads[0];
+        }
+
+        if (selectedThread && selectedThread.messages && selectedThread.messages.length > 0) {
+          setActiveThreadId(selectedThread.thread_id);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('satquery_active_thread_id', selectedThread.thread_id);
+          }
+          setActiveScenario(selectedThread.title);
+          const loadedMsgs: Array<{ sender: 'user' | 'ai'; text: string }> = selectedThread.messages.flatMap((m) => [
             { sender: 'user' as const, text: m.query },
             { sender: 'ai' as const, text: m.model_reply }
           ]);
@@ -419,6 +430,10 @@ export default function BhuViksanaApp() {
 
     const newThreadId = `thread_${Date.now()}`;
     setActiveThreadId(newThreadId);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('satquery_active_thread_id', newThreadId);
+      localStorage.setItem('satquery_current_page', 'workstation');
+    }
 
     const initialQ = queryText.trim() || "Analyze target raster scene and ground key features.";
     const dynamicTitle = initialQ.length > 40 ? initialQ.slice(0, 40) + "..." : initialQ;
@@ -1025,6 +1040,10 @@ export default function BhuViksanaApp() {
                   onClick={() => {
                     setActiveScenario(item.title);
                     setActiveThreadId(item.id);
+                    if (typeof window !== 'undefined') {
+                      localStorage.setItem('satquery_active_thread_id', item.id);
+                      localStorage.setItem('satquery_current_page', 'workstation');
+                    }
                     setMapCenter([item.coordinates.lat, item.coordinates.lng]);
                     setLiveCoords({ lat: item.coordinates.lat, lng: item.coordinates.lng, zoom: 15 });
 
