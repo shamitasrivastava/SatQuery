@@ -91,6 +91,11 @@ export default function BhuViksanaApp() {
 
   useEffect(() => {
     setIsClient(true);
+    const token = getAuthToken();
+    if (token) {
+      setCurrentPage('canvas');
+      loadThreadsFromBackend();
+    }
   }, []);
 
   // -------------------------------------------------------------
@@ -420,22 +425,24 @@ export default function BhuViksanaApp() {
       setActiveViewTool('single');
     }
 
-    // Save to Inspection History
-    const newHistory: HistoryItem = {
-      id: `hist-${Date.now()}`,
-      title: activeScenario,
-      timestamp: 'Just now',
-      method: effectiveMethod,
-      pipeline: effectiveMethod === 'bitemporal' ? 'Open-CD (Bi-Temporal Siamese)' : effectiveMethod === 'opticalsar' ? 'Cross-Attention Optical-SAR' : 'Falcon-0.7B-RS (Single RS-VQA)',
-      entitiesCount: entities.length,
-      coordinates: { lat: liveCoords.lat, lng: liveCoords.lng }
-    };
-    setHistoryList((prev) => [newHistory, ...prev]);
-
     const newThreadId = `thread_${Date.now()}`;
     setActiveThreadId(newThreadId);
 
     const initialQ = queryText.trim() || "Analyze target raster scene and ground key features.";
+    const dynamicTitle = initialQ.length > 40 ? initialQ.slice(0, 40) + "..." : initialQ;
+
+    // Save to Inspection History
+    const newHistory: HistoryItem = {
+      id: newThreadId,
+      title: dynamicTitle,
+      timestamp: 'Just now',
+      method: effectiveMethod,
+      pipeline: effectiveMethod === 'bitemporal' ? 'Open-CD (Bi-Temporal Siamese)' : effectiveMethod === 'opticalsar' ? 'Cross-Attention Optical-SAR' : 'GEOCHAT-7B VQA & GROUNDING',
+      entitiesCount: 1,
+      coordinates: { lat: liveCoords.lat, lng: liveCoords.lng }
+    };
+    setHistoryList((prev) => [newHistory, ...prev]);
+
     setChatMessages([{ sender: 'user', text: initialQ }]);
 
     try {
@@ -447,14 +454,14 @@ export default function BhuViksanaApp() {
           imageT2: fileT2,
           useGraph: true,
           threadId: newThreadId,
-          title: activeScenario
+          title: dynamicTitle
         });
       } else {
         res = await executeSatelliteQueryJson({
           query: initialQ,
           useGraph: true,
           threadId: newThreadId,
-          title: activeScenario
+          title: dynamicTitle
         });
       }
 
@@ -465,6 +472,8 @@ export default function BhuViksanaApp() {
         const newEntities = convertVisualEvidenceToEntities(res.visual_evidence);
         if (newEntities.length > 0) setEntities(newEntities);
       }
+
+      await loadThreadsFromBackend();
     } catch (err) {
       console.warn("Launch query API error:", err);
       setChatMessages((prev) => [
@@ -596,6 +605,8 @@ export default function BhuViksanaApp() {
         const newEntities = convertVisualEvidenceToEntities(res.visual_evidence);
         if (newEntities.length > 0) setEntities(newEntities);
       }
+
+      await loadThreadsFromBackend();
     } catch (err: any) {
       console.warn("Send message API error:", err);
       let aiReply = `Analyzed spatial viewport at ${liveCoords.lat}°N, ${liveCoords.lng}°E.`;
