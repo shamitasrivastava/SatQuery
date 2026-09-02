@@ -34,7 +34,8 @@ import {
   Cpu,
   Trash2,
   Columns3,
-  Binary
+  Binary,
+  AlertCircle
 } from 'lucide-react';
 import * as GeoTIFF from 'geotiff';
 import { jsPDF } from 'jspdf';
@@ -62,7 +63,6 @@ import {
 import AgenticAuditTrace from '@/components/AgenticAuditTrace';
 import ChangeDetectionPanel from '@/components/ChangeDetectionPanel';
 
-
 // Dynamic SSR-safe import of the standalone Leaflet Map component
 const WorkstationMap = dynamic(() => import('@/components/WorkstationMap'), {
   ssr: false,
@@ -72,8 +72,6 @@ const WorkstationMap = dynamic(() => import('@/components/WorkstationMap'), {
     </div>
   )
 });
-
-
 
 interface HistoryItem {
   id: string;
@@ -96,10 +94,15 @@ export default function BhuViksanaApp() {
   // -------------------------------------------------------------
   // PAGE 1: AUTH STATE
   // -------------------------------------------------------------
+  const [authTab, setAuthTab] = useState<'signin' | 'signup'>('signin');
+  const [signupUsername, setSignupUsername] = useState('');
+  const [signupFullName, setSignupFullName] = useState('');
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [agencyCode, setAgencyCode] = useState('ISRO-SAC');
   const [showPassword, setShowPassword] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [authLoading, setAuthLoading] = useState(false);
 
   // -------------------------------------------------------------
   // PAGE 2 & 3: WORKSTATION STATE
@@ -218,41 +221,41 @@ export default function BhuViksanaApp() {
     });
   };
 
-  const handleLoginSubmit = async (e: React.FormEvent) => {
+  const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!loginEmail || !loginPassword) {
-      setCurrentPage('canvas');
-      return;
-    }
+    setAuthError(null);
+    setAuthLoading(true);
 
     try {
-      // 1. Attempt login via Django Ninja API
-      await loginUser(loginEmail, loginPassword);
-    } catch {
-      // 2. Auto register account if user doesn't exist yet
+      if (authTab === 'signin') {
+        // 1. Sign In via Django Ninja API
+        await loginUser(loginEmail, loginPassword);
+      } else {
+        // 2. Sign Up via Django Ninja API
+        const username = signupUsername.trim() || (loginEmail.includes('@') ? loginEmail.split('@')[0] : loginEmail);
+        await signUpUser(username, loginEmail, loginPassword, agencyCode, signupFullName);
+      }
+
+      // 3. Load user's saved chat history
       try {
-        const username = loginEmail.includes('@') ? loginEmail.split('@')[0] : loginEmail;
-        await signUpUser(username, loginEmail, loginPassword, agencyCode);
-      } catch (signupErr) {
-        console.warn("Sign up fallback error:", signupErr);
+        const historyData = await fetchUserChatHistory();
+        if (historyData.history && historyData.history.length > 0) {
+          const loadedMessages: Array<{ sender: 'user' | 'ai'; text: string }> = historyData.history.flatMap((item) => [
+            { sender: 'user', text: item.query },
+            { sender: 'ai', text: item.model_reply }
+          ]);
+          setChatMessages(loadedMessages);
+        }
+      } catch (histErr) {
+        console.warn("Could not load user chat history:", histErr);
       }
-    }
 
-    // 3. Retrieve user's past chat history linked to their User ID
-    try {
-      const historyData = await fetchUserChatHistory();
-      if (historyData.history && historyData.history.length > 0) {
-        const loadedMessages: Array<{ sender: 'user' | 'ai'; text: string }> = historyData.history.flatMap((item) => [
-          { sender: 'user', text: item.query },
-          { sender: 'ai', text: item.model_reply }
-        ]);
-        setChatMessages(loadedMessages);
-      }
-    } catch (histErr) {
-      console.warn("Could not load user chat history:", histErr);
+      setCurrentPage('canvas');
+    } catch (err: any) {
+      setAuthError(err.message || (authTab === 'signin' ? 'Sign in failed. Check credentials.' : 'Registration failed.'));
+    } finally {
+      setAuthLoading(false);
     }
-
-    setCurrentPage('canvas');
   };
 
   const processRaster = async (file: File): Promise<string> => {
@@ -644,15 +647,88 @@ export default function BhuViksanaApp() {
 
         <main className="flex-1 flex flex-col justify-center items-center px-4 py-8 relative z-20">
           <div className="w-full max-w-[460px] bg-white/95 rounded-[26px] border border-white/80 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.12)] p-8 sm:p-10 backdrop-blur-xl relative">
-            <div className="text-center mb-7">
+            <div className="text-center mb-5">
               <div className="w-14 h-14 mx-auto mb-3.5 flex items-center justify-center rounded-2xl bg-slate-50 border border-slate-200/80 shadow-sm">
                 <img src="/logo.png" alt="BhuViksana" className="w-9 h-9 object-contain" />
               </div>
-              <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Sign in to your account</h2>
-              <p className="text-xs text-slate-500 mt-1">Enter official credentials to access the geospatial workstation.</p>
+              <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
+                {authTab === 'signin' ? 'Sign in to your account' : 'Register New Officer Account'}
+              </h2>
+              <p className="text-xs text-slate-500 mt-1">
+                {authTab === 'signin'
+                  ? 'Enter official credentials to access the geospatial workstation.'
+                  : 'Create official credentials to access Earth observation tools.'}
+              </p>
             </div>
 
-            <form onSubmit={handleLoginSubmit} className="space-y-4">
+            {/* TAB SWITCHER: SIGN IN vs CREATE ACCOUNT */}
+            <div className="flex rounded-xl bg-slate-100 p-1 mb-5 border border-slate-200/80">
+              <button
+                type="button"
+                onClick={() => { setAuthTab('signin'); setAuthError(null); }}
+                className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition ${
+                  authTab === 'signin'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                Sign In
+              </button>
+              <button
+                type="button"
+                onClick={() => { setAuthTab('signup'); setAuthError(null); }}
+                className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition ${
+                  authTab === 'signup'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                Sign Up
+              </button>
+            </div>
+
+            {/* ERROR ALERT BANNER */}
+            {authError && (
+              <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+                <span>{authError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleAuthSubmit} className="space-y-4">
+              {/* EXTRA FIELDS FOR SIGN UP MODE */}
+              {authTab === 'signup' && (
+                <>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5 text-left">User ID / Username</label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={signupUsername}
+                        onChange={(e) => setSignupUsername(e.target.value)}
+                        placeholder="e.g. officer_sharma"
+                        required
+                        className="w-full text-xs text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 pl-10 outline-none focus:border-[#0284c7] focus:bg-white transition"
+                      />
+                      <ShieldCheck className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5 text-left">Full Name (Optional)</label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={signupFullName}
+                        onChange={(e) => setSignupFullName(e.target.value)}
+                        placeholder="e.g. Aditya Sharma"
+                        className="w-full text-xs text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 outline-none focus:border-[#0284c7] focus:bg-white transition"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5 text-left">Designated Command Unit</label>
                 <div className="relative">
@@ -689,7 +765,9 @@ export default function BhuViksanaApp() {
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="text-xs font-semibold text-slate-700">Security Passkey</label>
-                  <a href="#forgot" className="text-[11px] font-medium text-[#0284c7] hover:underline">Forgot Password?</a>
+                  {authTab === 'signin' && (
+                    <a href="#forgot" className="text-[11px] font-medium text-[#0284c7] hover:underline">Forgot Password?</a>
+                  )}
                 </div>
                 <div className="relative">
                   <input
@@ -713,10 +791,20 @@ export default function BhuViksanaApp() {
 
               <button
                 type="submit"
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-semibold shadow-md active:scale-[0.98] transition mt-2"
+                disabled={authLoading}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-semibold shadow-md active:scale-[0.98] transition mt-2 disabled:opacity-60"
               >
-                <span>Sign In with Gov Auth</span>
-                <ArrowRight className="w-3.5 h-3.5 text-cyan-400" />
+                {authLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />
+                    <span>Processing Authentication...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>{authTab === 'signin' ? 'Sign In with Gov Auth' : 'Create Officer Account'}</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-cyan-400" />
+                  </>
+                )}
               </button>
             </form>
 
