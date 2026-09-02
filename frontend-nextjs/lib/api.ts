@@ -248,8 +248,8 @@ export async function executeSatelliteQueryUpload({
   query,
   imageT1,
   imageT2,
-  temperature = 0.6,
-  maxNewTokens = 512,
+  temperature = 0.7,
+  maxNewTokens = 768,
   useGraph = true
 }: QueryUploadParams): Promise<QueryResponseSchema> {
   const endpoint = useGraph
@@ -319,8 +319,8 @@ export interface QueryJsonParams {
 export async function executeSatelliteQueryJson({
   query,
   imagePaths = [],
-  temperature = 0.6,
-  maxNewTokens = 512,
+  temperature = 0.7,
+  maxNewTokens = 768,
   useGraph = true
 }: QueryJsonParams): Promise<QueryResponseSchema> {
   const endpoint = useGraph

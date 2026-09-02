@@ -1526,7 +1526,9 @@ export default function BhuViksanaApp() {
               <div className="p-3.5 bg-[#f8fafd] border-b border-[#dadce0] flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-[#188038]" />
-                  <span className="text-xs font-medium text-[#3c4043]">Pipeline: FALCON-RS-GROUNDING</span>
+                  <span className="text-xs font-medium text-[#3c4043]">
+                    Pipeline: {targetMethod === 'bitemporal' ? 'OPEN-CD BITEMPORAL SIAMESE' : targetMethod === 'opticalsar' ? 'CROSS-ATTENTION OPTICAL-SAR' : 'GEOCHAT-7B VQA & GROUNDING'}
+                  </span>
                 </div>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#e6f4ea] text-[#137333]">
                   READY
@@ -1540,7 +1542,7 @@ export default function BhuViksanaApp() {
                   {chatMessages.map((msg, idx) => (
                     <div
                       key={idx}
-                      className={`text-xs leading-relaxed p-3 rounded-2xl border ${
+                      className={`text-xs leading-relaxed p-3 rounded-2xl border whitespace-pre-wrap ${
                         msg.sender === 'user'
                           ? 'bg-[#e8f0fe] border-[#d2e3fc] text-[#174ea6] ml-6'
                           : 'bg-[#f1f3f4] border-[#dadce0] text-[#202124] mr-4'
