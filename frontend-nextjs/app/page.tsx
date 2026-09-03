@@ -428,7 +428,6 @@ export default function BhuViksanaApp() {
       setActiveViewTool('single');
     }
 
-<<<<<<< HEAD
     const newThreadId = `thread_${Date.now()}`;
     setActiveThreadId(newThreadId);
     if (typeof window !== 'undefined') {
@@ -440,8 +439,6 @@ export default function BhuViksanaApp() {
     const dynamicTitle = initialQ.length > 40 ? initialQ.slice(0, 40) + "..." : initialQ;
 
     // Save to Inspection History
-=======
->>>>>>> ccc695e8d44b40f8fa0913c86b32cd5f1f595bd7
     const newHistory: HistoryItem = {
       id: newThreadId,
       title: dynamicTitle,
