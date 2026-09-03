@@ -157,7 +157,7 @@ export default function BhuViksanaApp() {
   const [t2DataUrl, setT2DataUrl] = useState<string | null>(null);
   const [changeMaskUrl, setChangeMaskUrl] = useState<string | null>(null);
 
-  // Accurate Grounded Bounding Boxes for Visakhapatnam Port
+  // Bounding Boxes
   const [entities, setEntities] = useState<MapEntity[]>([
     {
       id: 1,
@@ -316,7 +316,7 @@ export default function BhuViksanaApp() {
   };
 
   // -------------------------------------------------------------
-  // AUTONOMOUS ROUTING LOGIC BASED ON UPLOAD QUANTITY & METADATA
+  // AUTONOMOUS ROUTING LOGIC
   // -------------------------------------------------------------
   const autoDetectPipeline = (f1: File | null, f2: File | null) => {
     if (!f1 && !f2) {
@@ -428,6 +428,7 @@ export default function BhuViksanaApp() {
       setActiveViewTool('single');
     }
 
+<<<<<<< HEAD
     const newThreadId = `thread_${Date.now()}`;
     setActiveThreadId(newThreadId);
     if (typeof window !== 'undefined') {
@@ -439,6 +440,8 @@ export default function BhuViksanaApp() {
     const dynamicTitle = initialQ.length > 40 ? initialQ.slice(0, 40) + "..." : initialQ;
 
     // Save to Inspection History
+=======
+>>>>>>> ccc695e8d44b40f8fa0913c86b32cd5f1f595bd7
     const newHistory: HistoryItem = {
       id: newThreadId,
       title: dynamicTitle,
@@ -496,6 +499,9 @@ export default function BhuViksanaApp() {
     }
   };
 
+  // -------------------------------------------------------------
+  // BENCHMARK SCENARIO LOADER
+  // -------------------------------------------------------------
   const handleLoadScenario = (scenario: 'port' | 'flood') => {
     handleClearFiles();
     if (scenario === 'port') {
@@ -549,9 +555,9 @@ export default function BhuViksanaApp() {
       ]);
     } else {
       setActiveScenario('Brahmaputra Basin, Assam (Flood Inundation)');
-      setTargetMethod('bitemporal');
-      setActiveWorkstationTab('bitemporal');
-      setActiveViewTool('tripane');
+      setTargetMethod('single');
+      setActiveWorkstationTab('rsvqa');
+      setActiveViewTool('single');
       setMapCenter([26.1900, 91.7300]);
       setMapZoom(14);
       setLiveCoords({ lat: 26.1900, lng: 91.7300, zoom: 14 });
@@ -571,13 +577,16 @@ export default function BhuViksanaApp() {
       setChatMessages([
         {
           sender: 'ai',
-          text: 'Bi-temporal Siamese Change Detection initialized. Identified 1 inundated sector spanning 24,500 m².'
+          text: 'Flood Inundation Analysis loaded for Brahmaputra Basin. Displaying high-resolution satellite imagery.'
         }
       ]);
     }
     setCurrentPage('workstation');
   };
 
+  // -------------------------------------------------------------
+  // LIVE API HANDLER: WIRED TO LANGGRAPH & BACKEND ON PORT 8000
+  // -------------------------------------------------------------
   const handleSendMessage = async () => {
     if (!chatInput.trim() || isLoading) return;
     const userQ = chatInput.trim();
@@ -607,6 +616,21 @@ export default function BhuViksanaApp() {
 
       const aiReply = res.result || `Processed query: "${userQ}". Verified bounding coordinates.`;
       setChatMessages((prev) => [...prev, { sender: 'ai', text: aiReply }]);
+
+      // Wire Binary Mask from Backend to Pane 3 if available
+      const mask =
+        res.visual_evidence?.mask_base64 ||
+        res.visual_evidence?.change_mask ||
+        res.visual_evidence?.change_mask_url ||
+        res.visual_evidence?.mask ||
+        res.visual_evidence?.binary_mask;
+      if (mask) {
+        const formattedMask =
+          typeof mask === 'string' && (mask.startsWith('data:image') || mask.startsWith('http'))
+            ? mask
+            : `data:image/png;base64,${mask}`;
+        setChangeMaskUrl(formattedMask);
+      }
 
       if (res.visual_evidence) {
         const newEntities = convertVisualEvidenceToEntities(res.visual_evidence);
@@ -714,13 +738,11 @@ export default function BhuViksanaApp() {
   };
 
   // =========================================================================
-  // PAGE 1: AUTHENTICATION (ORIGINAL CODE PRESERVED)
+  // PAGE 1: AUTHENTICATION
   // =========================================================================
   if (currentPage === 'login') {
     return (
-      <div
-        className="flex flex-col min-h-screen w-screen overflow-hidden font-sans select-none relative justify-between animated-gradient-bg"
-      >
+      <div className="flex flex-col min-h-screen w-screen overflow-hidden font-sans select-none relative justify-between animated-gradient-bg">
         <div className="absolute -top-[6%] -left-[6%] w-[34rem] h-[34rem] rounded-full bg-[#f97316] blur-[95px] pointer-events-none opacity-30 blob-wave-orange" />
         <div className="absolute -bottom-[8%] -right-[6%] w-[36rem] h-[36rem] rounded-full bg-[#0284c7] blur-[100px] pointer-events-none opacity-30 blob-wave-blue" />
 
@@ -970,7 +992,7 @@ export default function BhuViksanaApp() {
   }
 
   // =========================================================================
-  // PAGE 2: SETUP CANVAS (WITH HISTORY DOCK & DROPDOWN + AUTO-DETECT)
+  // PAGE 2: SETUP CANVAS
   // =========================================================================
   if (currentPage === 'canvas') {
     return (
@@ -979,7 +1001,7 @@ export default function BhuViksanaApp() {
           <img src="/logo.png" alt="Watermark" className="w-full h-full object-contain" />
         </div>
 
-        {/* LEFT DOCK WITH HOME & HISTORY ICONS */}
+        {/* LEFT DOCK */}
         <aside className="w-[72px] h-full flex flex-col items-center justify-between py-6 border-r border-slate-200/70 bg-white/70 backdrop-blur-md z-30">
           <div className="flex flex-col items-center gap-6">
             <div className="w-10 h-10 relative flex items-center justify-center">
@@ -992,8 +1014,7 @@ export default function BhuViksanaApp() {
               >
                 <Home className="w-5 h-5" />
               </button>
-              
-              {/* HISTORY TOGGLE BUTTON */}
+
               <button
                 onClick={() => setIsHistoryDrawerOpen(!isHistoryDrawerOpen)}
                 className={`p-2.5 rounded-xl transition hover:scale-105 ${
@@ -1017,7 +1038,7 @@ export default function BhuViksanaApp() {
           </button>
         </aside>
 
-        {/* SLIDING HISTORY DRAWER (GOOGLE MAPS STYLE) */}
+        {/* SLIDING HISTORY DRAWER */}
         {isHistoryDrawerOpen && (
           <aside className="w-[340px] h-full bg-white/95 backdrop-blur-xl border-r border-slate-200 shadow-xl flex flex-col justify-between z-20 transition-all duration-300">
             <div className="p-4 border-b border-slate-100 flex items-center justify-between">
@@ -1094,13 +1115,11 @@ export default function BhuViksanaApp() {
         <main className="flex-1 flex flex-col justify-center items-center p-8 relative z-10">
           <div className="w-full max-w-3xl mx-auto flex flex-col items-center space-y-6">
             <h1 className="text-4xl font-semibold tracking-tight text-center text-slate-900 leading-snug">
-              <span className="text-[#0284c7]">Good Afternoon,</span> What Satelite<br />
+              <span className="text-[#0284c7]">Good Afternoon,</span> What Satellite<br />
               scene you would like to <span className="text-[#f37021]">Discover?</span>
             </h1>
 
             <div className="w-full bg-white rounded-[24px] border border-slate-200/80 shadow-[0_12px_40px_-15px_rgba(0,0,0,0.08)] p-6 space-y-4">
-              
-              {/* TARGET METHOD DROPDOWN SELECTION */}
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-slate-800 text-xs">Model Pipeline Mode</span>
@@ -1155,8 +1174,6 @@ export default function BhuViksanaApp() {
               {/* MULTI-IMAGE UPLOAD ENGINE */}
               <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
                 <div className="flex items-center gap-2">
-                  
-                  {/* MULTI-FILE QUICK UPLOAD */}
                   <label className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 cursor-pointer text-xs font-medium text-slate-700 transition">
                     <UploadCloud className="w-4 h-4 text-[#0284c7]" />
                     <span>
@@ -1176,7 +1193,6 @@ export default function BhuViksanaApp() {
                     />
                   </label>
 
-                  {/* Optional Separate Attachment for T2 */}
                   {fileT1 && !fileT2 && (
                     <label className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-dashed border-slate-300 bg-white hover:bg-slate-50 cursor-pointer text-xs font-medium text-slate-600 transition">
                       <span>+ Attach 2nd Swath for Change Detection</span>
@@ -1248,7 +1264,7 @@ export default function BhuViksanaApp() {
   }
 
   // =========================================================================
-  // PAGE 3: WORKSTATION VIEW (WITH 3-PANE BIT-CD SPLIT & MAP WORKSPACE)
+  // PAGE 3: WORKSTATION VIEW
   // =========================================================================
   return (
     <div
@@ -1282,7 +1298,7 @@ export default function BhuViksanaApp() {
           <button
             onClick={() => handleLoadScenario('port')}
             className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium shadow-[0_1px_4px_rgba(0,0,0,0.15)] transition whitespace-nowrap ${
-              activeScenario.includes('Visakhapatnam')
+              activeScenario.includes('Visakhapatnam') && activeViewTool === 'single'
                 ? 'bg-[#1a73e8] text-white'
                 : 'bg-white text-[#3c4043] hover:bg-[#f8f9fa] border border-[#dadce0]'
             }`}
@@ -1293,7 +1309,7 @@ export default function BhuViksanaApp() {
           <button
             onClick={() => handleLoadScenario('flood')}
             className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium shadow-[0_1px_4px_rgba(0,0,0,0.15)] transition whitespace-nowrap ${
-              activeScenario.includes('Assam')
+              activeScenario.includes('Assam') && activeViewTool === 'single'
                 ? 'bg-[#1a73e8] text-white'
                 : 'bg-white text-[#3c4043] hover:bg-[#f8f9fa] border border-[#dadce0]'
             }`}
@@ -1357,7 +1373,7 @@ export default function BhuViksanaApp() {
             </button>
           </div>
 
-          {/* CONDITION 1: 3-PANE SPLIT VIEW FOR BIT-CD (T1 | T2 | BINARY BIT-CD MASK) */}
+          {/* CONDITION 1: 3-PANE SPLIT VIEW FOR BIT-CD */}
           {activeViewTool === 'tripane' ? (
             <div className="w-full h-full grid grid-cols-3 gap-1.5 bg-slate-950 p-2.5">
               
@@ -1397,14 +1413,13 @@ export default function BhuViksanaApp() {
                 </div>
               </div>
 
-              {/* PANE 3: BIT-CD BINARY MAP (0 & 1) */}
+              {/* PANE 3: BIT-CD BINARY MAP (ACTIVE SILHOUETTE TRACE) */}
               <div className="relative w-full h-full rounded-2xl overflow-hidden border border-rose-950/60 bg-black flex flex-col shadow-inner">
                 <div className="absolute top-3 left-3 z-10 bg-black/85 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-mono text-rose-400 border border-rose-500/40 flex items-center gap-1.5">
                   <Binary className="w-3.5 h-3.5 text-rose-500 animate-pulse" />
                   <span>Bit-CD: Binary Change Mask</span>
                 </div>
 
-                {/* 0 vs 1 Tensor Legend */}
                 <div className="absolute bottom-3 left-3 z-10 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-mono border border-slate-700 flex items-center gap-3">
                   <span className="flex items-center gap-1.5 text-slate-300">
                     <span className="w-2.5 h-2.5 rounded-sm bg-black border border-slate-500" /> [0] Unchanged
@@ -1415,18 +1430,19 @@ export default function BhuViksanaApp() {
                 </div>
 
                 {changeMaskUrl ? (
-                  <img src={changeMaskUrl} alt="Binary Mask" className="w-full h-full object-cover filter contrast-200" />
+                  <img
+                    src={changeMaskUrl}
+                    alt="Binary Mask"
+                    className="w-full h-full object-cover filter contrast-150"
+                  />
                 ) : (
-                  /* Autonomous Generated Binary 0/1 Mask Tensor */
                   <div className="w-full h-full bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
-                    <div className="w-56 h-56 border-2 border-rose-500/40 rounded-2xl relative overflow-hidden bg-black flex items-center justify-center shadow-[0_0_20px_rgba(244,63,94,0.15)]">
-                      <div className="absolute inset-x-6 top-10 bottom-10 bg-white rounded-lg shadow-[0_0_20px_rgba(255,255,255,0.9)] flex flex-col items-center justify-center text-black font-mono text-xs font-extrabold">
-                        <span>BIT 1: CHANGE</span>
-                        <span className="text-[10px] font-normal text-slate-700">24,500 m² Inundated</span>
-                      </div>
-                    </div>
-                    <span className="text-[11px] font-mono text-slate-400 mt-3">
-                      Siamese Feature Difference Matrix • Resolution: 512×512 px
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500 mb-3" />
+                    <span className="text-[11px] font-mono text-slate-400">
+                      Awaiting Siamese Mask from backend...
+                    </span>
+                    <span className="text-[9px] font-mono text-slate-600 mt-1">
+                      Send a query to initialize matrix generation
                     </span>
                   </div>
                 )}
@@ -1551,7 +1567,6 @@ export default function BhuViksanaApp() {
         {isSidebarOpen && (
           <aside className="w-[410px] h-full bg-white border-l border-[#dadce0] flex flex-col justify-between z-30 shadow-[-4px_0_16px_rgba(0,0,0,0.06)] relative flex-shrink-0">
             <div className="flex-1 overflow-y-auto">
-              {/* Clean Nav Tabs */}
               <div className="flex items-center border-b border-[#dadce0] px-3 pt-3 text-xs font-semibold bg-white sticky top-0 z-10">
                 <button
                   onClick={() => setActiveWorkstationTab('rsvqa')}
@@ -1586,7 +1601,7 @@ export default function BhuViksanaApp() {
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-[#188038]" />
                   <span className="text-xs font-medium text-[#3c4043]">
-                    Pipeline: {targetMethod === 'bitemporal' ? 'OPEN-CD BITEMPORAL SIAMESE' : targetMethod === 'opticalsar' ? 'CROSS-ATTENTION OPTICAL-SAR' : 'GEOCHAT-7B VQA & GROUNDING'}
+                    Pipeline: {targetMethod === 'bitemporal' || (activeScenario.includes('Assam') && activeViewTool === 'tripane') ? 'OPEN-CD (BI-TEMPORAL SIAMESE)' : targetMethod === 'opticalsar' ? 'CROSS-ATTENTION OPTICAL-SAR' : 'GEOCHAT-7B VQA & GROUNDING'}
                   </span>
                 </div>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#e6f4ea] text-[#137333]">
@@ -1596,7 +1611,6 @@ export default function BhuViksanaApp() {
 
               {/* Chat & Grounded Entities */}
               <div className="p-4 space-y-4">
-                {/* Chat Stream */}
                 <div className="space-y-3">
                   {chatMessages.map((msg, idx) => (
                     <div
@@ -1613,6 +1627,11 @@ export default function BhuViksanaApp() {
                       {msg.text}
                     </div>
                   ))}
+                  {isLoading && (
+                    <div className="flex items-center gap-2 text-xs font-mono text-[#1a73e8] p-2">
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" /> Querying Siamese Model Engine...
+                    </div>
+                  )}
                 </div>
 
                 {/* Identified Feature Entities List */}
@@ -1668,7 +1687,8 @@ export default function BhuViksanaApp() {
                 />
                 <button
                   onClick={handleSendMessage}
-                  className="p-1.5 rounded-full bg-[#1a73e8] hover:bg-[#1557b0] text-white transition"
+                  disabled={isLoading || !chatInput.trim()}
+                  className="p-1.5 rounded-full bg-[#1a73e8] hover:bg-[#1557b0] text-white disabled:opacity-40 transition"
                   title="Send Query"
                 >
                   <Send className="w-3 h-3" />
