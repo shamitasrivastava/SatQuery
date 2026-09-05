@@ -501,7 +501,7 @@ export default function BhuViksanaApp() {
       return;
     }
     if (f1 && !f2) {
-      setDetectedPipeline('Single Swath detected ΓåÆ Routed to Falcon-0.7B-RS (Single RS-VQA)');
+      setDetectedPipeline('Single Swath detected → Routed to Falcon-0.7B-RS (Single RS-VQA)');
       if (targetMethod === 'auto') {
         setActiveWorkstationTab('rsvqa');
         setActiveViewTool('single');
@@ -511,9 +511,9 @@ export default function BhuViksanaApp() {
     if (f1 && f2) {
       const nameCheck = (f1.name + ' ' + f2.name).toLowerCase();
       if (nameCheck.includes('sar') || nameCheck.includes('sentinel-1') || nameCheck.includes('s1') || nameCheck.includes('radar')) {
-        setDetectedPipeline('SAR + Optical Swaths detected ΓåÆ Routed to Cross-Attention Optical-SAR Fusion');
+        setDetectedPipeline('SAR + Optical Swaths detected → Routed to Cross-Attention Optical-SAR Fusion');
       } else {
-        setDetectedPipeline('Dual Temporal Swaths detected (Pre/Post) ΓåÆ Routed to Open-CD Bi-Temporal Siamese');
+        setDetectedPipeline('Dual Temporal Swaths detected (Pre/Post) → Routed to Open-CD Bi-Temporal Siamese');
       }
       if (targetMethod === 'auto') {
         setActiveWorkstationTab('bitemporal');
@@ -973,10 +973,10 @@ export default function BhuViksanaApp() {
       await loadThreadsFromBackend();
     } catch (err: any) {
       console.warn("Send message API error:", err);
-      let aiReply = `Analyzed spatial viewport at ${liveCoords.lat}┬░N, ${liveCoords.lng}┬░E.`;
+      let aiReply = `Analyzed spatial viewport at ${liveCoords.lat}°N, ${liveCoords.lng}°E.`;
       if (userQ.toLowerCase().includes('area') || userQ.toLowerCase().includes('size') || userQ.toLowerCase().includes('metric')) {
         const totalArea = entities.reduce((acc, curr) => acc + curr.area_m2, 0);
-        aiReply = `Total identified grounded area across ${entities.length} sectors is ${totalArea.toLocaleString()} m┬▓ (${(totalArea / 1000000).toFixed(4)} km┬▓).`;
+        aiReply = `Total identified grounded area across ${entities.length} sectors is ${totalArea.toLocaleString()} m² (${(totalArea / 1000000).toFixed(4)} km²).`;
       } else if (userQ.toLowerCase().includes('ship') || userQ.toLowerCase().includes('vessel') || userQ.toLowerCase().includes('port')) {
         aiReply = `Grounded 2 marine vessels at berths with model confidence >97.5%. Berthing berths verified.`;
       } else {
@@ -1344,7 +1344,7 @@ export default function BhuViksanaApp() {
           </div>
           <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs text-slate-700 font-mono">
             <ShieldCheck className="w-4 h-4 text-[#0284c7]" />
-            <span className="hidden md:inline">NIC Security Certified ΓÇó AES-256</span>
+            <span className="hidden md:inline">NIC Security Certified • AES-256</span>
           </div>
         </header>
 
@@ -1440,9 +1440,9 @@ export default function BhuViksanaApp() {
                     onChange={(e) => setAgencyCode(e.target.value)}
                     className="w-full text-xs font-medium text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 outline-none focus:border-[#0284c7] focus:bg-white transition appearance-none cursor-pointer"
                   >
-                    <option value="ISRO-SAC">ISRO ΓÇö Space Applications Centre (SAC)</option>
-                    <option value="ISRO-NRSC">ISRO ΓÇö National Remote Sensing Centre (NRSC)</option>
-                    <option value="NDRF-HQ">NDRF ΓÇö Disaster Response Command</option>
+                    <option value="ISRO-SAC">ISRO — Space Applications Centre (SAC)</option>
+                    <option value="ISRO-NRSC">ISRO — National Remote Sensing Centre (NRSC)</option>
+                    <option value="NDRF-HQ">NDRF — Disaster Response Command</option>
                     <option value="STATE-DMA">State Disaster Management Authority (SDMA)</option>
                     <option value="SIH-JURY">SIH2026 Evaluation Panel / Auditor</option>
                   </select>
@@ -1477,7 +1477,7 @@ export default function BhuViksanaApp() {
                     type={showPassword ? 'text' : 'password'}
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
-                    placeholder="ΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇó"
+                    placeholder="••••••••••••"
                     required
                     className="w-full text-xs text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 pl-10 pr-10 outline-none focus:border-[#0284c7] focus:bg-white transition"
                   />
@@ -1794,7 +1794,7 @@ export default function BhuViksanaApp() {
                     <span className="truncate">{item.pipeline}</span>
                   </div>
                   <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100/80 text-[10px] text-slate-400 font-mono">
-                    <span>{item.coordinates.lat.toFixed(3)}┬░N, {item.coordinates.lng.toFixed(3)}┬░E</span>
+                    <span>{item.coordinates.lat.toFixed(3)}°N, {item.coordinates.lng.toFixed(3)}°E</span>
                     <span className="text-[#188038] font-bold">{item.entitiesCount} Grounded</span>
                   </div>
                 </div>
@@ -2014,7 +2014,7 @@ export default function BhuViksanaApp() {
                 {canvasResponse && !isLoading && (
                   <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs">
                     <span className="text-[11px] text-slate-400 font-mono">
-                      Fallback Engine ΓÇó No Image Swaths Attached
+                      Fallback Engine • No Image Swaths Attached
                     </span>
                     <div className="flex items-center gap-2">
                       <button
@@ -2313,7 +2313,7 @@ export default function BhuViksanaApp() {
                   }}
                 >
                   <span className="absolute -top-6 left-0 text-[10px] font-sans font-medium px-2 py-0.5 bg-white text-[#1a73e8] border border-[#dadce0] rounded-full shadow whitespace-nowrap">
-                    {det.name} ΓÇó {(det.confidence * 100).toFixed(1)}%
+                    {det.name} — {(det.confidence * 100).toFixed(1)}%
                   </span>
                 </div>
               ))}
@@ -2364,7 +2364,7 @@ export default function BhuViksanaApp() {
 
           {/* Bottom Coordinates Telemetry Stamp */}
           <div className="absolute bottom-2 right-4 z-[400] text-[11px] font-mono text-[#5f6368] bg-white/85 backdrop-blur-md px-2.5 py-0.5 rounded-full shadow-sm border border-[#dadce0]">
-            {liveCoords.lat.toFixed(4)}┬░N, {liveCoords.lng.toFixed(4)}┬░E ΓÇó Zoom: {liveCoords.zoom}x
+            {liveCoords.lat.toFixed(4)}°N, {liveCoords.lng.toFixed(4)}°E • Zoom: {liveCoords.zoom}x
           </div>
 
           {/* Floating Sidebar Toggle Handle */}
@@ -2498,7 +2498,7 @@ export default function BhuViksanaApp() {
                         Identified Features ({entities.length})
                       </span>
                       <span className="text-xs font-semibold text-[#1a73e8]">
-                        {entities.reduce((a, b) => a + b.area_m2, 0).toLocaleString()} m┬▓ Total
+                        {entities.reduce((a, b) => a + b.area_m2, 0).toLocaleString()} m² Total
                       </span>
                     </div>
 
@@ -2516,7 +2516,7 @@ export default function BhuViksanaApp() {
                             <div>
                               <div className="text-xs font-semibold text-[#202124]">{item.name}</div>
                               <div className="text-[11px] text-[#5f6368] font-mono">
-                                Footprint: {item.area_m2.toLocaleString()} m┬▓
+                                Footprint: {item.area_m2.toLocaleString()} m²
                               </div>
                             </div>
                           </div>
