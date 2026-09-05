@@ -37,8 +37,7 @@ import {
   Binary,
   Radio,
   PhoneCall,
-  KeyRound,
-  UserCheck
+  KeyRound
 } from 'lucide-react';
 import * as GeoTIFF from 'geotiff';
 import { jsPDF } from 'jspdf';
@@ -103,7 +102,6 @@ export default function BhuViksanaApp() {
   const [resetError, setResetError] = useState('');
   const [resetSuccess, setResetSuccess] = useState(false);
 
-  // Helper: Extract initial
   const getUserInitial = () => {
     if (!loginEmail) return 'U';
     const clean = loginEmail.trim().toUpperCase();
@@ -348,7 +346,7 @@ export default function BhuViksanaApp() {
       setChatMessages([
         {
           sender: 'ai',
-          text: `Autonomous router initialized [Pipeline: ${effectiveMethod.toUpperCase()}]. Active raster swath loaded. Ask a question or request feature segmentation.`
+          text: `Autonomous router initialized [Pipeline: ${effectiveMethod.toUpperCase()}]. Active raster swath loaded cleanly.`
         }
       ]);
     }
@@ -468,11 +466,98 @@ export default function BhuViksanaApp() {
           }
         ]);
       } else {
-        aiReply = `Processed query: "${userQ}". Grounded primary sector.`;
+        aiReply = `Processed query: "${userQ}". Grounded primary visual sector.`;
       }
       setChatMessages((prev) => [...prev, { sender: 'ai', text: aiReply }]);
       setIsLoading(false);
     }, 400);
+  };
+
+  // -------------------------------------------------------------
+  // PDF REPORT EXPORT FUNCTION
+  // -------------------------------------------------------------
+  const handleExportPDF = () => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    // Primary Header Banner
+    doc.setFillColor(26, 115, 232);
+    doc.rect(0, 0, pageWidth, 28, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.setTextColor(255, 255, 255);
+    doc.text('BHUVIKSANA AI - NATIONAL GEOSPATIAL INTELLIGENCE BRIEFING', 14, 13);
+    doc.setFontSize(8.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(232, 240, 254);
+    doc.text('DEPARTMENT OF SPACE • ISRO SIH26167 • RESTRICTED GOVERNMENT BRIEFING', 14, 21);
+
+    // 1. Acquisition Metadata
+    doc.setTextColor(32, 33, 36);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text('1. OPERATIONAL TELEMETRY & ACQUISITION METADATA', 14, 38);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.text(`Target Scenario   : ${activeScenario}`, 14, 46);
+    doc.text(`Acquisition GPS   : ${liveCoords.lat.toFixed(4)}° N, ${liveCoords.lng.toFixed(4)}° E (Zoom: ${liveCoords.zoom}x)`, 14, 52);
+    doc.text(`Active Pipeline   : ${targetMethod === 'bitemporal' ? 'Open-CD (Bi-Temporal Siamese)' : targetMethod === 'opticalsar' ? 'Cross-Attention Optical-SAR' : 'Falcon-0.7B-RS (Single RS-VQA)'}`, 14, 58);
+    doc.text(`Operator Unit     : ${agencyCode} (${loginEmail})`, 14, 64);
+    doc.text(`Timestamp         : ${new Date().toUTCString()}`, 14, 70);
+
+    // 2. Grounded Entities Table
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.text(`2. GROUNDED VECTOR ENTITIES (${entities.length})`, 14, 82);
+
+    doc.setFillColor(241, 243, 244);
+    doc.rect(14, 86, pageWidth - 28, 8, 'F');
+    doc.setFontSize(8.5);
+    doc.setTextColor(32, 33, 36);
+    doc.text('ID', 18, 91);
+    doc.text('Identified Feature', 30, 91);
+    doc.text('Confidence', 110, 91);
+    doc.text('Footprint (m²)', 145, 91);
+
+    let y = 100;
+    entities.forEach((item, index) => {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.text(String(index + 1), 18, y);
+      doc.text(item.name, 30, y);
+      doc.text(`${(item.confidence * 100).toFixed(1)}%`, 110, y);
+      doc.text(`${item.area_m2.toLocaleString()} m²`, 145, y);
+      y += 8;
+    });
+
+    if (entities.length === 0) {
+      doc.setFont('helvetica', 'italic');
+      doc.setFontSize(8.5);
+      doc.setTextColor(128, 134, 139);
+      doc.text('No critical vector anomalies flagged in active viewport.', 30, y);
+      y += 8;
+    }
+
+    // 3. AI Reasoning
+    y += 6;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(32, 33, 36);
+    doc.text('3. AI REASONING & EXECUTIVE ASSESSMENT', 14, y);
+
+    y += 8;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    const lastAiMessage = chatMessages.slice().reverse().find((m) => m.sender === 'ai')?.text || 'Zero critical anomalies detected.';
+    const splitSummary = doc.splitTextToSize(lastAiMessage, pageWidth - 28);
+    doc.text(splitSummary, 14, y);
+
+    // Footer
+    doc.setFontSize(7.5);
+    doc.setTextColor(128, 134, 139);
+    doc.text('Generated via BhuViksana AI Autonomous Intelligence Pipeline • AES-256 Encrypted Telemetry', 14, 285);
+
+    doc.save(`BhuViksana_Briefing_${Date.now()}.pdf`);
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -732,9 +817,8 @@ export default function BhuViksanaApp() {
             </nav>
           </div>
 
-          {/* ⬇️ BOTTOM USER PROFILE BUTTON WITH INITIALS & POPUP ⬇️ */}
+          {/* BOTTOM USER PROFILE BUTTON WITH INITIALS & POPUP */}
           <div className="flex flex-col items-center gap-3 relative">
-            {/* Popover Card */}
             {showUserPopover && (
               <div className="absolute bottom-2 left-16 z-50 w-72 bg-white rounded-2xl border border-slate-200 shadow-2xl p-4 animate-in fade-in zoom-in-95 duration-150">
                 <div className="flex items-center gap-3 pb-3 border-b border-slate-100">
@@ -778,7 +862,6 @@ export default function BhuViksanaApp() {
               </div>
             )}
 
-            {/* Circular Avatar Button */}
             <button
               onClick={() => setShowUserPopover(!showUserPopover)}
               className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#0284c7] to-cyan-500 text-white font-bold text-sm shadow-md hover:scale-105 active:scale-95 transition flex items-center justify-center ring-2 ring-white border border-cyan-300"
@@ -787,7 +870,6 @@ export default function BhuViksanaApp() {
               {getUserInitial()}
             </button>
 
-            {/* Direct Sign Out */}
             <button
               onClick={() => setCurrentPage('login')}
               title="Sign Out"
@@ -902,13 +984,14 @@ export default function BhuViksanaApp() {
   }
 
   // =========================================================================
-  // PAGE 3: WORKSTATION VIEW
+  // PAGE 3: WORKSTATION VIEW (WITH EXPORT BRIEFING RESTORED)
   // =========================================================================
   return (
     <div
       className="flex h-screen w-screen overflow-hidden bg-[#e5e3df] font-sans text-[#202124] select-none relative"
       onMouseUp={() => { isDraggingSwipe.current = false; }}
     >
+      {/* TOP-LEFT TOOLBAR */}
       <div className="absolute top-4 left-4 z-[400] flex flex-col gap-2 pointer-events-auto max-w-[calc(100vw-32px)]">
         <div className="flex items-center h-12 bg-white rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.2)] border border-[#dadce0] px-3 gap-2 w-[360px] sm:w-[390px]">
           <button onClick={() => setCurrentPage('canvas')} className="p-1.5 rounded-full hover:bg-[#f1f3f4] text-[#5f6368] transition">
@@ -965,10 +1048,11 @@ export default function BhuViksanaApp() {
         </div>
       </div>
 
-      {/* VIEWPORT CANVAS */}
+      {/* MAP CANVAS VIEWPORT */}
       <div className="flex flex-1 h-full w-full relative">
         <div ref={containerRef} onMouseMove={handleMouseMove} className="flex-1 relative bg-[#e5e3df] overflow-hidden select-none">
           
+          {/* FLOATING ACTION PILLS: SMS ALERT + AUDIT TRACE + EXPORT BRIEFING */}
           <div className="absolute top-4 right-4 z-[400] flex items-center gap-2 pointer-events-auto">
             <button
               onClick={() => setShowSmsModal(true)}
@@ -986,8 +1070,19 @@ export default function BhuViksanaApp() {
               <Activity className="w-3.5 h-3.5 text-[#1a73e8]" />
               <span>Audit Trace</span>
             </button>
+
+            {/* ⬇️ RESTORED EXPORT TO PDF REPORT BUTTON ⬇️ */}
+            <button
+              onClick={handleExportPDF}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#1a73e8] hover:bg-[#1557b0] text-xs font-semibold text-white shadow-[0_2px_6px_rgba(0,0,0,0.2)] transition active:scale-95"
+              title="Export Full PDF Intelligence Briefing"
+            >
+              <FileDown className="w-3.5 h-3.5" />
+              <span>Export Briefing</span>
+            </button>
           </div>
 
+          {/* SPLIT / CANVASES */}
           {activeViewTool === 'tripane' ? (
             <div className="w-full h-full grid grid-cols-3 gap-1.5 bg-slate-950 p-2.5">
               <div className="relative w-full h-full rounded-2xl overflow-hidden border border-slate-800 bg-black flex flex-col shadow-inner">
@@ -1033,12 +1128,20 @@ export default function BhuViksanaApp() {
             )
           )}
 
+          {/* TELEMETRY STAMP */}
           <div className="absolute bottom-2 right-4 z-[400] text-[11px] font-mono text-[#5f6368] bg-white/85 backdrop-blur-md px-2.5 py-0.5 rounded-full shadow-sm border border-[#dadce0]">
             {liveCoords.lat.toFixed(4)}°N, {liveCoords.lng.toFixed(4)}°E • Zoom: {liveCoords.zoom}x
           </div>
+
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="absolute top-1/2 -translate-y-1/2 right-0 z-[450] bg-white hover:bg-[#f8f9fa] border-y border-l border-[#dadce0] py-3 px-1 rounded-l-xl text-[#5f6368] shadow transition"
+          >
+            {isSidebarOpen ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+          </button>
         </div>
 
-        {/* SIDEBAR */}
+        {/* DETAILS SIDEBAR */}
         {isSidebarOpen && (
           <aside className="w-[410px] h-full bg-white border-l border-[#dadce0] flex flex-col justify-between z-30 relative flex-shrink-0">
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -1056,6 +1159,22 @@ export default function BhuViksanaApp() {
                     {msg.text}
                   </div>
                 ))}
+              </div>
+
+              <div className="pt-2">
+                <span className="text-xs font-bold text-[#3c4043] uppercase tracking-wider block mb-2">
+                  Identified Features ({entities.length})
+                </span>
+                <div className="space-y-2">
+                  {entities.map((item) => (
+                    <div key={item.id} className="flex items-center justify-between p-3 rounded-xl bg-white border border-[#dadce0] shadow-sm">
+                      <div className="text-xs font-semibold text-[#202124]">{item.name}</div>
+                      <div className="text-xs font-bold text-[#188038] bg-[#e6f4ea] px-2 py-0.5 rounded-md">
+                        {(item.confidence * 100).toFixed(1)}%
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -1144,6 +1263,26 @@ export default function BhuViksanaApp() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* AUDIT TRACE MODAL */}
+      {showAuditModal && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
+          <div className="w-full max-w-lg bg-white border border-[#dadce0] rounded-[24px] p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-[#dadce0] pb-3">
+              <h3 className="text-sm font-semibold text-[#202124]">Execution Telemetry & Audit Log</h3>
+              <button onClick={() => setShowAuditModal(false)} className="p-1 rounded-full text-[#5f6368] hover:bg-[#f1f3f4]">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="text-xs text-[#3c4043]">Aligned sensor array to 512x512 tile patches with EPSG:4326 CRS coordinates.</div>
+            <div className="pt-2 flex justify-end">
+              <button onClick={() => setShowAuditModal(false)} className="px-4 py-2 bg-[#1a73e8] text-xs font-semibold text-white rounded-full">
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
