@@ -43,6 +43,9 @@ import {
   Flame,
   Terminal,
   Clock,
+  FileImage,
+  Map as MapIcon,
+  Globe
 } from 'lucide-react';
 import autoTable from 'jspdf-autotable';
 import * as GeoTIFF from 'geotiff';
@@ -121,6 +124,7 @@ interface HistoryItem {
 
 export default function BhuViksanaApp() {
   const [currentPage, setCurrentPage] = useState<'login' | 'canvas' | 'workstation' | 'reset-password'>('login');
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [isClient, setIsClient] = useState(false);
 
   const navigateTo = (page: 'login' | 'canvas' | 'workstation' | 'reset-password') => {
@@ -1296,7 +1300,7 @@ export default function BhuViksanaApp() {
     doc.setFontSize(7.5);
     doc.setTextColor(100, 116, 139);
     doc.text('Geo-Analytics & Earth Observation Division', signX + 48, signY + 4, { align: 'right' });
-    doc.text('Bhuviksana Platform', signX + 48, signY + 8, { align: 'right' });
+    doc.text('BHUVIKSANA Platform', signX + 48, signY + 8, { align: 'right' });
 
     renderFooter(2);
 
@@ -1316,35 +1320,33 @@ export default function BhuViksanaApp() {
   // =========================================================================
   if (currentPage === 'login') {
     return (
-      <div className="flex flex-col min-h-screen w-screen overflow-hidden font-sans select-none relative justify-between animated-gradient-bg">
+      <div 
+        className="flex flex-col min-h-screen w-screen overflow-hidden font-sans select-none relative justify-between scale-100 origin-top animated-gradient-bg"
+        style={{
+          height: '100vh'
+        }}
+      >
         <div className="absolute -top-[6%] -left-[6%] w-[34rem] h-[34rem] rounded-full bg-[#f97316] blur-[95px] pointer-events-none opacity-30 blob-wave-orange" />
         <div className="absolute -bottom-[8%] -right-[6%] w-[36rem] h-[36rem] rounded-full bg-[#0284c7] blur-[100px] pointer-events-none opacity-30 blob-wave-blue" />
 
-        <header className="w-full bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-8 py-5 flex items-center justify-between shadow-sm z-30 relative">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-3">
-              <img src="/isro-logo.png" alt="ISRO Logo" className="h-14 w-auto object-contain" />
-              <div className="hidden sm:flex flex-col text-left leading-tight">
-                <span className="text-sm font-bold text-slate-800 tracking-tight uppercase">Department of Space</span>
-                <span className="text-xs font-medium text-slate-500">Government of India</span>
+        <header className="w-full bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 py-3 flex items-center justify-between shadow-sm z-30 relative">
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2.5">
+              <img src="/isro-logo.png" alt="ISRO Logo" className="h-11 w-auto object-contain" />
+              <div className="flex flex-col text-left leading-tight">
+                <span className="text-[11px] font-bold text-slate-900 tracking-tight uppercase">DEPARTMENT OF SPACE</span>
+                <span className="text-[10px] font-medium text-slate-500">Government of India</span>
               </div>
             </div>
-            <div className="h-10 w-[1px] bg-slate-300 hidden sm:block" />
-            <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="BhuViksana Logo" className="h-12 w-auto object-contain drop-shadow-sm" />
-              <div className="flex flex-col text-left">
-                <span className="text-lg font-extrabold text-slate-900 tracking-tight leading-none">
-                  BhuViksana <span className="text-sm font-mono text-[#0284c7]">AI</span>
-                </span>
-                <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mt-1">
-                  Earth Observation Portal
-                </span>
-              </div>
+            
+            <div className="h-7 w-[1px] bg-slate-300 ml-1.5 mr-0.5 hidden sm:block" />
+
+            <div className="flex items-center gap-2 ml-1">
+              <img src="/logo.png" alt="BhuViksana Logo" className="h-9 w-auto object-contain drop-shadow-sm scale-105" />
+              <span className="text-base font-extrabold text-[#0284c7] tracking-tight leading-none">
+                BhuViksana
+              </span>
             </div>
-          </div>
-          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs text-slate-700 font-mono">
-            <ShieldCheck className="w-4 h-4 text-[#0284c7]" />
-            <span className="hidden md:inline">NIC Security Certified • AES-256</span>
           </div>
         </header>
 
@@ -1431,14 +1433,13 @@ export default function BhuViksanaApp() {
                   </div>
                 </>
               )}
-
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5 text-left">Designated Command Unit</label>
+                <label className="block text-[11px] font-semibold text-slate-700 mb-1 text-left">Designated Command Unit</label>
                 <div className="relative">
                   <select
                     value={agencyCode}
                     onChange={(e) => setAgencyCode(e.target.value)}
-                    className="w-full text-xs font-medium text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 outline-none focus:border-[#0284c7] focus:bg-white transition appearance-none cursor-pointer"
+                    className="w-full text-xs font-medium text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 outline-none focus:border-[#0284c7] focus:bg-white transition appearance-none cursor-pointer"
                   >
                     <option value="ISRO-SAC">ISRO — Space Applications Centre (SAC)</option>
                     <option value="ISRO-NRSC">ISRO — National Remote Sensing Centre (NRSC)</option>
@@ -1446,12 +1447,12 @@ export default function BhuViksanaApp() {
                     <option value="STATE-DMA">State Disaster Management Authority (SDMA)</option>
                     <option value="SIH-JURY">SIH2026 Evaluation Panel / Auditor</option>
                   </select>
-                  <Building2 className="w-4 h-4 text-slate-400 absolute right-3.5 top-3 pointer-events-none" />
+                  <Building2 className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-2.5 pointer-events-none" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5 text-left">Official Government Email ID</label>
+                <label className="block text-[11px] font-semibold text-slate-700 mb-1 text-left">Official Government Email ID</label>
                 <div className="relative">
                   <input
                     type="email"
@@ -1459,9 +1460,9 @@ export default function BhuViksanaApp() {
                     onChange={(e) => setLoginEmail(e.target.value)}
                     placeholder="officer.name@isro.gov.in / @nic.in"
                     required
-                    className="w-full text-xs text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 pl-10 outline-none focus:border-[#0284c7] focus:bg-white transition"
+                    className="w-full text-xs text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 pl-9 outline-none focus:border-[#0284c7] focus:bg-white transition"
                   />
-                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                  <Mail className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                 </div>
               </div>
 
@@ -1479,15 +1480,15 @@ export default function BhuViksanaApp() {
                     onChange={(e) => setLoginPassword(e.target.value)}
                     placeholder="••••••••••••"
                     required
-                    className="w-full text-xs text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 pl-10 pr-10 outline-none focus:border-[#0284c7] focus:bg-white transition"
+                    className="w-full text-xs text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 pl-9 pr-9 outline-none focus:border-[#0284c7] focus:bg-white transition"
                   />
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                  <Lock className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-600 focus:outline-none"
+                    className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 focus:outline-none"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                   </button>
                 </div>
               </div>
@@ -1495,7 +1496,7 @@ export default function BhuViksanaApp() {
               <button
                 type="submit"
                 disabled={authLoading}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-semibold shadow-md active:scale-[0.98] transition mt-2 disabled:opacity-60"
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-semibold shadow-md active:scale-[0.98] transition mt-2 disabled:opacity-60 cursor-pointer"
               >
                 {authLoading ? (
                   <>
@@ -1519,11 +1520,8 @@ export default function BhuViksanaApp() {
           </div>
         </main>
 
-        <footer className="w-full bg-slate-900/90 backdrop-blur-md border-t border-slate-800 text-slate-300 py-3 px-6 text-center text-xs z-30 relative">
-          <p className="max-w-4xl mx-auto leading-normal">
-            <span className="font-bold text-white">Official Notice: </span>
-            Authorized access only for ISRO, NRSC, and State Disaster Command personnel under the Information Technology Act, 2000. All access activities and telemetry queries are monitored and audited.
-          </p>
+        <footer className="w-full bg-[#070b13] text-slate-300 py-2.5 px-6 text-center text-[10px] font-medium border-t border-slate-800 z-30 relative">
+          Official Notice: Authorized access only for ISRO, NRSC, and State Disaster Command personnel under the Information Technology Act, 2000. All access activities and telemetry queries are monitored and audited.
         </footer>
 
         <style jsx>{`
@@ -1814,37 +1812,35 @@ export default function BhuViksanaApp() {
         )}
 
         {/* MAIN CANVAS */}
-        <main className="flex-1 flex flex-col items-center p-6 sm:p-8 relative z-10 overflow-y-auto">
-          <div className="w-full max-w-3xl mx-auto flex flex-col items-center space-y-6 my-auto">
+        <main className="flex-1 flex flex-col justify-center items-center p-8 relative z-10 overflow-y-auto">
+          {/* WATERMARK BACKGROUND LOGO */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.035] transform scale-150">
+            <img src="/logo.png" alt="Watermark" className="w-[520px] h-[520px] object-contain" />
+          </div>
+
+          <div className="w-full max-w-3xl mx-auto flex flex-col items-center space-y-6 relative z-10">
             <h1 className="text-4xl font-semibold tracking-tight text-center text-slate-900 leading-snug">
               <span className="text-[#0284c7]">Good Afternoon,</span> What Satellite<br />
               scene you would like to <span className="text-[#f37021]">Discover?</span>
             </h1>
 
             <div className="w-full bg-white rounded-[24px] border border-slate-200/80 shadow-[0_12px_40px_-15px_rgba(0,0,0,0.08)] p-6 space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-slate-800 text-xs">Model Pipeline Mode</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#e8f0fe] text-[#1a73e8] font-mono">
-                    Autonomous Dispatcher
-                  </span>
-                </div>
-
-                <div className="relative">
+              <div className="flex justify-end">
+                <div className="relative w-[340px]">
                   <select
                     value={targetMethod}
                     onChange={(e) => {
                       setTargetMethod(e.target.value as any);
                       autoDetectPipeline(fileT1, fileT2);
                     }}
-                    className="text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 pr-9 outline-none focus:border-[#0284c7] focus:bg-white transition cursor-pointer appearance-none shadow-sm"
+                    className="w-full text-sm font-semibold text-slate-900 bg-slate-50 border border-slate-400/80 rounded-xl px-4 py-2.5 pr-10 outline-none focus:border-[#0284c7] focus:bg-white transition appearance-none cursor-pointer shadow-sm"
                   >
-                    <option value="auto">Auto-Detect (Model routes by uploaded photos)</option>
-                    <option value="single">Single Swath (Falcon-0.7B-RS VQA)</option>
-                    <option value="bitemporal">Bi-Temporal (Open-CD Siamese Change Detection)</option>
-                    <option value="opticalsar">Optical SAR (Cross-Attention Fusion)</option>
+                    <option value="auto">Autodetect</option>
+                    <option value="single">Single Satellite Imagery</option>
+                    <option value="bitemporal">Bi-Temporal (Change Detection)</option>
+                    <option value="opticalsar">Optical and SAR Fusion</option>
                   </select>
-                  <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-2.5 pointer-events-none" />
+                  <ChevronDown className="w-4 h-4 text-slate-500 absolute right-3.5 top-3.5 pointer-events-none" />
                 </div>
               </div>
 
@@ -1876,8 +1872,12 @@ export default function BhuViksanaApp() {
               {/* MULTI-IMAGE UPLOAD ENGINE */}
               <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
                 <div className="flex items-center gap-2">
-                  <label className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 cursor-pointer text-xs font-medium text-slate-700 transition">
-                    <UploadCloud className="w-4 h-4 text-[#0284c7]" />
+                  <label className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-semibold shadow-sm transition cursor-pointer ${
+                    (fileT1 || fileT2)
+                      ? 'bg-[#1a73e8] border-[#1a73e8] text-white shadow-md'
+                      : 'bg-slate-50 border-slate-300 text-slate-700 hover:bg-slate-100'
+                  }`}>
+                    <UploadCloud className={`w-4 h-4 ${(fileT1 || fileT2) ? 'text-white' : 'text-[#0284c7]'}`} />
                     <span>
                       {fileT1 && fileT2
                         ? `${fileT1.name.slice(0, 10)}... + ${fileT2.name.slice(0, 10)}...`
@@ -2036,9 +2036,11 @@ export default function BhuViksanaApp() {
               </div>
             )}
 
-            {/* PRE-CONFIGURED BENCHMARK SCENARIOS */}
-            <div className="flex flex-col items-center gap-2 pt-2">
-              <span className="text-xs text-slate-400 font-medium">Or load an operational remote sensing scenario:</span>
+            {/* USE CASES PROMPT LINE & SCENARIO BUTTONS */}
+            <div className="w-full flex flex-col items-center space-y-3 pt-2">
+              <span className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
+                Explore Real-World Remote-Sensing Use Cases
+              </span>
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => handleLoadScenario('port')}
@@ -2145,6 +2147,30 @@ export default function BhuViksanaApp() {
             <span>Swipe Tool</span>
           </button>
         </div>
+
+        {/* CONDITIONAL SATELLITE & STREET MAP TOGGLE FOR VISAKHAPATNAM & ASSAM PRESETS */}
+        {(activeScenario.includes('Visakhapatnam') || activeScenario.includes('Assam')) && (
+          <div className="flex items-center bg-white/95 backdrop-blur-md rounded-full shadow-md border border-slate-200 p-0.5 w-fit">
+            <button
+              onClick={() => setBaseMapType('esri')}
+              className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold transition ${
+                baseMapType === 'esri' ? 'bg-[#1a73e8] text-white' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Globe className="w-3 h-3" />
+              <span>Satellite View</span>
+            </button>
+            <button
+              onClick={() => setBaseMapType('osm')}
+              className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold transition ${
+                baseMapType === 'osm' ? 'bg-[#1a73e8] text-white' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <MapIcon className="w-3 h-3" />
+              <span>Street Map View</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 2. MAP CANVAS VIEWPORT */}
@@ -2152,7 +2178,7 @@ export default function BhuViksanaApp() {
         <div
           ref={containerRef}
           onMouseMove={handleMouseMove}
-          className="flex-1 relative bg-[#e5e3df] overflow-hidden select-none"
+          className="flex-1 relative bg-[#090d16] overflow-hidden select-none"
         >
           {/* FLOATING ACTION PILLS */}
           <div className="absolute top-4 right-4 z-[400] flex items-center gap-2 pointer-events-auto">
@@ -2191,17 +2217,18 @@ export default function BhuViksanaApp() {
           {activeViewTool === 'tripane' ? (
             <div className="w-full h-full grid grid-cols-3 gap-1.5 bg-slate-950 p-2.5">
               
-              {/* PANE 1: PRE-EVENT (T1) */}
-              <div className="relative w-full h-full rounded-2xl overflow-hidden border border-slate-800 bg-black flex flex-col shadow-inner">
-                <div className="absolute top-3 left-3 z-10 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-mono text-cyan-400 border border-cyan-500/30 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-cyan-400" />
+              {/* PANEL 1: T1 IMAGE */}
+              <div className="relative w-full h-full rounded-xl overflow-hidden border border-slate-800/80 bg-black flex flex-col shadow-2xl">
+                <div className="absolute top-3 left-3 z-20 bg-black/85 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-cyan-300 border border-cyan-800/60 flex items-center gap-1.5 shadow">
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
                   <span>T1: Pre-Event Swath</span>
                 </div>
                 {t1DataUrl ? (
                   <img src={t1DataUrl} alt="T1 Pre-Event" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-slate-500 font-mono text-xs">
-                    Baseline Raster [Assam Brahmaputra Basin - Pre Flood]
+                  <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 text-xs">
+                    <FileImage className="w-7 h-7 mb-2 opacity-40" />
+                    <span>Baseline Raster [Assam Brahmaputra Basin - Pre Flood]</span>
                   </div>
                 )}
                 <div className="absolute bottom-3 left-3 z-10 text-[10px] font-mono text-slate-400 bg-black/75 px-2 py-0.5 rounded">
@@ -2209,17 +2236,18 @@ export default function BhuViksanaApp() {
                 </div>
               </div>
 
-              {/* PANE 2: POST-EVENT (T2) */}
-              <div className="relative w-full h-full rounded-2xl overflow-hidden border border-slate-800 bg-black flex flex-col shadow-inner">
-                <div className="absolute top-3 left-3 z-10 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-mono text-amber-400 border border-amber-500/30 flex items-center gap-1.5">
+              {/* PANEL 2: T2 IMAGE */}
+              <div className="relative w-full h-full rounded-xl overflow-hidden border border-slate-800/80 bg-black flex flex-col shadow-2xl">
+                <div className="absolute top-3 left-3 z-20 bg-black/85 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-amber-300 border border-amber-800/60 flex items-center gap-1.5 shadow">
                   <span className="w-2 h-2 rounded-full bg-amber-400" />
                   <span>T2: Post-Event Swath</span>
                 </div>
                 {t2DataUrl || t1DataUrl ? (
                   <img src={(t2DataUrl || t1DataUrl) ?? undefined} alt="T2 Post-Event" className="w-full h-full object-cover filter contrast-125" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-slate-500 font-mono text-xs">
-                    Target Raster [Assam Brahmaputra Basin - Inundated]
+                  <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 text-xs">
+                    <FileImage className="w-7 h-7 mb-2 opacity-40" />
+                    <span>Target Raster [Assam Brahmaputra Basin - Inundated]</span>
                   </div>
                 )}
                 <div className="absolute bottom-3 left-3 z-10 text-[10px] font-mono text-slate-400 bg-black/75 px-2 py-0.5 rounded">
@@ -2227,14 +2255,14 @@ export default function BhuViksanaApp() {
                 </div>
               </div>
 
-              {/* PANE 3: BIT-CD BINARY MAP (ACTIVE SILHOUETTE TRACE) */}
-              <div className="relative w-full h-full rounded-2xl overflow-hidden border border-rose-950/60 bg-black flex flex-col shadow-inner">
-                <div className="absolute top-3 left-3 z-10 bg-black/85 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-mono text-rose-400 border border-rose-500/40 flex items-center gap-1.5">
-                  <Binary className="w-3.5 h-3.5 text-rose-500 animate-pulse" />
-                  <span>Bit-CD: Binary Change Mask</span>
+              {/* PANEL 3: MASKING & BINARY MAP */}
+              <div className="relative w-full h-full rounded-xl overflow-hidden border border-rose-950/60 bg-black flex flex-col shadow-2xl">
+                <div className="absolute top-3 left-3 z-20 bg-rose-950/80 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-rose-400 border border-rose-800 flex items-center gap-1.5 shadow">
+                  <Binary className="w-3.5 h-3.5 text-rose-400 animate-pulse" />
+                  <span>Masking: Bit-CD Binary Change Mask</span>
                 </div>
 
-                <div className="absolute bottom-3 left-3 z-10 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-mono border border-slate-700 flex items-center gap-3">
+                <div className="absolute bottom-3 left-3 z-20 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-mono border border-slate-700 flex items-center gap-3">
                   <span className="flex items-center gap-1.5 text-slate-300">
                     <span className="w-2.5 h-2.5 rounded-sm bg-black border border-slate-500" /> [0] Unchanged
                   </span>
@@ -2265,6 +2293,11 @@ export default function BhuViksanaApp() {
           ) : t1DataUrl ? (
             /* CONDITION 2: UPLOADED SINGLE/SWIPE RASTER CANVAS */
             <div className="w-full h-full relative overflow-hidden flex items-center justify-center bg-black">
+              <div className="absolute top-3 left-3 z-20 bg-black/85 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-cyan-300 border border-cyan-800/60 flex items-center gap-1.5 shadow pointer-events-none">
+                <span className="w-2 h-2 rounded-full bg-cyan-400" />
+                <span>Single Satellite Imagery Viewport</span>
+              </div>
+
               <img
                 src={t2DataUrl || t1DataUrl}
                 alt="Post-Event"
@@ -2321,14 +2354,16 @@ export default function BhuViksanaApp() {
           ) : (
             /* CONDITION 3: STANDARD SATELLITE LEAFLET MAP VIEWPORT */
             isClient && (
-              <WorkstationMap
-                center={mapCenter}
-                zoom={mapZoom}
-                baseMapType={baseMapType}
-                showBBoxes={showBBoxes}
-                entities={entities}
-                onUpdate={handleMapUpdate}
-              />
+              <div className="w-full h-full relative">
+                <WorkstationMap
+                  center={mapCenter}
+                  zoom={mapZoom}
+                  baseMapType={baseMapType}
+                  showBBoxes={showBBoxes}
+                  entities={entities}
+                  onUpdate={handleMapUpdate}
+                />
+              </div>
             )
           )}
 
@@ -2531,9 +2566,43 @@ export default function BhuViksanaApp() {
               )}
             </div>
 
-            {/* Bottom Search / Assistant Input Bar */}
-            <div className="p-3 border-t border-[#dadce0] bg-white">
-              <div className="flex items-center gap-2 bg-[#f1f3f4] border border-[#dadce0] rounded-full px-3.5 py-1.5 focus-within:bg-white focus-within:border-[#1a73e8] focus-within:ring-1 focus-within:ring-[#1a73e8] transition">
+            {/* ACTION BUTTONS & CHAT INPUT */}
+            <div className="p-3 border-t border-slate-200 bg-white space-y-2.5">
+              <div className="flex items-center justify-between gap-1.5">
+                <button
+                  onClick={() => setCurrentPage('canvas')}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-[11px] font-semibold transition"
+                >
+                  <ArrowLeft className="w-3 h-3" />
+                  <span>Canvas</span>
+                </button>
+
+                <button
+                  onClick={() => setShowSmsModal(true)}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[#f43f5e] hover:bg-[#e11d48] text-[11px] font-semibold text-white shadow transition"
+                >
+                  <Radio className="w-3 h-3" />
+                  <span>SMS</span>
+                </button>
+
+                <button
+                  onClick={() => setShowAuditModal(true)}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[#10b981] hover:bg-[#059669] text-[11px] font-semibold text-white shadow transition"
+                >
+                  <Activity className="w-3 h-3" />
+                  <span>Audit</span>
+                </button>
+
+                <button
+                  onClick={handleExportPDF}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#1a73e8] hover:bg-[#1557b0] text-[11px] font-semibold text-white shadow transition"
+                >
+                  <FileDown className="w-3 h-3" />
+                  <span>Export</span>
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2 bg-slate-100 border border-slate-200 rounded-full px-3.5 py-1.5 focus-within:bg-white focus-within:border-[#1a73e8]">
                 <Sparkles className="w-4 h-4 text-[#1a73e8]" />
                 <input
                   type="text"
@@ -2632,7 +2701,7 @@ export default function BhuViksanaApp() {
           <div className="w-full max-w-xl bg-white text-slate-900 border border-slate-200 rounded-[24px] p-6 space-y-5 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <Activity className="w-5 h-5 text-[#1a73e8]" />
+                <Activity className="w-5 h-5 text-[#10b981]" />
                 <h3 className="text-base font-bold text-slate-900">Execution Telemetry & Audit Log</h3>
               </div>
               <button
@@ -2672,7 +2741,7 @@ export default function BhuViksanaApp() {
             <div className="pt-2 flex justify-end">
               <button
                 onClick={() => setShowAuditModal(false)}
-                className="px-6 py-2.5 bg-[#1a73e8] hover:bg-blue-600 text-xs font-semibold text-white rounded-xl shadow transition cursor-pointer"
+                className="px-6 py-2.5 bg-[#10b981] hover:bg-[#059669] text-xs font-semibold text-white rounded-xl shadow transition cursor-pointer"
               >
                 Close Audit Log
               </button>
