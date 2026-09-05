@@ -41,6 +41,7 @@ import {
 } from 'lucide-react';
 import * as GeoTIFF from 'geotiff';
 import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // Dynamic SSR-safe import of Leaflet Map
 const WorkstationMap = dynamic(() => import('@/components/WorkstationMap'), {
@@ -104,8 +105,7 @@ export default function BhuViksanaApp() {
 
   const getUserInitial = () => {
     if (!loginEmail) return 'U';
-    const clean = loginEmail.trim().toUpperCase();
-    return clean.charAt(0);
+    return loginEmail.trim().charAt(0).toUpperCase();
   };
 
   // -------------------------------------------------------------
@@ -315,6 +315,26 @@ export default function BhuViksanaApp() {
     }
   };
 
+  const handleFileT1Change = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setFileT1(file);
+      const url = await processRaster(file);
+      setT1DataUrl(url);
+      autoDetectPipeline(file, fileT2);
+    }
+  };
+
+  const handleFileT2Change = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setFileT2(file);
+      const url = await processRaster(file);
+      setT2DataUrl(url);
+      autoDetectPipeline(fileT1, file);
+    }
+  };
+
   const handleClearFiles = () => {
     setFileT1(null);
     setFileT2(null);
@@ -474,90 +494,323 @@ export default function BhuViksanaApp() {
   };
 
   // -------------------------------------------------------------
-  // PDF REPORT EXPORT FUNCTION
+  // HELPER: FETCH LOCAL /logo.png AS BASE64 FOR PDF
   // -------------------------------------------------------------
-  const handleExportPDF = () => {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-
-    // Primary Header Banner
-    doc.setFillColor(26, 115, 232);
-    doc.rect(0, 0, pageWidth, 28, 'F');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(13);
-    doc.setTextColor(255, 255, 255);
-    doc.text('BHUVIKSANA AI - NATIONAL GEOSPATIAL INTELLIGENCE BRIEFING', 14, 13);
-    doc.setFontSize(8.5);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(232, 240, 254);
-    doc.text('DEPARTMENT OF SPACE • ISRO SIH26167 • RESTRICTED GOVERNMENT BRIEFING', 14, 21);
-
-    // 1. Acquisition Metadata
-    doc.setTextColor(32, 33, 36);
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.text('1. OPERATIONAL TELEMETRY & ACQUISITION METADATA', 14, 38);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    doc.text(`Target Scenario   : ${activeScenario}`, 14, 46);
-    doc.text(`Acquisition GPS   : ${liveCoords.lat.toFixed(4)}° N, ${liveCoords.lng.toFixed(4)}° E (Zoom: ${liveCoords.zoom}x)`, 14, 52);
-    doc.text(`Active Pipeline   : ${targetMethod === 'bitemporal' ? 'Open-CD (Bi-Temporal Siamese)' : targetMethod === 'opticalsar' ? 'Cross-Attention Optical-SAR' : 'Falcon-0.7B-RS (Single RS-VQA)'}`, 14, 58);
-    doc.text(`Operator Unit     : ${agencyCode} (${loginEmail})`, 14, 64);
-    doc.text(`Timestamp         : ${new Date().toUTCString()}`, 14, 70);
-
-    // 2. Grounded Entities Table
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.text(`2. GROUNDED VECTOR ENTITIES (${entities.length})`, 14, 82);
-
-    doc.setFillColor(241, 243, 244);
-    doc.rect(14, 86, pageWidth - 28, 8, 'F');
-    doc.setFontSize(8.5);
-    doc.setTextColor(32, 33, 36);
-    doc.text('ID', 18, 91);
-    doc.text('Identified Feature', 30, 91);
-    doc.text('Confidence', 110, 91);
-    doc.text('Footprint (m²)', 145, 91);
-
-    let y = 100;
-    entities.forEach((item, index) => {
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8);
-      doc.text(String(index + 1), 18, y);
-      doc.text(item.name, 30, y);
-      doc.text(`${(item.confidence * 100).toFixed(1)}%`, 110, y);
-      doc.text(`${item.area_m2.toLocaleString()} m²`, 145, y);
-      y += 8;
+  const fetchImageAsBase64 = async (src: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth || img.width;
+        canvas.height = img.naturalHeight || img.height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0);
+          resolve(canvas.toDataURL('image/png'));
+        } else {
+          reject(new Error('Canvas context not available'));
+        }
+      };
+      img.onerror = (e) => reject(e);
+      img.src = src;
     });
+  };
 
-    if (entities.length === 0) {
-      doc.setFont('helvetica', 'italic');
-      doc.setFontSize(8.5);
-      doc.setTextColor(128, 134, 139);
-      doc.text('No critical vector anomalies flagged in active viewport.', 30, y);
-      y += 8;
+  // -------------------------------------------------------------
+  // PDF EXPORT EMBEDDING ACTUAL /logo.png
+  // -------------------------------------------------------------
+  const handleExportPDF = async () => {
+    let logoDataUrl = '';
+    try {
+      logoDataUrl = await fetchImageAsBase64('/logo.png');
+    } catch (e) {
+      console.warn('Could not load /logo.png from public directory, proceeding without image embed:', e);
     }
 
-    // 3. AI Reasoning
-    y += 6;
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 14;
+    const contentWidth = pageWidth - margin * 2;
+
+    const renderHeader = () => {
+      doc.setFillColor(226, 238, 249);
+      doc.setDrawColor(200, 220, 240);
+      doc.setLineWidth(0.4);
+      doc.rect(0, 0, pageWidth, 26, 'FD');
+
+      // Rounded container for logo
+      doc.setFillColor(255, 255, 255);
+      doc.setDrawColor(215, 225, 238);
+      doc.setLineWidth(0.3);
+      doc.roundedRect(margin, 5.5, 14, 15, 2.5, 2.5, 'FD');
+
+      if (logoDataUrl) {
+        doc.addImage(logoDataUrl, 'PNG', margin + 1.5, 7, 11, 12);
+      }
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.setTextColor(30, 58, 95);
+      doc.text('BHUVIKSANA', margin + 18, 13.5);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(71, 85, 105);
+      doc.text('Satellite Intelligence & Geo-Analytics Platform', margin + 18, 19.5);
+    };
+
+    const renderFooter = (pageNumber: number) => {
+      doc.setDrawColor(226, 232, 240);
+      doc.setLineWidth(0.35);
+      doc.line(margin, pageHeight - 14, pageWidth - margin, pageHeight - 14);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(140, 150, 165);
+      doc.text('BHUVIKSANA | Satellite Intelligence & Geo-Analytics Platform', margin, pageHeight - 9);
+      doc.text(`Page ${pageNumber}`, pageWidth - margin - 11, pageHeight - 9);
+    };
+
+    // PAGE 1: METADATA & SPECIFICATIONS
+    renderHeader();
+
+    let y = 33;
+    const cardHeight = 31;
+    doc.setFillColor(240, 246, 252);
+    doc.setDrawColor(200, 220, 240);
+    doc.setLineWidth(0.35);
+    doc.roundedRect(margin, y, contentWidth, cardHeight, 3, 3, 'FD');
+
+    const metadataItems: [string, string][] = [
+      ['Project Title:', 'Multi-Temporal Land Use / Land Cover (LULC) & Change Detection Analysis'],
+      ['Report Reference:', 'BVK/EO-AN/LULC/2026/048-A'],
+      ['Data Source:', 'Bhuviksana Analysis Engine (Cartosat-3 / Resourcesat-2 imagery)'],
+      ['Date of Issue:', 'September 5, 2026']
+    ];
+
+    let my = y + 6;
+    metadataItems.forEach(([label, value]) => {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8.5);
+      doc.setTextColor(2, 132, 199);
+      doc.text(label, margin + 5, my);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(30, 41, 59);
+      doc.text(value, margin + 40, my);
+      my += 6;
+    });
+
+    y += cardHeight + 8;
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.setTextColor(32, 33, 36);
-    doc.text('3. AI REASONING & EXECUTIVE ASSESSMENT', 14, y);
+    doc.setFontSize(10.5);
+    doc.setTextColor(2, 132, 199);
+    doc.text('1. SATELLITE DATA SPECIFICATIONS & METADATA', margin, y);
 
-    y += 8;
+    y += 5;
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.5);
-    const lastAiMessage = chatMessages.slice().reverse().find((m) => m.sender === 'ai')?.text || 'Zero critical anomalies detected.';
-    const splitSummary = doc.splitTextToSize(lastAiMessage, pageWidth - 28);
-    doc.text(splitSummary, 14, y);
+    doc.setFontSize(8);
+    doc.setTextColor(51, 65, 85);
+    const introParagraph = doc.splitTextToSize(
+      'This report presents the automated thematic extraction and radiometric analysis carried out on high-resolution satellite imagery for the selected target zone, generated through the Bhuviksana processing pipeline.',
+      contentWidth
+    );
+    doc.text(introParagraph, margin, y);
+    y += introParagraph.length * 4 + 2;
 
-    // Footer
+    autoTable(doc, {
+      startY: y,
+      margin: { left: margin, right: margin },
+      head: [['PARAMETER', 'SENSOR / PROCESSING SPECIFICATION']],
+      body: [
+        ['Satellite Mission', 'Resourcesat-2 / Cartosat-3 Constellation'],
+        ['Payload Sensor', 'Linear Imaging Self-Scanning Sensor (LISS-IV) & Panchromatic (PAN)'],
+        ['Path / Row Reference', 'Path 98, Row 54 (Sub-scene quadrant B)'],
+        ['Date of Acquisition', '14-January-2026 (05:42 UTC)'],
+        ['Spatial Resolution', '5.8 m (Multi-spectral) / 0.8 m (Panchromatic sharpened)'],
+        ['Radiometric Resolution', '10-bit Quantization (1024 grey levels)'],
+        ['Map Projection & Datum', 'UTM Zone 43N / WGS-84 Datum']
+      ],
+      theme: 'grid',
+      headStyles: {
+        fillColor: [86, 184, 232],
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+        fontSize: 7.8,
+        lineWidth: 0.2,
+        lineColor: [220, 230, 242],
+        cellPadding: 2.4
+      },
+      bodyStyles: {
+        textColor: [30, 41, 59],
+        fontSize: 7.8,
+        lineWidth: 0.15,
+        lineColor: [220, 230, 242],
+        cellPadding: 2.2
+      },
+      columnStyles: {
+        0: { fontStyle: 'normal', cellWidth: 55, textColor: [51, 65, 85] },
+        1: { fontStyle: 'normal' }
+      }
+    });
+
+    y = (doc as any).lastAutoTable.finalY + 8;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(2, 132, 199);
+    doc.text('2. OBJECTIVE AND SCOPE OF ANALYSIS', margin, y);
+
+    y += 5;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(51, 65, 85);
+    const scopeParagraph = doc.splitTextToSize(
+      'The analysis performs radiometric calibration, orthorectification, and supervised classification to track environmental change, urban expansion, and vegetation health within the selected area of interest. The resulting raster and vector layers are intended for use in planning, monitoring, and resource-tracking workflows on the Bhuviksana platform.',
+      contentWidth
+    );
+    doc.text(scopeParagraph, margin, y);
+    y += scopeParagraph.length * 4 + 4;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(2, 132, 199);
+    doc.text('3. METHODOLOGY & PROCESSING PIPELINE', margin, y);
+
+    y += 5;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(51, 65, 85);
+    doc.text('Level-0 sensor data is processed through the following automated pipeline stages:', margin, y);
+    y += 4.5;
+
+    const methodologyBullets = [
+      '• Radiometric Calibration: Raw digital numbers converted to Top-of-Atmosphere and surface reflectance using solar zenith angle correction.',
+      '• Geometric Correction: Orthorectification using CartoDEM elevation data and ground control points, targeting sub-pixel RMSE.',
+      '• Feature Extraction & Classification: Supervised Maximum Likelihood Classification combined with NDVI thresholding (NDVI = (NIR - Red) / (NIR + Red)) to separate vegetation, bare soil, and built-up surfaces.'
+    ];
+
+    methodologyBullets.forEach((bullet) => {
+      const wrapped = doc.splitTextToSize(bullet, contentWidth);
+      doc.text(wrapped, margin, y);
+      y += wrapped.length * 3.8 + 1.2;
+    });
+
+    renderFooter(1);
+
+    // PAGE 2: STATISTICAL OBSERVATIONS & SIGN-OFF
+    doc.addPage();
+    renderHeader();
+
+    // Large Center Watermark
+    if (logoDataUrl) {
+      doc.saveGraphicsState();
+      if ((doc as any).setGState && (doc as any).GState) {
+        doc.setGState(new (doc as any).GState({ opacity: 0.06 }));
+      }
+      doc.addImage(logoDataUrl, 'PNG', pageWidth / 2 - 45, pageHeight / 2 - 50, 90, 100);
+      doc.restoreGraphicsState();
+    }
+
+    y = 35;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(2, 132, 199);
+    doc.text('4. RESULTS AND STATISTICAL OBSERVATIONS', margin, y);
+
+    y += 5;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(51, 65, 85);
+    doc.text(
+      'Comparative analysis against the 2024 baseline reveals the following trends across the target quadrant of 1,250 km²:',
+      margin,
+      y
+    );
+    y += 5;
+
+    const tableBody = [
+      ['Built-up / Urban Sprawl', '185.50', '14.84%', '+4.2% (Expansion)'],
+      ['Agricultural Land & Crop Cover', '562.20', '44.98%', 'Stable (NDVI > 0.4)'],
+      ['Forest & Dense Vegetation', '310.00', '24.80%', 'Minor regeneration (+0.8%)'],
+      ['Water Bodies & Wetlands', '85.30', '6.82%', 'Stable retention'],
+      ['Wasteland / Barren Rock', '107.00', '8.56%', 'Decreased (afforestation)'],
+      ['Total Analyzed Area', '1,250.00', '100.00%', '—']
+    ];
+
+    autoTable(doc, {
+      startY: y,
+      margin: { left: margin, right: margin },
+      head: [['THEMATIC CLASS', 'AREA (km²)', 'COVERAGE', 'TREND (vs. 2024)']],
+      body: tableBody,
+      theme: 'grid',
+      headStyles: {
+        fillColor: [249, 115, 22],
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+        fontSize: 7.8,
+        lineWidth: 0.2,
+        lineColor: [220, 230, 242],
+        cellPadding: 2.4
+      },
+      bodyStyles: {
+        textColor: [30, 41, 59],
+        fontSize: 7.8,
+        lineWidth: 0.15,
+        lineColor: [220, 230, 242],
+        cellPadding: 2.2
+      },
+      columnStyles: {
+        0: { fontStyle: 'normal', cellWidth: 55, textColor: [30, 41, 59] },
+        1: { halign: 'left', cellWidth: 32 },
+        2: { halign: 'left', cellWidth: 32 },
+        3: { halign: 'left' }
+      }
+    });
+
+    y = (doc as any).lastAutoTable.finalY + 9;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(2, 132, 199);
+    doc.text('5. CONCLUSION', margin, y);
+
+    y += 5;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(51, 65, 85);
+    const conclusionParagraph = doc.splitTextToSize(
+      'The processed outputs indicate stable environmental conditions alongside managed urban growth in the analyzed quadrant. Orthorectified mosaics, false-color composites, and vector layers generated for this analysis are stored in the Bhuviksana geospatial workspace and are available for export from your dashboard.',
+      contentWidth
+    );
+    doc.text(conclusionParagraph, margin, y);
+
+    const signX = pageWidth - margin - 50;
+    const signY = pageHeight - 46;
+
+    if (logoDataUrl) {
+      doc.addImage(logoDataUrl, 'PNG', signX + 37, signY - 14, 10, 11);
+    }
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(15, 23, 42);
+    doc.text('Approved by Bhuviksana', signX + 48, signY, { align: 'right' });
+
+    doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
-    doc.setTextColor(128, 134, 139);
-    doc.text('Generated via BhuViksana AI Autonomous Intelligence Pipeline • AES-256 Encrypted Telemetry', 14, 285);
+    doc.setTextColor(100, 116, 139);
+    doc.text('Geo-Analytics & Earth Observation Division', signX + 48, signY + 4, { align: 'right' });
+    doc.text('Bhuviksana Platform', signX + 48, signY + 8, { align: 'right' });
 
-    doc.save(`BhuViksana_Briefing_${Date.now()}.pdf`);
+    renderFooter(2);
+
+    doc.save(`Bhuviksana_LULC_Analysis_Report_restyled.pdf`);
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -795,7 +1048,6 @@ export default function BhuViksanaApp() {
   if (currentPage === 'canvas') {
     return (
       <div className="flex h-screen w-screen overflow-hidden bg-slate-50 font-sans text-slate-800 select-none relative">
-        {/* LEFT DOCK PANEL */}
         <aside className="w-[72px] h-full flex flex-col items-center justify-between py-6 border-r border-slate-200/70 bg-white/70 backdrop-blur-md z-30 relative">
           <div className="flex flex-col items-center gap-6">
             <div className="w-10 h-10 relative flex items-center justify-center">
@@ -817,7 +1069,6 @@ export default function BhuViksanaApp() {
             </nav>
           </div>
 
-          {/* BOTTOM USER PROFILE BUTTON WITH INITIALS & POPUP */}
           <div className="flex flex-col items-center gap-3 relative">
             {showUserPopover && (
               <div className="absolute bottom-2 left-16 z-50 w-72 bg-white rounded-2xl border border-slate-200 shadow-2xl p-4 animate-in fade-in zoom-in-95 duration-150">
@@ -984,14 +1235,13 @@ export default function BhuViksanaApp() {
   }
 
   // =========================================================================
-  // PAGE 3: WORKSTATION VIEW (WITH EXPORT BRIEFING RESTORED)
+  // PAGE 3: WORKSTATION VIEW
   // =========================================================================
   return (
     <div
       className="flex h-screen w-screen overflow-hidden bg-[#e5e3df] font-sans text-[#202124] select-none relative"
       onMouseUp={() => { isDraggingSwipe.current = false; }}
     >
-      {/* TOP-LEFT TOOLBAR */}
       <div className="absolute top-4 left-4 z-[400] flex flex-col gap-2 pointer-events-auto max-w-[calc(100vw-32px)]">
         <div className="flex items-center h-12 bg-white rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.2)] border border-[#dadce0] px-3 gap-2 w-[360px] sm:w-[390px]">
           <button onClick={() => setCurrentPage('canvas')} className="p-1.5 rounded-full hover:bg-[#f1f3f4] text-[#5f6368] transition">
@@ -1048,11 +1298,11 @@ export default function BhuViksanaApp() {
         </div>
       </div>
 
-      {/* MAP CANVAS VIEWPORT */}
+      {/* VIEWPORT CANVAS */}
       <div className="flex flex-1 h-full w-full relative">
         <div ref={containerRef} onMouseMove={handleMouseMove} className="flex-1 relative bg-[#e5e3df] overflow-hidden select-none">
           
-          {/* FLOATING ACTION PILLS: SMS ALERT + AUDIT TRACE + EXPORT BRIEFING */}
+          {/* FLOATING ACTION PILLS */}
           <div className="absolute top-4 right-4 z-[400] flex items-center gap-2 pointer-events-auto">
             <button
               onClick={() => setShowSmsModal(true)}
@@ -1071,7 +1321,6 @@ export default function BhuViksanaApp() {
               <span>Audit Trace</span>
             </button>
 
-            {/* ⬇️ RESTORED EXPORT TO PDF REPORT BUTTON ⬇️ */}
             <button
               onClick={handleExportPDF}
               className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#1a73e8] hover:bg-[#1557b0] text-xs font-semibold text-white shadow-[0_2px_6px_rgba(0,0,0,0.2)] transition active:scale-95"
@@ -1082,7 +1331,6 @@ export default function BhuViksanaApp() {
             </button>
           </div>
 
-          {/* SPLIT / CANVASES */}
           {activeViewTool === 'tripane' ? (
             <div className="w-full h-full grid grid-cols-3 gap-1.5 bg-slate-950 p-2.5">
               <div className="relative w-full h-full rounded-2xl overflow-hidden border border-slate-800 bg-black flex flex-col shadow-inner">
@@ -1128,20 +1376,12 @@ export default function BhuViksanaApp() {
             )
           )}
 
-          {/* TELEMETRY STAMP */}
           <div className="absolute bottom-2 right-4 z-[400] text-[11px] font-mono text-[#5f6368] bg-white/85 backdrop-blur-md px-2.5 py-0.5 rounded-full shadow-sm border border-[#dadce0]">
             {liveCoords.lat.toFixed(4)}°N, {liveCoords.lng.toFixed(4)}°E • Zoom: {liveCoords.zoom}x
           </div>
-
-          <button
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="absolute top-1/2 -translate-y-1/2 right-0 z-[450] bg-white hover:bg-[#f8f9fa] border-y border-l border-[#dadce0] py-3 px-1 rounded-l-xl text-[#5f6368] shadow transition"
-          >
-            {isSidebarOpen ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-          </button>
         </div>
 
-        {/* DETAILS SIDEBAR */}
+        {/* SIDEBAR */}
         {isSidebarOpen && (
           <aside className="w-[410px] h-full bg-white border-l border-[#dadce0] flex flex-col justify-between z-30 relative flex-shrink-0">
             <div className="flex-1 overflow-y-auto p-4 space-y-4">

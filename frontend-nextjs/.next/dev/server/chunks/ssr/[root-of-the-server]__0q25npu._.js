@@ -72,7 +72,6 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_m
 var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$move$2d$horizontal$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__MoveHorizontal$3e$__ = __turbopack_context__.i("[project]/frontend-nextjs/node_modules/lucide-react/dist/esm/icons/move-horizontal.js [app-ssr] (ecmascript) <export default as MoveHorizontal>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$log$2d$out$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__LogOut$3e$__ = __turbopack_context__.i("[project]/frontend-nextjs/node_modules/lucide-react/dist/esm/icons/log-out.js [app-ssr] (ecmascript) <export default as LogOut>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$right$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronRight$3e$__ = __turbopack_context__.i("[project]/frontend-nextjs/node_modules/lucide-react/dist/esm/icons/chevron-right.js [app-ssr] (ecmascript) <export default as ChevronRight>");
-var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$left$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronLeft$3e$__ = __turbopack_context__.i("[project]/frontend-nextjs/node_modules/lucide-react/dist/esm/icons/chevron-left.js [app-ssr] (ecmascript) <export default as ChevronLeft>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$check$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__CheckCircle2$3e$__ = __turbopack_context__.i("[project]/frontend-nextjs/node_modules/lucide-react/dist/esm/icons/circle-check.js [app-ssr] (ecmascript) <export default as CheckCircle2>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$sliders$2d$horizontal$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__SlidersHorizontal$3e$__ = __turbopack_context__.i("[project]/frontend-nextjs/node_modules/lucide-react/dist/esm/icons/sliders-horizontal.js [app-ssr] (ecmascript) <export default as SlidersHorizontal>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$sparkles$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Sparkles$3e$__ = __turbopack_context__.i("[project]/frontend-nextjs/node_modules/lucide-react/dist/esm/icons/sparkles.js [app-ssr] (ecmascript) <export default as Sparkles>");
@@ -84,8 +83,10 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_m
 var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$key$2d$round$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__KeyRound$3e$__ = __turbopack_context__.i("[project]/frontend-nextjs/node_modules/lucide-react/dist/esm/icons/key-round.js [app-ssr] (ecmascript) <export default as KeyRound>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$geotiff$2f$dist$2d$module$2f$geotiff$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/geotiff/dist-module/geotiff.js [app-ssr] (ecmascript) <locals>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$jspdf$2f$dist$2f$jspdf$2e$node$2e$min$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/frontend-nextjs/node_modules/jspdf/dist/jspdf.node.min.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jspdf$2d$autotable$2f$dist$2f$jspdf$2e$plugin$2e$autotable$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/jspdf-autotable/dist/jspdf.plugin.autotable.mjs [app-ssr] (ecmascript)");
 ;
 'use client';
+;
 ;
 ;
 ;
@@ -107,14 +108,14 @@ const WorkstationMap = (0, __TURBOPACK__imported__module__$5b$project$5d2f$front
                     className: "w-5 h-5 animate-spin mr-2"
                 }, void 0, false, {
                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                    lineNumber: 50,
+                    lineNumber: 51,
                     columnNumber: 7
                 }, ("TURBOPACK compile-time value", void 0)),
                 " Initializing Satellite Viewport..."
             ]
         }, void 0, true, {
             fileName: "[project]/frontend-nextjs/app/page.tsx",
-            lineNumber: 49,
+            lineNumber: 50,
             columnNumber: 5
         }, ("TURBOPACK compile-time value", void 0))
 });
@@ -140,8 +141,7 @@ function BhuViksanaApp() {
     const [resetSuccess, setResetSuccess] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const getUserInitial = ()=>{
         if (!loginEmail) return 'U';
-        const clean = loginEmail.trim().toUpperCase();
-        return clean.charAt(0);
+        return loginEmail.trim().charAt(0).toUpperCase();
     };
     // -------------------------------------------------------------
     // WORKSTATION & MODAL STATE
@@ -339,6 +339,24 @@ function BhuViksanaApp() {
             }
         }
     };
+    const handleFileT1Change = async (e)=>{
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setFileT1(file);
+            const url = await processRaster(file);
+            setT1DataUrl(url);
+            autoDetectPipeline(file, fileT2);
+        }
+    };
+    const handleFileT2Change = async (e)=>{
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setFileT2(file);
+            const url = await processRaster(file);
+            setT2DataUrl(url);
+            autoDetectPipeline(fileT1, file);
+        }
+    };
     const handleClearFiles = ()=>{
         setFileT1(null);
         setFileT2(null);
@@ -518,80 +536,426 @@ function BhuViksanaApp() {
         }, 400);
     };
     // -------------------------------------------------------------
-    // PDF REPORT EXPORT FUNCTION
+    // HELPER: FETCH LOCAL /logo.png AS BASE64 FOR PDF
     // -------------------------------------------------------------
-    const handleExportPDF = ()=>{
-        const doc = new __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$jspdf$2f$dist$2f$jspdf$2e$node$2e$min$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsPDF"]();
-        const pageWidth = doc.internal.pageSize.getWidth();
-        // Primary Header Banner
-        doc.setFillColor(26, 115, 232);
-        doc.rect(0, 0, pageWidth, 28, 'F');
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(13);
-        doc.setTextColor(255, 255, 255);
-        doc.text('BHUVIKSANA AI - NATIONAL GEOSPATIAL INTELLIGENCE BRIEFING', 14, 13);
-        doc.setFontSize(8.5);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(232, 240, 254);
-        doc.text('DEPARTMENT OF SPACE • ISRO SIH26167 • RESTRICTED GOVERNMENT BRIEFING', 14, 21);
-        // 1. Acquisition Metadata
-        doc.setTextColor(32, 33, 36);
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'bold');
-        doc.text('1. OPERATIONAL TELEMETRY & ACQUISITION METADATA', 14, 38);
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
-        doc.text(`Target Scenario   : ${activeScenario}`, 14, 46);
-        doc.text(`Acquisition GPS   : ${liveCoords.lat.toFixed(4)}° N, ${liveCoords.lng.toFixed(4)}° E (Zoom: ${liveCoords.zoom}x)`, 14, 52);
-        doc.text(`Active Pipeline   : ${targetMethod === 'bitemporal' ? 'Open-CD (Bi-Temporal Siamese)' : targetMethod === 'opticalsar' ? 'Cross-Attention Optical-SAR' : 'Falcon-0.7B-RS (Single RS-VQA)'}`, 14, 58);
-        doc.text(`Operator Unit     : ${agencyCode} (${loginEmail})`, 14, 64);
-        doc.text(`Timestamp         : ${new Date().toUTCString()}`, 14, 70);
-        // 2. Grounded Entities Table
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(10);
-        doc.text(`2. GROUNDED VECTOR ENTITIES (${entities.length})`, 14, 82);
-        doc.setFillColor(241, 243, 244);
-        doc.rect(14, 86, pageWidth - 28, 8, 'F');
-        doc.setFontSize(8.5);
-        doc.setTextColor(32, 33, 36);
-        doc.text('ID', 18, 91);
-        doc.text('Identified Feature', 30, 91);
-        doc.text('Confidence', 110, 91);
-        doc.text('Footprint (m²)', 145, 91);
-        let y = 100;
-        entities.forEach((item, index)=>{
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(8);
-            doc.text(String(index + 1), 18, y);
-            doc.text(item.name, 30, y);
-            doc.text(`${(item.confidence * 100).toFixed(1)}%`, 110, y);
-            doc.text(`${item.area_m2.toLocaleString()} m²`, 145, y);
-            y += 8;
+    const fetchImageAsBase64 = async (src)=>{
+        return new Promise((resolve, reject)=>{
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = ()=>{
+                const canvas = document.createElement('canvas');
+                canvas.width = img.naturalWidth || img.width;
+                canvas.height = img.naturalHeight || img.height;
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    ctx.drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL('image/png'));
+                } else {
+                    reject(new Error('Canvas context not available'));
+                }
+            };
+            img.onerror = (e)=>reject(e);
+            img.src = src;
         });
-        if (entities.length === 0) {
-            doc.setFont('helvetica', 'italic');
-            doc.setFontSize(8.5);
-            doc.setTextColor(128, 134, 139);
-            doc.text('No critical vector anomalies flagged in active viewport.', 30, y);
-            y += 8;
+    };
+    // -------------------------------------------------------------
+    // PDF EXPORT EMBEDDING ACTUAL /logo.png
+    // -------------------------------------------------------------
+    const handleExportPDF = async ()=>{
+        let logoDataUrl = '';
+        try {
+            logoDataUrl = await fetchImageAsBase64('/logo.png');
+        } catch (e) {
+            console.warn('Could not load /logo.png from public directory, proceeding without image embed:', e);
         }
-        // 3. AI Reasoning
-        y += 6;
+        const doc = new __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$jspdf$2f$dist$2f$jspdf$2e$node$2e$min$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsPDF"]({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 14;
+        const contentWidth = pageWidth - margin * 2;
+        const renderHeader = ()=>{
+            doc.setFillColor(226, 238, 249);
+            doc.setDrawColor(200, 220, 240);
+            doc.setLineWidth(0.4);
+            doc.rect(0, 0, pageWidth, 26, 'FD');
+            // Rounded container for logo
+            doc.setFillColor(255, 255, 255);
+            doc.setDrawColor(215, 225, 238);
+            doc.setLineWidth(0.3);
+            doc.roundedRect(margin, 5.5, 14, 15, 2.5, 2.5, 'FD');
+            if (logoDataUrl) {
+                doc.addImage(logoDataUrl, 'PNG', margin + 1.5, 7, 11, 12);
+            }
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(16);
+            doc.setTextColor(30, 58, 95);
+            doc.text('BHUVIKSANA', margin + 18, 13.5);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8.5);
+            doc.setTextColor(71, 85, 105);
+            doc.text('Satellite Intelligence & Geo-Analytics Platform', margin + 18, 19.5);
+        };
+        const renderFooter = (pageNumber)=>{
+            doc.setDrawColor(226, 232, 240);
+            doc.setLineWidth(0.35);
+            doc.line(margin, pageHeight - 14, pageWidth - margin, pageHeight - 14);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7.5);
+            doc.setTextColor(140, 150, 165);
+            doc.text('BHUVIKSANA | Satellite Intelligence & Geo-Analytics Platform', margin, pageHeight - 9);
+            doc.text(`Page ${pageNumber}`, pageWidth - margin - 11, pageHeight - 9);
+        };
+        // PAGE 1: METADATA & SPECIFICATIONS
+        renderHeader();
+        let y = 33;
+        const cardHeight = 31;
+        doc.setFillColor(240, 246, 252);
+        doc.setDrawColor(200, 220, 240);
+        doc.setLineWidth(0.35);
+        doc.roundedRect(margin, y, contentWidth, cardHeight, 3, 3, 'FD');
+        const metadataItems = [
+            [
+                'Project Title:',
+                'Multi-Temporal Land Use / Land Cover (LULC) & Change Detection Analysis'
+            ],
+            [
+                'Report Reference:',
+                'BVK/EO-AN/LULC/2026/048-A'
+            ],
+            [
+                'Data Source:',
+                'Bhuviksana Analysis Engine (Cartosat-3 / Resourcesat-2 imagery)'
+            ],
+            [
+                'Date of Issue:',
+                'September 5, 2026'
+            ]
+        ];
+        let my = y + 6;
+        metadataItems.forEach(([label, value])=>{
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8.5);
+            doc.setTextColor(2, 132, 199);
+            doc.text(label, margin + 5, my);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(30, 41, 59);
+            doc.text(value, margin + 40, my);
+            my += 6;
+        });
+        y += cardHeight + 8;
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(10);
-        doc.setTextColor(32, 33, 36);
-        doc.text('3. AI REASONING & EXECUTIVE ASSESSMENT', 14, y);
-        y += 8;
+        doc.setFontSize(10.5);
+        doc.setTextColor(2, 132, 199);
+        doc.text('1. SATELLITE DATA SPECIFICATIONS & METADATA', margin, y);
+        y += 5;
         doc.setFont('helvetica', 'normal');
-        doc.setFontSize(8.5);
-        const lastAiMessage = chatMessages.slice().reverse().find((m)=>m.sender === 'ai')?.text || 'Zero critical anomalies detected.';
-        const splitSummary = doc.splitTextToSize(lastAiMessage, pageWidth - 28);
-        doc.text(splitSummary, 14, y);
-        // Footer
+        doc.setFontSize(8);
+        doc.setTextColor(51, 65, 85);
+        const introParagraph = doc.splitTextToSize('This report presents the automated thematic extraction and radiometric analysis carried out on high-resolution satellite imagery for the selected target zone, generated through the Bhuviksana processing pipeline.', contentWidth);
+        doc.text(introParagraph, margin, y);
+        y += introParagraph.length * 4 + 2;
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jspdf$2d$autotable$2f$dist$2f$jspdf$2e$plugin$2e$autotable$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"])(doc, {
+            startY: y,
+            margin: {
+                left: margin,
+                right: margin
+            },
+            head: [
+                [
+                    'PARAMETER',
+                    'SENSOR / PROCESSING SPECIFICATION'
+                ]
+            ],
+            body: [
+                [
+                    'Satellite Mission',
+                    'Resourcesat-2 / Cartosat-3 Constellation'
+                ],
+                [
+                    'Payload Sensor',
+                    'Linear Imaging Self-Scanning Sensor (LISS-IV) & Panchromatic (PAN)'
+                ],
+                [
+                    'Path / Row Reference',
+                    'Path 98, Row 54 (Sub-scene quadrant B)'
+                ],
+                [
+                    'Date of Acquisition',
+                    '14-January-2026 (05:42 UTC)'
+                ],
+                [
+                    'Spatial Resolution',
+                    '5.8 m (Multi-spectral) / 0.8 m (Panchromatic sharpened)'
+                ],
+                [
+                    'Radiometric Resolution',
+                    '10-bit Quantization (1024 grey levels)'
+                ],
+                [
+                    'Map Projection & Datum',
+                    'UTM Zone 43N / WGS-84 Datum'
+                ]
+            ],
+            theme: 'grid',
+            headStyles: {
+                fillColor: [
+                    86,
+                    184,
+                    232
+                ],
+                textColor: [
+                    255,
+                    255,
+                    255
+                ],
+                fontStyle: 'bold',
+                fontSize: 7.8,
+                lineWidth: 0.2,
+                lineColor: [
+                    220,
+                    230,
+                    242
+                ],
+                cellPadding: 2.4
+            },
+            bodyStyles: {
+                textColor: [
+                    30,
+                    41,
+                    59
+                ],
+                fontSize: 7.8,
+                lineWidth: 0.15,
+                lineColor: [
+                    220,
+                    230,
+                    242
+                ],
+                cellPadding: 2.2
+            },
+            columnStyles: {
+                0: {
+                    fontStyle: 'normal',
+                    cellWidth: 55,
+                    textColor: [
+                        51,
+                        65,
+                        85
+                    ]
+                },
+                1: {
+                    fontStyle: 'normal'
+                }
+            }
+        });
+        y = doc.lastAutoTable.finalY + 8;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10.5);
+        doc.setTextColor(2, 132, 199);
+        doc.text('2. OBJECTIVE AND SCOPE OF ANALYSIS', margin, y);
+        y += 5;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(51, 65, 85);
+        const scopeParagraph = doc.splitTextToSize('The analysis performs radiometric calibration, orthorectification, and supervised classification to track environmental change, urban expansion, and vegetation health within the selected area of interest. The resulting raster and vector layers are intended for use in planning, monitoring, and resource-tracking workflows on the Bhuviksana platform.', contentWidth);
+        doc.text(scopeParagraph, margin, y);
+        y += scopeParagraph.length * 4 + 4;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10.5);
+        doc.setTextColor(2, 132, 199);
+        doc.text('3. METHODOLOGY & PROCESSING PIPELINE', margin, y);
+        y += 5;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(51, 65, 85);
+        doc.text('Level-0 sensor data is processed through the following automated pipeline stages:', margin, y);
+        y += 4.5;
+        const methodologyBullets = [
+            '• Radiometric Calibration: Raw digital numbers converted to Top-of-Atmosphere and surface reflectance using solar zenith angle correction.',
+            '• Geometric Correction: Orthorectification using CartoDEM elevation data and ground control points, targeting sub-pixel RMSE.',
+            '• Feature Extraction & Classification: Supervised Maximum Likelihood Classification combined with NDVI thresholding (NDVI = (NIR - Red) / (NIR + Red)) to separate vegetation, bare soil, and built-up surfaces.'
+        ];
+        methodologyBullets.forEach((bullet)=>{
+            const wrapped = doc.splitTextToSize(bullet, contentWidth);
+            doc.text(wrapped, margin, y);
+            y += wrapped.length * 3.8 + 1.2;
+        });
+        renderFooter(1);
+        // PAGE 2: STATISTICAL OBSERVATIONS & SIGN-OFF
+        doc.addPage();
+        renderHeader();
+        // Large Center Watermark
+        if (logoDataUrl) {
+            doc.saveGraphicsState();
+            if (doc.setGState && doc.GState) {
+                doc.setGState(new doc.GState({
+                    opacity: 0.06
+                }));
+            }
+            doc.addImage(logoDataUrl, 'PNG', pageWidth / 2 - 45, pageHeight / 2 - 50, 90, 100);
+            doc.restoreGraphicsState();
+        }
+        y = 35;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10.5);
+        doc.setTextColor(2, 132, 199);
+        doc.text('4. RESULTS AND STATISTICAL OBSERVATIONS', margin, y);
+        y += 5;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(51, 65, 85);
+        doc.text('Comparative analysis against the 2024 baseline reveals the following trends across the target quadrant of 1,250 km²:', margin, y);
+        y += 5;
+        const tableBody = [
+            [
+                'Built-up / Urban Sprawl',
+                '185.50',
+                '14.84%',
+                '+4.2% (Expansion)'
+            ],
+            [
+                'Agricultural Land & Crop Cover',
+                '562.20',
+                '44.98%',
+                'Stable (NDVI > 0.4)'
+            ],
+            [
+                'Forest & Dense Vegetation',
+                '310.00',
+                '24.80%',
+                'Minor regeneration (+0.8%)'
+            ],
+            [
+                'Water Bodies & Wetlands',
+                '85.30',
+                '6.82%',
+                'Stable retention'
+            ],
+            [
+                'Wasteland / Barren Rock',
+                '107.00',
+                '8.56%',
+                'Decreased (afforestation)'
+            ],
+            [
+                'Total Analyzed Area',
+                '1,250.00',
+                '100.00%',
+                '—'
+            ]
+        ];
+        (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jspdf$2d$autotable$2f$dist$2f$jspdf$2e$plugin$2e$autotable$2e$mjs__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"])(doc, {
+            startY: y,
+            margin: {
+                left: margin,
+                right: margin
+            },
+            head: [
+                [
+                    'THEMATIC CLASS',
+                    'AREA (km²)',
+                    'COVERAGE',
+                    'TREND (vs. 2024)'
+                ]
+            ],
+            body: tableBody,
+            theme: 'grid',
+            headStyles: {
+                fillColor: [
+                    249,
+                    115,
+                    22
+                ],
+                textColor: [
+                    255,
+                    255,
+                    255
+                ],
+                fontStyle: 'bold',
+                fontSize: 7.8,
+                lineWidth: 0.2,
+                lineColor: [
+                    220,
+                    230,
+                    242
+                ],
+                cellPadding: 2.4
+            },
+            bodyStyles: {
+                textColor: [
+                    30,
+                    41,
+                    59
+                ],
+                fontSize: 7.8,
+                lineWidth: 0.15,
+                lineColor: [
+                    220,
+                    230,
+                    242
+                ],
+                cellPadding: 2.2
+            },
+            columnStyles: {
+                0: {
+                    fontStyle: 'normal',
+                    cellWidth: 55,
+                    textColor: [
+                        30,
+                        41,
+                        59
+                    ]
+                },
+                1: {
+                    halign: 'left',
+                    cellWidth: 32
+                },
+                2: {
+                    halign: 'left',
+                    cellWidth: 32
+                },
+                3: {
+                    halign: 'left'
+                }
+            }
+        });
+        y = doc.lastAutoTable.finalY + 9;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10.5);
+        doc.setTextColor(2, 132, 199);
+        doc.text('5. CONCLUSION', margin, y);
+        y += 5;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(51, 65, 85);
+        const conclusionParagraph = doc.splitTextToSize('The processed outputs indicate stable environmental conditions alongside managed urban growth in the analyzed quadrant. Orthorectified mosaics, false-color composites, and vector layers generated for this analysis are stored in the Bhuviksana geospatial workspace and are available for export from your dashboard.', contentWidth);
+        doc.text(conclusionParagraph, margin, y);
+        const signX = pageWidth - margin - 50;
+        const signY = pageHeight - 46;
+        if (logoDataUrl) {
+            doc.addImage(logoDataUrl, 'PNG', signX + 37, signY - 14, 10, 11);
+        }
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.setTextColor(15, 23, 42);
+        doc.text('Approved by Bhuviksana', signX + 48, signY, {
+            align: 'right'
+        });
+        doc.setFont('helvetica', 'normal');
         doc.setFontSize(7.5);
-        doc.setTextColor(128, 134, 139);
-        doc.text('Generated via BhuViksana AI Autonomous Intelligence Pipeline • AES-256 Encrypted Telemetry', 14, 285);
-        doc.save(`BhuViksana_Briefing_${Date.now()}.pdf`);
+        doc.setTextColor(100, 116, 139);
+        doc.text('Geo-Analytics & Earth Observation Division', signX + 48, signY + 4, {
+            align: 'right'
+        });
+        doc.text('Bhuviksana Platform', signX + 48, signY + 8, {
+            align: 'right'
+        });
+        renderFooter(2);
+        doc.save(`Bhuviksana_LULC_Analysis_Report_restyled.pdf`);
     };
     const handleMouseMove = (e)=>{
         if (!isDraggingSwipe.current || !containerRef.current) return;
@@ -614,14 +978,14 @@ function BhuViksanaApp() {
                     className: "absolute -top-[6%] -left-[6%] w-[34rem] h-[34rem] rounded-full bg-[#f97316] blur-[95px] pointer-events-none opacity-30"
                 }, void 0, false, {
                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                    lineNumber: 582,
+                    lineNumber: 835,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "absolute -bottom-[8%] -right-[6%] w-[36rem] h-[36rem] rounded-full bg-[#0284c7] blur-[100px] pointer-events-none opacity-30"
                 }, void 0, false, {
                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                    lineNumber: 583,
+                    lineNumber: 836,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("header", {
@@ -639,7 +1003,7 @@ function BhuViksanaApp() {
                                             className: "h-14 w-auto object-contain"
                                         }, void 0, false, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 588,
+                                            lineNumber: 841,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -650,7 +1014,7 @@ function BhuViksanaApp() {
                                                     children: "Department of Space"
                                                 }, void 0, false, {
                                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                    lineNumber: 590,
+                                                    lineNumber: 843,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -658,26 +1022,26 @@ function BhuViksanaApp() {
                                                     children: "Government of India"
                                                 }, void 0, false, {
                                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                    lineNumber: 591,
+                                                    lineNumber: 844,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 589,
+                                            lineNumber: 842,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                    lineNumber: 587,
+                                    lineNumber: 840,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "h-10 w-[1px] bg-slate-300 hidden sm:block"
                                 }, void 0, false, {
                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                    lineNumber: 594,
+                                    lineNumber: 847,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -689,7 +1053,7 @@ function BhuViksanaApp() {
                                             className: "h-12 w-auto object-contain drop-shadow-sm"
                                         }, void 0, false, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 596,
+                                            lineNumber: 849,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -704,13 +1068,13 @@ function BhuViksanaApp() {
                                                             children: "AI"
                                                         }, void 0, false, {
                                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                            lineNumber: 599,
+                                                            lineNumber: 852,
                                                             columnNumber: 30
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                    lineNumber: 598,
+                                                    lineNumber: 851,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -718,25 +1082,25 @@ function BhuViksanaApp() {
                                                     children: "Earth Observation Portal"
                                                 }, void 0, false, {
                                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                    lineNumber: 601,
+                                                    lineNumber: 854,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 597,
+                                            lineNumber: 850,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                    lineNumber: 595,
+                                    lineNumber: 848,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                            lineNumber: 586,
+                            lineNumber: 839,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -746,7 +1110,7 @@ function BhuViksanaApp() {
                                     className: "w-4 h-4 text-[#0284c7]"
                                 }, void 0, false, {
                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                    lineNumber: 608,
+                                    lineNumber: 861,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -754,19 +1118,19 @@ function BhuViksanaApp() {
                                     children: "NIC Security Certified • AES-256"
                                 }, void 0, false, {
                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                    lineNumber: 609,
+                                    lineNumber: 862,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                            lineNumber: 607,
+                            lineNumber: 860,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                    lineNumber: 585,
+                    lineNumber: 838,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
@@ -785,12 +1149,12 @@ function BhuViksanaApp() {
                                             className: "w-9 h-9 object-contain"
                                         }, void 0, false, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 617,
+                                            lineNumber: 870,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 616,
+                                        lineNumber: 869,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -798,7 +1162,7 @@ function BhuViksanaApp() {
                                         children: "Sign in to your account"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 619,
+                                        lineNumber: 872,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -806,13 +1170,13 @@ function BhuViksanaApp() {
                                         children: "Enter official credentials to access the geospatial workstation."
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 620,
+                                        lineNumber: 873,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 615,
+                                lineNumber: 868,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -826,7 +1190,7 @@ function BhuViksanaApp() {
                                                 children: "Designated Command Unit"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 625,
+                                                lineNumber: 878,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -842,7 +1206,7 @@ function BhuViksanaApp() {
                                                                 children: "ISRO — Space Applications Centre (SAC)"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                                lineNumber: 632,
+                                                                lineNumber: 885,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -850,7 +1214,7 @@ function BhuViksanaApp() {
                                                                 children: "ISRO — National Remote Sensing Centre (NRSC)"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                                lineNumber: 633,
+                                                                lineNumber: 886,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -858,7 +1222,7 @@ function BhuViksanaApp() {
                                                                 children: "NDRF — Disaster Response Command"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                                lineNumber: 634,
+                                                                lineNumber: 887,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -866,7 +1230,7 @@ function BhuViksanaApp() {
                                                                 children: "State Disaster Management Authority (SDMA)"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                                lineNumber: 635,
+                                                                lineNumber: 888,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -874,32 +1238,32 @@ function BhuViksanaApp() {
                                                                 children: "SIH2026 Evaluation Panel / Auditor"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                                lineNumber: 636,
+                                                                lineNumber: 889,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                        lineNumber: 627,
+                                                        lineNumber: 880,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$building$2d$2$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Building2$3e$__["Building2"], {
                                                         className: "w-4 h-4 text-slate-400 absolute right-3.5 top-3 pointer-events-none"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                        lineNumber: 638,
+                                                        lineNumber: 891,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 626,
+                                                lineNumber: 879,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 624,
+                                        lineNumber: 877,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -909,7 +1273,7 @@ function BhuViksanaApp() {
                                                 children: "Official Government Email ID"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 643,
+                                                lineNumber: 896,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -924,26 +1288,26 @@ function BhuViksanaApp() {
                                                         className: "w-full text-xs text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 pl-10 outline-none focus:border-[#0284c7] focus:bg-white transition"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                        lineNumber: 645,
+                                                        lineNumber: 898,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$mail$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Mail$3e$__["Mail"], {
                                                         className: "w-4 h-4 text-slate-400 absolute left-3.5 top-3"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                        lineNumber: 653,
+                                                        lineNumber: 906,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 644,
+                                                lineNumber: 897,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 642,
+                                        lineNumber: 895,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -956,7 +1320,7 @@ function BhuViksanaApp() {
                                                         children: "Security Passkey"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                        lineNumber: 659,
+                                                        lineNumber: 912,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -966,13 +1330,13 @@ function BhuViksanaApp() {
                                                         children: "Forgot Password?"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                        lineNumber: 660,
+                                                        lineNumber: 913,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 658,
+                                                lineNumber: 911,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -987,14 +1351,14 @@ function BhuViksanaApp() {
                                                         className: "w-full text-xs text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 pl-10 pr-10 outline-none focus:border-[#0284c7] focus:bg-white transition"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                        lineNumber: 669,
+                                                        lineNumber: 922,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$lock$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Lock$3e$__["Lock"], {
                                                         className: "w-4 h-4 text-slate-400 absolute left-3.5 top-3"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                        lineNumber: 677,
+                                                        lineNumber: 930,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1005,30 +1369,30 @@ function BhuViksanaApp() {
                                                             className: "w-4 h-4"
                                                         }, void 0, false, {
                                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                            lineNumber: 683,
+                                                            lineNumber: 936,
                                                             columnNumber: 37
                                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$eye$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Eye$3e$__["Eye"], {
                                                             className: "w-4 h-4"
                                                         }, void 0, false, {
                                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                            lineNumber: 683,
+                                                            lineNumber: 936,
                                                             columnNumber: 70
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                        lineNumber: 678,
+                                                        lineNumber: 931,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 668,
+                                                lineNumber: 921,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 657,
+                                        lineNumber: 910,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1039,43 +1403,43 @@ function BhuViksanaApp() {
                                                 children: "Sign In with Gov Auth"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 692,
+                                                lineNumber: 945,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$arrow$2d$right$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ArrowRight$3e$__["ArrowRight"], {
                                                 className: "w-3.5 h-3.5 text-cyan-400"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 693,
+                                                lineNumber: 946,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 688,
+                                        lineNumber: 941,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 623,
+                                lineNumber: 876,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                        lineNumber: 614,
+                        lineNumber: 867,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                    lineNumber: 613,
+                    lineNumber: 866,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/frontend-nextjs/app/page.tsx",
-            lineNumber: 576,
+            lineNumber: 829,
             columnNumber: 7
         }, this);
     }
@@ -1102,12 +1466,12 @@ function BhuViksanaApp() {
                                     className: "w-4 h-4"
                                 }, void 0, false, {
                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                    lineNumber: 720,
+                                    lineNumber: 973,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 715,
+                                lineNumber: 968,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1117,7 +1481,7 @@ function BhuViksanaApp() {
                                         children: "Change Security Passkey"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 723,
+                                        lineNumber: 976,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1128,19 +1492,19 @@ function BhuViksanaApp() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 724,
+                                        lineNumber: 977,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 722,
+                                lineNumber: 975,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                        lineNumber: 714,
+                        lineNumber: 967,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -1154,7 +1518,7 @@ function BhuViksanaApp() {
                                         children: "New Password"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 730,
+                                        lineNumber: 983,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1169,14 +1533,14 @@ function BhuViksanaApp() {
                                                 className: "w-full text-xs text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 pl-10 pr-10 outline-none focus:border-[#0284c7] focus:bg-white transition"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 732,
+                                                lineNumber: 985,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$lock$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Lock$3e$__["Lock"], {
                                                 className: "w-4 h-4 text-slate-400 absolute left-3.5 top-3"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 740,
+                                                lineNumber: 993,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1187,30 +1551,30 @@ function BhuViksanaApp() {
                                                     className: "w-4 h-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                    lineNumber: 746,
+                                                    lineNumber: 999,
                                                     columnNumber: 38
                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$eye$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Eye$3e$__["Eye"], {
                                                     className: "w-4 h-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                    lineNumber: 746,
+                                                    lineNumber: 999,
                                                     columnNumber: 71
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 741,
+                                                lineNumber: 994,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 731,
+                                        lineNumber: 984,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 729,
+                                lineNumber: 982,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1220,7 +1584,7 @@ function BhuViksanaApp() {
                                         children: "Re-type New Password"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 752,
+                                        lineNumber: 1005,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1235,26 +1599,26 @@ function BhuViksanaApp() {
                                                 className: "w-full text-xs text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 pl-10 outline-none focus:border-[#0284c7] focus:bg-white transition"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 754,
+                                                lineNumber: 1007,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$key$2d$round$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__KeyRound$3e$__["KeyRound"], {
                                                 className: "w-4 h-4 text-slate-400 absolute left-3.5 top-3"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 762,
+                                                lineNumber: 1015,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 753,
+                                        lineNumber: 1006,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 751,
+                                lineNumber: 1004,
                                 columnNumber: 13
                             }, this),
                             resetError && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1262,7 +1626,7 @@ function BhuViksanaApp() {
                                 children: resetError
                             }, void 0, false, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 767,
+                                lineNumber: 1020,
                                 columnNumber: 15
                             }, this),
                             resetSuccess && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1272,20 +1636,20 @@ function BhuViksanaApp() {
                                         className: "w-4 h-4 text-emerald-600"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 774,
+                                        lineNumber: 1027,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         children: "Password updated successfully! Returning..."
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 775,
+                                        lineNumber: 1028,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 773,
+                                lineNumber: 1026,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1296,37 +1660,37 @@ function BhuViksanaApp() {
                                         children: "Save & Update Passkey"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 783,
+                                        lineNumber: 1036,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$arrow$2d$right$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ArrowRight$3e$__["ArrowRight"], {
                                         className: "w-3.5 h-3.5 text-cyan-400"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 784,
+                                        lineNumber: 1037,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 779,
+                                lineNumber: 1032,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                        lineNumber: 728,
+                        lineNumber: 981,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                lineNumber: 713,
+                lineNumber: 966,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/frontend-nextjs/app/page.tsx",
-            lineNumber: 707,
+            lineNumber: 960,
             columnNumber: 7
         }, this);
     }
@@ -1351,12 +1715,12 @@ function BhuViksanaApp() {
                                         className: "w-9 h-9 object-contain"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 802,
+                                        lineNumber: 1054,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                    lineNumber: 801,
+                                    lineNumber: 1053,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("nav", {
@@ -1369,12 +1733,12 @@ function BhuViksanaApp() {
                                                 className: "w-5 h-5"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 806,
+                                                lineNumber: 1058,
                                                 columnNumber: 17
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 805,
+                                            lineNumber: 1057,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1385,24 +1749,24 @@ function BhuViksanaApp() {
                                                 className: "w-5 h-5"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 815,
+                                                lineNumber: 1067,
                                                 columnNumber: 17
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 808,
+                                            lineNumber: 1060,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                    lineNumber: 804,
+                                    lineNumber: 1056,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                            lineNumber: 800,
+                            lineNumber: 1052,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1419,7 +1783,7 @@ function BhuViksanaApp() {
                                                     children: getUserInitial()
                                                 }, void 0, false, {
                                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                    lineNumber: 825,
+                                                    lineNumber: 1076,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1430,7 +1794,7 @@ function BhuViksanaApp() {
                                                             children: loginEmail
                                                         }, void 0, false, {
                                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                            lineNumber: 829,
+                                                            lineNumber: 1080,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1441,19 +1805,19 @@ function BhuViksanaApp() {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                            lineNumber: 830,
+                                                            lineNumber: 1081,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                    lineNumber: 828,
+                                                    lineNumber: 1079,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 824,
+                                            lineNumber: 1075,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1472,38 +1836,38 @@ function BhuViksanaApp() {
                                                                 className: "w-4 h-4 text-[#0284c7]"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                                lineNumber: 843,
+                                                                lineNumber: 1094,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 children: "Change Password"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                                lineNumber: 844,
+                                                                lineNumber: 1095,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                        lineNumber: 842,
+                                                        lineNumber: 1093,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$right$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronRight$3e$__["ChevronRight"], {
                                                         className: "w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                        lineNumber: 846,
+                                                        lineNumber: 1097,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 835,
+                                                lineNumber: 1086,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 834,
+                                            lineNumber: 1085,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1519,31 +1883,31 @@ function BhuViksanaApp() {
                                                         className: "w-4 h-4"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                        lineNumber: 858,
+                                                        lineNumber: 1109,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         children: "Sign Out"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                        lineNumber: 859,
+                                                        lineNumber: 1110,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 851,
+                                                lineNumber: 1102,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 850,
+                                            lineNumber: 1101,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                    lineNumber: 823,
+                                    lineNumber: 1074,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1553,7 +1917,7 @@ function BhuViksanaApp() {
                                     children: getUserInitial()
                                 }, void 0, false, {
                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                    lineNumber: 865,
+                                    lineNumber: 1116,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1564,24 +1928,24 @@ function BhuViksanaApp() {
                                         className: "w-5 h-5"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 878,
+                                        lineNumber: 1129,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                    lineNumber: 873,
+                                    lineNumber: 1124,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                            lineNumber: 821,
+                            lineNumber: 1072,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                    lineNumber: 799,
+                    lineNumber: 1051,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
@@ -1597,13 +1961,13 @@ function BhuViksanaApp() {
                                         children: "Good Afternoon,"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 886,
+                                        lineNumber: 1137,
                                         columnNumber: 15
                                     }, this),
                                     " What Satellite",
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 886,
+                                        lineNumber: 1137,
                                         columnNumber: 85
                                     }, this),
                                     "scene you would like to ",
@@ -1612,13 +1976,13 @@ function BhuViksanaApp() {
                                         children: "Discover?"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 887,
+                                        lineNumber: 1138,
                                         columnNumber: 39
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 885,
+                                lineNumber: 1136,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1635,7 +1999,7 @@ function BhuViksanaApp() {
                                                         children: "Model Pipeline Mode"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                        lineNumber: 893,
+                                                        lineNumber: 1144,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1643,13 +2007,13 @@ function BhuViksanaApp() {
                                                         children: "Autonomous Dispatcher"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                        lineNumber: 894,
+                                                        lineNumber: 1145,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 892,
+                                                lineNumber: 1143,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1668,7 +2032,7 @@ function BhuViksanaApp() {
                                                                 children: "Auto-Detect (Model routes by uploaded photos)"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                                lineNumber: 907,
+                                                                lineNumber: 1158,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -1676,7 +2040,7 @@ function BhuViksanaApp() {
                                                                 children: "Single Swath (Falcon-0.7B-RS VQA)"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                                lineNumber: 908,
+                                                                lineNumber: 1159,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -1684,7 +2048,7 @@ function BhuViksanaApp() {
                                                                 children: "Bi-Temporal (Open-CD Siamese Change Detection)"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                                lineNumber: 909,
+                                                                lineNumber: 1160,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -1692,32 +2056,32 @@ function BhuViksanaApp() {
                                                                 children: "Optical SAR (Cross-Attention Fusion)"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                                lineNumber: 910,
+                                                                lineNumber: 1161,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                        lineNumber: 899,
+                                                        lineNumber: 1150,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$down$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDown$3e$__["ChevronDown"], {
                                                         className: "w-4 h-4 text-slate-400 absolute right-3 top-2.5 pointer-events-none"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                        lineNumber: 912,
+                                                        lineNumber: 1163,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 898,
+                                                lineNumber: 1149,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 891,
+                                        lineNumber: 1142,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1730,12 +2094,12 @@ function BhuViksanaApp() {
                                             className: "w-full text-sm text-slate-800 placeholder-slate-400 bg-transparent border-none resize-none focus:outline-none focus:ring-0 leading-relaxed"
                                         }, void 0, false, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 917,
+                                            lineNumber: 1168,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 916,
+                                        lineNumber: 1167,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1751,14 +2115,14 @@ function BhuViksanaApp() {
                                                                 className: "w-4 h-4 text-[#0284c7]"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                                lineNumber: 929,
+                                                                lineNumber: 1180,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 children: fileT1 && fileT2 ? `${fileT1.name.slice(0, 10)}... + ${fileT2.name.slice(0, 10)}...` : fileT1 ? fileT1.name.slice(0, 18) + '...' : 'Upload 1 or 2 Satellite Swaths'
                                                             }, void 0, false, {
                                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                                lineNumber: 930,
+                                                                lineNumber: 1181,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1770,13 +2134,13 @@ function BhuViksanaApp() {
                                                                 onChange: handleMultiFileUpload
                                                             }, void 0, false, {
                                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                                lineNumber: 937,
+                                                                lineNumber: 1188,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                        lineNumber: 928,
+                                                        lineNumber: 1179,
                                                         columnNumber: 19
                                                     }, this),
                                                     (fileT1 || fileT2) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1786,18 +2150,18 @@ function BhuViksanaApp() {
                                                             className: "w-4 h-4"
                                                         }, void 0, false, {
                                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                            lineNumber: 948,
+                                                            lineNumber: 1199,
                                                             columnNumber: 23
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                        lineNumber: 947,
+                                                        lineNumber: 1198,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 927,
+                                                lineNumber: 1178,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1809,32 +2173,32 @@ function BhuViksanaApp() {
                                                         children: "Launch Workstation"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                        lineNumber: 958,
+                                                        lineNumber: 1209,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$rocket$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Rocket$3e$__["Rocket"], {
                                                         className: "w-3.5 h-3.5 fill-white"
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                        lineNumber: 959,
+                                                        lineNumber: 1210,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 953,
+                                                lineNumber: 1204,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 926,
+                                        lineNumber: 1177,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 890,
+                                lineNumber: 1141,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1848,20 +2212,20 @@ function BhuViksanaApp() {
                                                 className: "w-3.5 h-3.5 text-[#0284c7]"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 969,
+                                                lineNumber: 1220,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Visakhapatnam Port"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 970,
+                                                lineNumber: 1221,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 965,
+                                        lineNumber: 1216,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1872,48 +2236,48 @@ function BhuViksanaApp() {
                                                 className: "w-3.5 h-3.5 text-[#f37021]"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 976,
+                                                lineNumber: 1227,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Assam Flood Inundation"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 977,
+                                                lineNumber: 1228,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 972,
+                                        lineNumber: 1223,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 964,
+                                lineNumber: 1215,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                        lineNumber: 884,
+                        lineNumber: 1135,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                    lineNumber: 883,
+                    lineNumber: 1134,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/frontend-nextjs/app/page.tsx",
-            lineNumber: 797,
+            lineNumber: 1050,
             columnNumber: 7
         }, this);
     }
     // =========================================================================
-    // PAGE 3: WORKSTATION VIEW (WITH EXPORT BRIEFING RESTORED)
+    // PAGE 3: WORKSTATION VIEW
     // =========================================================================
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "flex h-screen w-screen overflow-hidden bg-[#e5e3df] font-sans text-[#202124] select-none relative",
@@ -1934,12 +2298,12 @@ function BhuViksanaApp() {
                                     className: "w-4 h-4"
                                 }, void 0, false, {
                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                    lineNumber: 998,
+                                    lineNumber: 1248,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 997,
+                                lineNumber: 1247,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1947,7 +2311,7 @@ function BhuViksanaApp() {
                                 children: activeScenario
                             }, void 0, false, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 1000,
+                                lineNumber: 1250,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1957,18 +2321,18 @@ function BhuViksanaApp() {
                                     className: "w-4 h-4"
                                 }, void 0, false, {
                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                    lineNumber: 1004,
+                                    lineNumber: 1254,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 1003,
+                                lineNumber: 1253,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                        lineNumber: 996,
+                        lineNumber: 1246,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1982,20 +2346,20 @@ function BhuViksanaApp() {
                                         className: "w-3.5 h-3.5"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 1015,
+                                        lineNumber: 1265,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         children: "Port Recon"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 1016,
+                                        lineNumber: 1266,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 1009,
+                                lineNumber: 1259,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2006,20 +2370,20 @@ function BhuViksanaApp() {
                                         className: "w-3.5 h-3.5"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 1024,
+                                        lineNumber: 1274,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         children: "Flood Analysis"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 1025,
+                                        lineNumber: 1275,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 1018,
+                                lineNumber: 1268,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2033,20 +2397,20 @@ function BhuViksanaApp() {
                                         className: "w-3.5 h-3.5"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 1036,
+                                        lineNumber: 1286,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         children: "3-Pane Bit-CD"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 1037,
+                                        lineNumber: 1287,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 1027,
+                                lineNumber: 1277,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2057,32 +2421,32 @@ function BhuViksanaApp() {
                                         className: "w-3.5 h-3.5"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 1045,
+                                        lineNumber: 1295,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         children: "Swipe Tool"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 1046,
+                                        lineNumber: 1296,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 1039,
+                                lineNumber: 1289,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                        lineNumber: 1008,
+                        lineNumber: 1258,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                lineNumber: 995,
+                lineNumber: 1245,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2105,20 +2469,20 @@ function BhuViksanaApp() {
                                                 className: "w-3.5 h-3.5"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 1062,
+                                                lineNumber: 1312,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "SMS Alert"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 1063,
+                                                lineNumber: 1313,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 1057,
+                                        lineNumber: 1307,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2129,20 +2493,20 @@ function BhuViksanaApp() {
                                                 className: "w-3.5 h-3.5 text-[#1a73e8]"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 1070,
+                                                lineNumber: 1320,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Audit Trace"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 1071,
+                                                lineNumber: 1321,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 1066,
+                                        lineNumber: 1316,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2154,26 +2518,26 @@ function BhuViksanaApp() {
                                                 className: "w-3.5 h-3.5"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 1080,
+                                                lineNumber: 1329,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Export Briefing"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 1081,
+                                                lineNumber: 1330,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 1075,
+                                        lineNumber: 1324,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 1056,
+                                lineNumber: 1306,
                                 columnNumber: 11
                             }, this),
                             activeViewTool === 'tripane' ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2187,19 +2551,19 @@ function BhuViksanaApp() {
                                             className: "w-full h-full object-cover"
                                         }, void 0, false, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 1089,
+                                            lineNumber: 1337,
                                             columnNumber: 30
                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "w-full h-full flex items-center justify-center text-slate-500 font-mono text-xs",
                                             children: "Pre-Event Baseline"
                                         }, void 0, false, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 1089,
+                                            lineNumber: 1337,
                                             columnNumber: 104
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 1088,
+                                        lineNumber: 1336,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2210,19 +2574,19 @@ function BhuViksanaApp() {
                                             className: "w-full h-full object-cover"
                                         }, void 0, false, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 1092,
+                                            lineNumber: 1340,
                                             columnNumber: 43
                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "w-full h-full flex items-center justify-center text-slate-500 font-mono text-xs",
                                             children: "Post-Event Target"
                                         }, void 0, false, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 1092,
+                                            lineNumber: 1340,
                                             columnNumber: 130
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 1091,
+                                        lineNumber: 1339,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2233,25 +2597,25 @@ function BhuViksanaApp() {
                                             className: "w-full h-full object-cover filter contrast-150"
                                         }, void 0, false, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 1095,
+                                            lineNumber: 1343,
                                             columnNumber: 34
                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "w-full h-full flex items-center justify-center text-slate-500 font-mono text-xs",
                                             children: "Awaiting Mask Matrix"
                                         }, void 0, false, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 1095,
+                                            lineNumber: 1343,
                                             columnNumber: 134
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 1094,
+                                        lineNumber: 1342,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 1087,
+                                lineNumber: 1335,
                                 columnNumber: 13
                             }, this) : t1DataUrl ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "w-full h-full relative overflow-hidden flex items-center justify-center bg-black",
@@ -2262,7 +2626,7 @@ function BhuViksanaApp() {
                                         className: "absolute inset-0 w-full h-full object-cover"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 1100,
+                                        lineNumber: 1348,
                                         columnNumber: 15
                                     }, this),
                                     showBBoxes && entities.map((box, idx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2283,18 +2647,18 @@ function BhuViksanaApp() {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 1112,
+                                                lineNumber: 1360,
                                                 columnNumber: 19
                                             }, this)
                                         }, box.id ?? idx, false, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 1102,
+                                            lineNumber: 1350,
                                             columnNumber: 17
                                         }, this))
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 1099,
+                                lineNumber: 1347,
                                 columnNumber: 13
                             }, this) : isClient && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(WorkstationMap, {
                                 center: mapCenter,
@@ -2305,7 +2669,7 @@ function BhuViksanaApp() {
                                 onUpdate: handleMapUpdate
                             }, void 0, false, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 1120,
+                                lineNumber: 1368,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2320,34 +2684,13 @@ function BhuViksanaApp() {
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 1132,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                onClick: ()=>setIsSidebarOpen(!isSidebarOpen),
-                                className: "absolute top-1/2 -translate-y-1/2 right-0 z-[450] bg-white hover:bg-[#f8f9fa] border-y border-l border-[#dadce0] py-3 px-1 rounded-l-xl text-[#5f6368] shadow transition",
-                                children: isSidebarOpen ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$right$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronRight$3e$__["ChevronRight"], {
-                                    className: "w-4 h-4"
-                                }, void 0, false, {
-                                    fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                    lineNumber: 1140,
-                                    columnNumber: 30
-                                }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$left$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronLeft$3e$__["ChevronLeft"], {
-                                    className: "w-4 h-4"
-                                }, void 0, false, {
-                                    fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                    lineNumber: 1140,
-                                    columnNumber: 69
-                                }, this)
-                            }, void 0, false, {
-                                fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 1136,
+                                lineNumber: 1379,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                        lineNumber: 1053,
+                        lineNumber: 1303,
                         columnNumber: 9
                     }, this),
                     isSidebarOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("aside", {
@@ -2366,19 +2709,19 @@ function BhuViksanaApp() {
                                                         children: msg.sender === 'user' ? 'Operator' : 'BhuViksana Assistant'
                                                     }, void 0, false, {
                                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                        lineNumber: 1156,
+                                                        lineNumber: 1396,
                                                         columnNumber: 21
                                                     }, this),
                                                     msg.text
                                                 ]
                                             }, idx, true, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 1150,
+                                                lineNumber: 1390,
                                                 columnNumber: 19
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 1148,
+                                        lineNumber: 1388,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2393,7 +2736,7 @@ function BhuViksanaApp() {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 1165,
+                                                lineNumber: 1405,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2406,7 +2749,7 @@ function BhuViksanaApp() {
                                                                 children: item.name
                                                             }, void 0, false, {
                                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                                lineNumber: 1171,
+                                                                lineNumber: 1411,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2417,30 +2760,30 @@ function BhuViksanaApp() {
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                                lineNumber: 1172,
+                                                                lineNumber: 1412,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, item.id, true, {
                                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                        lineNumber: 1170,
+                                                        lineNumber: 1410,
                                                         columnNumber: 21
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 1168,
+                                                lineNumber: 1408,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 1164,
+                                        lineNumber: 1404,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 1147,
+                                lineNumber: 1387,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2452,7 +2795,7 @@ function BhuViksanaApp() {
                                             className: "w-4 h-4 text-[#1a73e8]"
                                         }, void 0, false, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 1183,
+                                            lineNumber: 1423,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2464,7 +2807,7 @@ function BhuViksanaApp() {
                                             className: "w-full bg-transparent text-xs text-[#202124] focus:outline-none"
                                         }, void 0, false, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 1184,
+                                            lineNumber: 1424,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2474,35 +2817,35 @@ function BhuViksanaApp() {
                                                 className: "w-3 h-3"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 1193,
+                                                lineNumber: 1433,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 1192,
+                                            lineNumber: 1432,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                    lineNumber: 1182,
+                                    lineNumber: 1422,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 1181,
+                                lineNumber: 1421,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                        lineNumber: 1146,
+                        lineNumber: 1386,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                lineNumber: 1052,
+                lineNumber: 1302,
                 columnNumber: 7
             }, this),
             showSmsModal && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2522,12 +2865,12 @@ function BhuViksanaApp() {
                                                 className: "w-4 h-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                lineNumber: 1208,
+                                                lineNumber: 1448,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 1207,
+                                            lineNumber: 1447,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2537,7 +2880,7 @@ function BhuViksanaApp() {
                                                     children: "Broadcast Disaster SMS Alert"
                                                 }, void 0, false, {
                                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                    lineNumber: 1211,
+                                                    lineNumber: 1451,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2545,19 +2888,19 @@ function BhuViksanaApp() {
                                                     children: "Disaster Emergency Telemetry Dispatch"
                                                 }, void 0, false, {
                                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                    lineNumber: 1212,
+                                                    lineNumber: 1452,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 1210,
+                                            lineNumber: 1450,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                    lineNumber: 1206,
+                                    lineNumber: 1446,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2567,18 +2910,18 @@ function BhuViksanaApp() {
                                         className: "w-4 h-4"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 1219,
+                                        lineNumber: 1459,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                    lineNumber: 1215,
+                                    lineNumber: 1455,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                            lineNumber: 1205,
+                            lineNumber: 1445,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -2592,7 +2935,7 @@ function BhuViksanaApp() {
                                             children: "Enter Mobile Number to receive SMS Alert"
                                         }, void 0, false, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 1225,
+                                            lineNumber: 1465,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2607,26 +2950,26 @@ function BhuViksanaApp() {
                                                     className: "w-full text-xs font-mono text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-3 pl-10 outline-none focus:border-rose-500 focus:bg-white transition"
                                                 }, void 0, false, {
                                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                    lineNumber: 1229,
+                                                    lineNumber: 1469,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$phone$2d$call$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__PhoneCall$3e$__["PhoneCall"], {
                                                     className: "w-4 h-4 text-slate-400 absolute left-3.5 top-3.5"
                                                 }, void 0, false, {
                                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                    lineNumber: 1237,
+                                                    lineNumber: 1477,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 1228,
+                                            lineNumber: 1468,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                    lineNumber: 1224,
+                                    lineNumber: 1464,
                                     columnNumber: 15
                                 }, this),
                                 smsStatus === 'success' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2636,7 +2979,7 @@ function BhuViksanaApp() {
                                             className: "w-4 h-4 text-emerald-600 flex-shrink-0"
                                         }, void 0, false, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 1243,
+                                            lineNumber: 1483,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2647,13 +2990,13 @@ function BhuViksanaApp() {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 1244,
+                                            lineNumber: 1484,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                    lineNumber: 1242,
+                                    lineNumber: 1482,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2666,7 +3009,7 @@ function BhuViksanaApp() {
                                             children: "Cancel"
                                         }, void 0, false, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 1249,
+                                            lineNumber: 1489,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2678,49 +3021,49 @@ function BhuViksanaApp() {
                                                     children: "Transmitting..."
                                                 }, void 0, false, {
                                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                    lineNumber: 1261,
+                                                    lineNumber: 1501,
                                                     columnNumber: 35
                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                     children: "Dispatch Alert"
                                                 }, void 0, false, {
                                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                    lineNumber: 1261,
+                                                    lineNumber: 1501,
                                                     columnNumber: 66
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$radio$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Radio$3e$__["Radio"], {
                                                     className: "w-3.5 h-3.5"
                                                 }, void 0, false, {
                                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                                    lineNumber: 1262,
+                                                    lineNumber: 1502,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                            lineNumber: 1256,
+                                            lineNumber: 1496,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                    lineNumber: 1248,
+                                    lineNumber: 1488,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                            lineNumber: 1223,
+                            lineNumber: 1463,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                    lineNumber: 1204,
+                    lineNumber: 1444,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                lineNumber: 1203,
+                lineNumber: 1443,
                 columnNumber: 9
             }, this),
             showAuditModal && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2736,7 +3079,7 @@ function BhuViksanaApp() {
                                     children: "Execution Telemetry & Audit Log"
                                 }, void 0, false, {
                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                    lineNumber: 1275,
+                                    lineNumber: 1515,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2746,18 +3089,18 @@ function BhuViksanaApp() {
                                         className: "w-4 h-4"
                                     }, void 0, false, {
                                         fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                        lineNumber: 1277,
+                                        lineNumber: 1517,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                    lineNumber: 1276,
+                                    lineNumber: 1516,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                            lineNumber: 1274,
+                            lineNumber: 1514,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2765,7 +3108,7 @@ function BhuViksanaApp() {
                             children: "Aligned sensor array to 512x512 tile patches with EPSG:4326 CRS coordinates."
                         }, void 0, false, {
                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                            lineNumber: 1280,
+                            lineNumber: 1520,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$frontend$2d$nextjs$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2776,29 +3119,29 @@ function BhuViksanaApp() {
                                 children: "Close"
                             }, void 0, false, {
                                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                                lineNumber: 1282,
+                                lineNumber: 1522,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/frontend-nextjs/app/page.tsx",
-                            lineNumber: 1281,
+                            lineNumber: 1521,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/frontend-nextjs/app/page.tsx",
-                    lineNumber: 1273,
+                    lineNumber: 1513,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/frontend-nextjs/app/page.tsx",
-                lineNumber: 1272,
+                lineNumber: 1512,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/frontend-nextjs/app/page.tsx",
-        lineNumber: 990,
+        lineNumber: 1241,
         columnNumber: 5
     }, this);
 }
