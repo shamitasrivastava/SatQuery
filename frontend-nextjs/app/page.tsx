@@ -37,7 +37,11 @@ import {
   Binary,
   Radio,
   PhoneCall,
-  KeyRound
+  KeyRound,
+  FileImage,
+  Flame,
+  Terminal,
+  Clock
 } from 'lucide-react';
 import * as GeoTIFF from 'geotiff';
 import { jsPDF } from 'jspdf';
@@ -113,6 +117,7 @@ export default function BhuViksanaApp() {
   // -------------------------------------------------------------
   const [targetMethod, setTargetMethod] = useState<'auto' | 'single' | 'bitemporal' | 'opticalsar'>('auto');
   const [detectedPipeline, setDetectedPipeline] = useState<string>('Auto-Routing Engine Idle');
+  const [activeTab, setActiveTab] = useState<'overview' | 'change' | 'audit'>('overview');
   const [activeWorkstationTab, setActiveWorkstationTab] = useState<'rsvqa' | 'bitemporal' | 'audittrace'>('rsvqa');
   const [activeViewTool, setActiveViewTool] = useState<'single' | 'swipe' | 'tripane'>('single');
   const [showBBoxes, setShowBBoxes] = useState<boolean>(true);
@@ -167,24 +172,15 @@ export default function BhuViksanaApp() {
   const [chatInput, setChatInput] = useState('');
   const [activeScenario, setActiveScenario] = useState<string>('Custom Spatial Ingestion Swath');
 
-  const [fileT1, setFileT1] = useState<File | null>(null);
-  const [fileT2, setFileT2] = useState<File | null>(null);
+  // Unified File List
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [t1DataUrl, setT1DataUrl] = useState<string | null>(null);
   const [t2DataUrl, setT2DataUrl] = useState<string | null>(null);
-  const [changeMaskUrl, setChangeMaskUrl] = useState<string | null>(null);
 
   const [entities, setEntities] = useState<MapEntity[]>([]);
+  const [chatMessages, setChatMessages] = useState<Array<{ sender: 'user' | 'ai'; text: string }>>([]);
 
-  const [chatMessages, setChatMessages] = useState<Array<{ sender: 'user' | 'ai'; text: string }>>([
-    {
-      sender: 'ai',
-      text: 'BhuViksana Engine Initialized. Select or upload swaths to begin analysis.'
-    }
-  ]);
-
-  const fileInputT1Ref = useRef<HTMLInputElement>(null);
-  const fileInputT2Ref = useRef<HTMLInputElement>(null);
-  const multiFileInputRef = useRef<HTMLInputElement>(null);
+  const singleUploadInputRef = useRef<HTMLInputElement>(null);
 
   const handleMapUpdate = (lat?: number, lng?: number, zoom?: number) => {
     if (typeof lat !== 'number' || typeof lng !== 'number') return;
@@ -262,130 +258,87 @@ export default function BhuViksanaApp() {
     return URL.createObjectURL(file);
   };
 
-  const autoDetectPipeline = (f1: File | null, f2: File | null) => {
-    if (!f1 && !f2) {
-      setDetectedPipeline('Auto-Routing Engine Idle');
-      return;
-    }
-    if (f1 && !f2) {
-      setDetectedPipeline('Single Swath detected → Routed to Falcon-0.7B-RS (Single RS-VQA)');
-      if (targetMethod === 'auto') {
-        setActiveWorkstationTab('rsvqa');
-        setActiveViewTool('single');
-      }
-      return;
-    }
-    if (f1 && f2) {
-      const nameCheck = (f1.name + ' ' + f2.name).toLowerCase();
-      if (nameCheck.includes('sar') || nameCheck.includes('sentinel-1') || nameCheck.includes('s1') || nameCheck.includes('radar')) {
-        setDetectedPipeline('SAR + Optical Swaths detected → Routed to Cross-Attention Optical-SAR Fusion');
-      } else {
-        setDetectedPipeline('Dual Temporal Swaths detected (Pre/Post) → Routed to Open-CD Bi-Temporal Siamese');
-      }
-      if (targetMethod === 'auto') {
-        setActiveWorkstationTab('bitemporal');
-        setActiveViewTool('tripane');
-      }
-    }
-  };
+  const handleUniversalUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const newSelected = Array.from(e.target.files);
+    const combined = [...uploadedFiles, ...newSelected];
+    setUploadedFiles(combined);
 
-  const handleMultiFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const files = Array.from(e.target.files);
-      if (files.length === 1) {
-        const f1 = files[0];
-        setFileT1(f1);
-        setFileT2(null);
-        setT2DataUrl(null);
-        setChangeMaskUrl(null);
-        const url1 = await processRaster(f1);
-        setT1DataUrl(url1);
-        autoDetectPipeline(f1, null);
-      } else if (files.length >= 2) {
-        const f1 = files[0];
-        const f2 = files[1];
-        setFileT1(f1);
-        setFileT2(f2);
-        const url1 = await processRaster(f1);
-        const url2 = await processRaster(f2);
-        setT1DataUrl(url1);
-        setT2DataUrl(url2);
-        autoDetectPipeline(f1, f2);
-      }
+    if (combined.length === 1) {
+      const url1 = await processRaster(combined[0]);
+      setT1DataUrl(url1);
+      setT2DataUrl(null);
+      setTargetMethod('single');
+      setActiveViewTool('single');
+      setActiveWorkstationTab('rsvqa');
+      setActiveTab('overview');
+      setDetectedPipeline('1 Image detected → Auto-routed to Falcon-0.7B-RS (Single RS-VQA)');
+    } else if (combined.length >= 2) {
+      const url1 = await processRaster(combined[0]);
+      const url2 = await processRaster(combined[1]);
+      setT1DataUrl(url1);
+      setT2DataUrl(url2);
+      setTargetMethod('bitemporal');
+      setActiveViewTool('tripane');
+      setActiveWorkstationTab('bitemporal');
+      setActiveTab('change');
+      setDetectedPipeline('2+ Images detected → Auto-routed to Open-CD (Bi-Temporal Siamese 3-Pane Bit-CD)');
     }
-  };
 
-  const handleFileT1Change = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setFileT1(file);
-      const url = await processRaster(file);
-      setT1DataUrl(url);
-      autoDetectPipeline(file, fileT2);
-    }
-  };
-
-  const handleFileT2Change = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setFileT2(file);
-      const url = await processRaster(file);
-      setT2DataUrl(url);
-      autoDetectPipeline(fileT1, file);
+    if (singleUploadInputRef.current) {
+      singleUploadInputRef.current.value = '';
     }
   };
 
   const handleClearFiles = () => {
-    setFileT1(null);
-    setFileT2(null);
+    setUploadedFiles([]);
     setT1DataUrl(null);
     setT2DataUrl(null);
-    setChangeMaskUrl(null);
     setEntities([]);
+    setChatMessages([]);
     setDetectedPipeline('Auto-Routing Engine Idle');
-    if (fileInputT1Ref.current) fileInputT1Ref.current.value = '';
-    if (fileInputT2Ref.current) fileInputT2Ref.current.value = '';
-    if (multiFileInputRef.current) multiFileInputRef.current.value = '';
+    if (singleUploadInputRef.current) singleUploadInputRef.current.value = '';
   };
 
   const handleLaunchWorkstation = () => {
     setIsLoading(true);
-    let effectiveMethod = targetMethod;
-    if (targetMethod === 'auto') {
-      if (fileT1 && fileT2) {
-        const nameCheck = (fileT1.name + ' ' + fileT2.name).toLowerCase();
-        effectiveMethod = (nameCheck.includes('sar') || nameCheck.includes('s1')) ? 'opticalsar' : 'bitemporal';
-      } else {
-        effectiveMethod = 'single';
-      }
+    const isDual = uploadedFiles.length >= 2 || targetMethod === 'bitemporal' || targetMethod === 'opticalsar';
+
+    if (uploadedFiles.length > 0) {
+      setActiveScenario(
+        uploadedFiles.length >= 2
+          ? `${uploadedFiles[0].name} vs ${uploadedFiles[1].name}`
+          : uploadedFiles[0].name
+      );
     }
 
-    if (fileT1) {
-      setActiveScenario(`${fileT1.name}${fileT2 ? ' ⟷ ' + fileT2.name : ''}`);
-      setEntities([]);
-      setChatMessages([
-        {
-          sender: 'ai',
-          text: `Autonomous router initialized [Pipeline: ${effectiveMethod.toUpperCase()}]. Active raster swath loaded cleanly.`
-        }
-      ]);
-    }
-
-    if (effectiveMethod === 'bitemporal' || effectiveMethod === 'opticalsar') {
+    if (isDual) {
       setActiveWorkstationTab('bitemporal');
       setActiveViewTool('tripane');
+      setActiveTab('change');
+      setEntities([
+        {
+          id: 1,
+          name: 'Change Sector 1 (Center)',
+          confidence: 0.982,
+          area_m2: 60650,
+          color: '#1a73e8'
+        }
+      ]);
     } else {
       setActiveWorkstationTab('rsvqa');
       setActiveViewTool('single');
+      setActiveTab('overview');
+      setEntities([]);
     }
 
     const newHistory: HistoryItem = {
       id: `hist-${Date.now()}`,
-      title: fileT1 ? fileT1.name : activeScenario,
+      title: uploadedFiles.length > 0 ? uploadedFiles[0].name : activeScenario,
       timestamp: 'Just now',
-      method: effectiveMethod,
-      pipeline: effectiveMethod === 'bitemporal' ? 'Open-CD (Bi-Temporal Siamese)' : effectiveMethod === 'opticalsar' ? 'Cross-Attention Optical-SAR' : 'Falcon-0.7B-RS (Single RS-VQA)',
-      entitiesCount: 0,
+      method: isDual ? 'bitemporal' : 'single',
+      pipeline: isDual ? 'Open-CD (Bi-Temporal Siamese)' : 'Falcon-0.7B-RS (Single RS-VQA)',
+      entitiesCount: isDual ? 1 : 0,
       coordinates: { lat: liveCoords.lat, lng: liveCoords.lng }
     };
     setHistoryList((prev) => [newHistory, ...prev]);
@@ -400,6 +353,7 @@ export default function BhuViksanaApp() {
       setTargetMethod('single');
       setActiveWorkstationTab('rsvqa');
       setActiveViewTool('single');
+      setActiveTab('overview');
       setMapCenter([17.6965, 83.2980]);
       setMapZoom(15);
       setLiveCoords({ lat: 17.6965, lng: 83.2980, zoom: 15 });
@@ -409,18 +363,19 @@ export default function BhuViksanaApp() {
           name: 'Container Cargo Ship (Berth 4)',
           confidence: 0.990,
           area_m2: 6200,
-          top: 42,
-          left: 26,
-          width: 22,
-          height: 16,
+          latMin: 17.6940,
+          lngMin: 83.2950,
+          latMax: 17.6980,
+          lngMax: 83.3010,
           color: '#1a73e8'
         }
       ]);
     } else {
       setActiveScenario('Brahmaputra Basin, Assam (Flood Inundation)');
-      setTargetMethod('bitemporal');
-      setActiveWorkstationTab('bitemporal');
-      setActiveViewTool('tripane');
+      setTargetMethod('single');
+      setActiveWorkstationTab('rsvqa');
+      setActiveViewTool('single');
+      setActiveTab('overview');
       setMapCenter([26.1900, 91.7300]);
       setMapZoom(14);
       setLiveCoords({ lat: 26.1900, lng: 91.7300, zoom: 14 });
@@ -430,10 +385,10 @@ export default function BhuViksanaApp() {
           name: 'Submerged Highway NH-27 Corridor',
           confidence: 0.992,
           area_m2: 24500,
-          top: 35,
-          left: 30,
-          width: 38,
-          height: 25,
+          latMin: 26.1850,
+          lngMin: 91.7200,
+          latMax: 26.1950,
+          lngMax: 91.7400,
           color: '#d93025'
         }
       ]);
@@ -459,43 +414,13 @@ export default function BhuViksanaApp() {
     }, 1000);
   };
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = () => {
     if (!chatInput.trim()) return;
     const userQ = chatInput.trim();
     setChatMessages((prev) => [...prev, { sender: 'user', text: userQ }]);
     setChatInput('');
-    setIsLoading(true);
-
-    setTimeout(() => {
-      let aiReply = `Analyzed spatial raster at ${liveCoords.lat}°N, ${liveCoords.lng}°E.`;
-      const q = userQ.toLowerCase();
-
-      if (q.includes('flood') || q.includes('water')) {
-        aiReply = `Identified surface water accumulation across low-elevation zones. Specular radar backscatter confirms inundation.`;
-        setEntities([
-          {
-            id: 1,
-            name: 'Inundated Water Body / Flood Extent',
-            confidence: 0.984,
-            area_m2: 32400,
-            top: 32,
-            left: 28,
-            width: 38,
-            height: 26,
-            color: '#0284c7'
-          }
-        ]);
-      } else {
-        aiReply = `Processed query: "${userQ}". Grounded primary visual sector.`;
-      }
-      setChatMessages((prev) => [...prev, { sender: 'ai', text: aiReply }]);
-      setIsLoading(false);
-    }, 400);
   };
 
-  // -------------------------------------------------------------
-  // HELPER: FETCH LOCAL /logo.png AS BASE64 FOR PDF
-  // -------------------------------------------------------------
   const fetchImageAsBase64 = async (src: string): Promise<string> => {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -509,23 +434,20 @@ export default function BhuViksanaApp() {
           ctx.drawImage(img, 0, 0);
           resolve(canvas.toDataURL('image/png'));
         } else {
-          reject(new Error('Canvas context not available'));
+          reject(new Error('Canvas context unavailable'));
         }
       };
-      img.onerror = (e) => reject(e);
+      img.onerror = (err) => reject(err);
       img.src = src;
     });
   };
 
-  // -------------------------------------------------------------
-  // PDF EXPORT EMBEDDING ACTUAL /logo.png
-  // -------------------------------------------------------------
   const handleExportPDF = async () => {
     let logoDataUrl = '';
     try {
       logoDataUrl = await fetchImageAsBase64('/logo.png');
     } catch (e) {
-      console.warn('Could not load /logo.png from public directory, proceeding without image embed:', e);
+      console.warn('Could not load /logo.png, exporting without image embed:', e);
     }
 
     const doc = new jsPDF({
@@ -545,7 +467,6 @@ export default function BhuViksanaApp() {
       doc.setLineWidth(0.4);
       doc.rect(0, 0, pageWidth, 26, 'FD');
 
-      // Rounded container for logo
       doc.setFillColor(255, 255, 255);
       doc.setDrawColor(215, 225, 238);
       doc.setLineWidth(0.3);
@@ -578,7 +499,6 @@ export default function BhuViksanaApp() {
       doc.text(`Page ${pageNumber}`, pageWidth - margin - 11, pageHeight - 9);
     };
 
-    // PAGE 1: METADATA & SPECIFICATIONS
     renderHeader();
 
     let y = 33;
@@ -708,7 +628,6 @@ export default function BhuViksanaApp() {
     doc.addPage();
     renderHeader();
 
-    // Large Center Watermark
     if (logoDataUrl) {
       doc.saveGraphicsState();
       if ((doc as any).setGState && (doc as any).GState) {
@@ -1149,15 +1068,12 @@ export default function BhuViksanaApp() {
                 <div className="relative">
                   <select
                     value={targetMethod}
-                    onChange={(e) => {
-                      setTargetMethod(e.target.value as any);
-                      autoDetectPipeline(fileT1, fileT2);
-                    }}
+                    onChange={(e) => setTargetMethod(e.target.value as any)}
                     className="text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 pr-9 outline-none focus:border-[#0284c7] focus:bg-white transition cursor-pointer appearance-none shadow-sm"
                   >
-                    <option value="auto">Auto-Detect (Model routes by uploaded photos)</option>
+                    <option value="auto">Auto-Detect (Routes model by uploaded swaths)</option>
                     <option value="single">Single Swath (Falcon-0.7B-RS VQA)</option>
-                    <option value="bitemporal">Bi-Temporal (Open-CD Siamese Change Detection)</option>
+                    <option value="bitemporal">Bi-Temporal (Open-CD 3-Pane Bit-CD)</option>
                     <option value="opticalsar">Optical SAR (Cross-Attention Fusion)</option>
                   </select>
                   <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-2.5 pointer-events-none" />
@@ -1174,41 +1090,55 @@ export default function BhuViksanaApp() {
                 />
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
-                <div className="flex items-center gap-2">
-                  <label className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 cursor-pointer text-xs font-medium text-slate-700 transition">
-                    <UploadCloud className="w-4 h-4 text-[#0284c7]" />
-                    <span>
-                      {fileT1 && fileT2
-                        ? `${fileT1.name.slice(0, 10)}... + ${fileT2.name.slice(0, 10)}...`
-                        : fileT1
-                        ? fileT1.name.slice(0, 18) + '...'
-                        : 'Upload 1 or 2 Satellite Swaths'}
-                    </span>
-                    <input
-                      ref={multiFileInputRef}
-                      type="file"
-                      multiple
-                      className="hidden"
-                      accept=".tif,.tiff,.png,.jpg,.jpeg"
-                      onChange={handleMultiFileUpload}
-                    />
-                  </label>
-                  {(fileT1 || fileT2) && (
-                    <button onClick={handleClearFiles} className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition">
-                      <X className="w-4 h-4" />
-                    </button>
-                  )}
+              <div className="space-y-3 pt-3 border-t border-slate-100">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <label className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 cursor-pointer text-xs font-medium text-slate-700 shadow-sm transition">
+                      <UploadCloud className="w-4 h-4 text-[#0284c7]" />
+                      <span>
+                        {uploadedFiles.length === 0
+                          ? 'Upload Satellite Images (Select 1 or more)'
+                          : uploadedFiles.length === 1
+                          ? `1 Swath: ${uploadedFiles[0].name.slice(0, 20)}...`
+                          : `${uploadedFiles.length} Swaths Uploaded (${uploadedFiles[0].name.slice(0, 10)}... + ${uploadedFiles.length - 1} more)`}
+                      </span>
+                      <input
+                        ref={singleUploadInputRef}
+                        type="file"
+                        multiple
+                        className="hidden"
+                        accept=".tif,.tiff,.png,.jpg,.jpeg"
+                        onChange={handleUniversalUpload}
+                      />
+                    </label>
+
+                    {uploadedFiles.length > 0 && (
+                      <button
+                        onClick={handleClearFiles}
+                        className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
+                        title="Clear uploaded images"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={handleLaunchWorkstation}
+                    disabled={isLoading || uploadedFiles.length === 0}
+                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#f37021] to-[#f97316] hover:from-[#ea580c] hover:to-[#f37021] text-white text-xs font-semibold shadow-md active:scale-[0.98] transition disabled:opacity-50 cursor-pointer"
+                  >
+                    <span>Launch Workstation</span>
+                    <Rocket className="w-3.5 h-3.5 fill-white" />
+                  </button>
                 </div>
 
-                <button
-                  onClick={handleLaunchWorkstation}
-                  disabled={isLoading}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#f37021] to-[#f97316] hover:from-[#ea580c] hover:to-[#f37021] text-white text-xs font-semibold shadow-md active:scale-[0.98] transition disabled:opacity-50"
-                >
-                  <span>Launch Workstation</span>
-                  <Rocket className="w-3.5 h-3.5 fill-white" />
-                </button>
+                {detectedPipeline !== 'Auto-Routing Engine Idle' && (
+                  <div className="text-[11px] font-mono text-[#0284c7] bg-[#f0f7ff] px-3.5 py-2 rounded-xl border border-[#d0e5ff] flex items-center gap-2">
+                    <Sparkles className="w-3.5 h-3.5 text-[#f37021] flex-shrink-0" />
+                    <span className="truncate">{detectedPipeline}</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -1239,60 +1169,62 @@ export default function BhuViksanaApp() {
   // =========================================================================
   return (
     <div
-      className="flex h-screen w-screen overflow-hidden bg-[#e5e3df] font-sans text-[#202124] select-none relative"
+      className="flex h-screen w-screen overflow-hidden bg-[#090d16] font-sans text-slate-200 select-none relative"
       onMouseUp={() => { isDraggingSwipe.current = false; }}
     >
-      <div className="absolute top-4 left-4 z-[400] flex flex-col gap-2 pointer-events-auto max-w-[calc(100vw-32px)]">
-        <div className="flex items-center h-12 bg-white rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.2)] border border-[#dadce0] px-3 gap-2 w-[360px] sm:w-[390px]">
-          <button onClick={() => setCurrentPage('canvas')} className="p-1.5 rounded-full hover:bg-[#f1f3f4] text-[#5f6368] transition">
+      <div className="absolute top-3 left-3 z-[400] flex flex-col gap-2 pointer-events-auto max-w-[calc(100vw-32px)]">
+        <div className="flex items-center h-10 bg-white/95 backdrop-blur-md rounded-full shadow-lg border border-slate-200 px-3 gap-2 w-[340px] sm:w-[380px]">
+          <button onClick={() => setCurrentPage('canvas')} className="p-1 rounded-full hover:bg-slate-100 text-slate-600 transition">
             <ArrowLeft className="w-4 h-4" />
           </button>
-          <div className="flex-1 truncate text-xs font-semibold text-[#202124]">
-            {activeScenario}
+          <div className="flex-1 truncate text-xs font-medium text-slate-800">
+            Swath: {activeScenario}
           </div>
-          <button onClick={() => handleLoadScenario(activeScenario.includes('Visakhapatnam') ? 'flood' : 'port')} className="p-1.5 rounded-full hover:bg-[#f1f3f4] text-[#1a73e8] transition">
-            <SlidersHorizontal className="w-4 h-4" />
+          <button onClick={() => handleLoadScenario(activeScenario.includes('Visakhapatnam') ? 'flood' : 'port')} className="p-1 rounded-full hover:bg-slate-100 text-slate-600 transition">
+            <SlidersHorizontal className="w-3.5 h-3.5" />
           </button>
         </div>
 
         <div className="flex items-center gap-1.5 overflow-x-auto py-0.5 no-scrollbar">
           <button
             onClick={() => handleLoadScenario('port')}
-            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium shadow-[0_1px_4px_rgba(0,0,0,0.15)] transition whitespace-nowrap ${
-              activeScenario.includes('Visakhapatnam') ? 'bg-[#1a73e8] text-white' : 'bg-white text-[#3c4043] hover:bg-[#f8f9fa] border border-[#dadce0]'
+            className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium shadow transition whitespace-nowrap ${
+              activeScenario.includes('Visakhapatnam') ? 'bg-[#1a73e8] text-white' : 'bg-white/90 text-slate-700 hover:bg-white border border-slate-200'
             }`}
           >
-            <Anchor className="w-3.5 h-3.5" />
+            <Anchor className="w-3 h-3" />
             <span>Port Recon</span>
           </button>
           <button
             onClick={() => handleLoadScenario('flood')}
-            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium shadow-[0_1px_4px_rgba(0,0,0,0.15)] transition whitespace-nowrap ${
-              activeScenario.includes('Assam') ? 'bg-[#1a73e8] text-white' : 'bg-white text-[#3c4043] hover:bg-[#f8f9fa] border border-[#dadce0]'
+            className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium shadow transition whitespace-nowrap ${
+              activeScenario.includes('Assam') ? 'bg-[#1a73e8] text-white' : 'bg-white/90 text-slate-700 hover:bg-white border border-slate-200'
             }`}
           >
-            <CloudRain className="w-3.5 h-3.5" />
+            <CloudRain className="w-3 h-3" />
             <span>Flood Analysis</span>
           </button>
+
           <button
             onClick={() => {
               setActiveViewTool(activeViewTool === 'tripane' ? 'single' : 'tripane');
               setActiveWorkstationTab('bitemporal');
             }}
-            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium shadow-[0_1px_4px_rgba(0,0,0,0.15)] transition whitespace-nowrap ${
-              activeViewTool === 'tripane' ? 'bg-[#1a73e8] text-white font-bold' : 'bg-white text-[#3c4043] hover:bg-[#f8f9fa] border border-[#dadce0]'
+            className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium shadow transition whitespace-nowrap ${
+              activeViewTool === 'tripane' ? 'bg-[#1a73e8] text-white font-bold' : 'bg-white/90 text-slate-700 hover:bg-white border border-slate-200'
             }`}
           >
-            <Columns3 className="w-3.5 h-3.5" />
+            <Columns3 className="w-3 h-3" />
             <span>3-Pane Bit-CD</span>
           </button>
+
           <button
             onClick={() => setActiveViewTool(activeViewTool === 'swipe' ? 'single' : 'swipe')}
-            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium shadow-[0_1px_4px_rgba(0,0,0,0.15)] transition whitespace-nowrap ${
-              activeViewTool === 'swipe' ? 'bg-[#e37400] text-white' : 'bg-white text-[#3c4043] hover:bg-[#f8f9fa] border border-[#dadce0]'
+            className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium shadow transition whitespace-nowrap ${
+              activeViewTool === 'swipe' ? 'bg-[#e37400] text-white' : 'bg-white/90 text-slate-700 hover:bg-white border border-slate-200'
             }`}
           >
-            <MoveHorizontal className="w-3.5 h-3.5" />
+            <MoveHorizontal className="w-3 h-3" />
             <span>Swipe Tool</span>
           </button>
         </div>
@@ -1300,47 +1232,113 @@ export default function BhuViksanaApp() {
 
       {/* VIEWPORT CANVAS */}
       <div className="flex flex-1 h-full w-full relative">
-        <div ref={containerRef} onMouseMove={handleMouseMove} className="flex-1 relative bg-[#e5e3df] overflow-hidden select-none">
+        <div ref={containerRef} onMouseMove={handleMouseMove} className="flex-1 relative bg-[#090d16] overflow-hidden select-none">
           
-          {/* FLOATING ACTION PILLS */}
-          <div className="absolute top-4 right-4 z-[400] flex items-center gap-2 pointer-events-auto">
+          <div className="absolute top-3 right-4 z-[400] flex items-center gap-2 pointer-events-auto">
             <button
               onClick={() => setShowSmsModal(true)}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-rose-600 hover:bg-rose-700 text-xs font-semibold text-white shadow-[0_2px_8px_rgba(225,29,72,0.35)] transition active:scale-95 animate-pulse"
-              title="Broadcast Emergency SMS"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-600/90 hover:bg-rose-600 text-xs font-semibold text-white shadow transition"
             >
-              <Radio className="w-3.5 h-3.5" />
+              <Radio className="w-3 h-3" />
               <span>SMS Alert</span>
             </button>
 
             <button
               onClick={() => setShowAuditModal(true)}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white hover:bg-[#f8f9fa] border border-[#dadce0] text-xs font-medium text-[#3c4043] shadow-[0_2px_6px_rgba(0,0,0,0.15)] transition"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 text-slate-700 hover:bg-white border border-slate-200 text-xs font-medium shadow transition"
             >
-              <Activity className="w-3.5 h-3.5 text-[#1a73e8]" />
+              <Activity className="w-3 h-3 text-[#1a73e8]" />
               <span>Audit Trace</span>
             </button>
 
             <button
               onClick={handleExportPDF}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#1a73e8] hover:bg-[#1557b0] text-xs font-semibold text-white shadow-[0_2px_6px_rgba(0,0,0,0.2)] transition active:scale-95"
-              title="Export Full PDF Intelligence Briefing"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#1a73e8] hover:bg-[#1557b0] text-xs font-semibold text-white shadow transition"
             >
-              <FileDown className="w-3.5 h-3.5" />
+              <FileDown className="w-3 h-3" />
               <span>Export Briefing</span>
             </button>
           </div>
 
           {activeViewTool === 'tripane' ? (
-            <div className="w-full h-full grid grid-cols-3 gap-1.5 bg-slate-950 p-2.5">
-              <div className="relative w-full h-full rounded-2xl overflow-hidden border border-slate-800 bg-black flex flex-col shadow-inner">
-                {t1DataUrl ? <img src={t1DataUrl} alt="T1" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-slate-500 font-mono text-xs">Pre-Event Baseline</div>}
+            <div className="w-full h-full grid grid-cols-1 md:grid-cols-3 gap-1.5 bg-[#090d16] p-1.5 pb-8">
+              
+              {/* PANEL 1: T1 BASELINE */}
+              <div className="relative w-full h-full rounded-xl overflow-hidden border border-slate-800/80 bg-black flex flex-col shadow-2xl">
+                <div className="absolute top-2.5 left-2.5 z-20 bg-black/85 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-semibold text-cyan-300 border border-cyan-800/60 flex items-center gap-1.5 shadow">
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                  <span>T1: Pre-Event Swath (Baseline)</span>
+                </div>
+
+                {t1DataUrl ? (
+                  <img src={t1DataUrl} alt="T1 Baseline" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 text-xs">
+                    <FileImage className="w-7 h-7 mb-2 opacity-40" />
+                    <span>Pre-Event Baseline Swath</span>
+                  </div>
+                )}
+
+                <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 z-20">
+                  <div className="bg-black/80 backdrop-blur-md px-2.5 py-0.5 rounded text-[10px] font-mono text-slate-200 border border-slate-700/80">
+                    LAYERS Satellite
+                  </div>
+                  <div className="bg-black/80 backdrop-blur-md px-2.5 py-0.5 rounded text-[10px] font-mono text-cyan-300 border border-slate-700/80 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                    <span>Bounding Box: ON</span>
+                  </div>
+                </div>
               </div>
-              <div className="relative w-full h-full rounded-2xl overflow-hidden border border-slate-800 bg-black flex flex-col shadow-inner">
-                {t2DataUrl || t1DataUrl ? <img src={t2DataUrl || t1DataUrl} alt="T2" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-slate-500 font-mono text-xs">Post-Event Target</div>}
+
+              {/* PANEL 2: T2 TARGET */}
+              <div className="relative w-full h-full rounded-xl overflow-hidden border border-slate-800/80 bg-black flex flex-col shadow-2xl">
+                <div className="absolute top-2.5 left-2.5 z-20 bg-black/85 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-semibold text-amber-300 border border-amber-800/60 flex items-center gap-1.5 shadow">
+                  <span className="w-2 h-2 rounded-full bg-amber-400" />
+                  <span>T2: Post-Event Swath (Target)</span>
+                </div>
+
+                {t2DataUrl || t1DataUrl ? (
+                  <img src={t2DataUrl || t1DataUrl} alt="T2 Target" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 text-xs">
+                    <FileImage className="w-7 h-7 mb-2 opacity-40" />
+                    <span>Post-Event Target Swath</span>
+                  </div>
+                )}
+
+                <div className="absolute bottom-2.5 left-2.5 z-20 bg-black/80 backdrop-blur-md px-2.5 py-0.5 rounded text-[10px] font-mono text-slate-300 border border-slate-700/80">
+                  Acquisition: 2026-07-28 (Optical/SAR)
+                </div>
               </div>
-              <div className="relative w-full h-full rounded-2xl overflow-hidden border border-rose-950/60 bg-black flex flex-col shadow-inner">
-                {changeMaskUrl ? <img src={changeMaskUrl} alt="Mask" className="w-full h-full object-cover filter contrast-150" /> : <div className="w-full h-full flex items-center justify-center text-slate-500 font-mono text-xs">Awaiting Mask Matrix</div>}
+
+              {/* PANEL 3: BIT-CD BINARY CHANGE MASK */}
+              <div className="relative w-full h-full rounded-xl overflow-hidden border border-rose-900/60 bg-[#070b13] flex flex-col justify-center items-center shadow-2xl p-4">
+                <div className="absolute top-2.5 left-2.5 z-20 bg-rose-950/80 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-semibold text-rose-400 border border-rose-800 flex items-center gap-1.5 shadow">
+                  <Binary className="w-3 h-3 text-rose-400" />
+                  <span>Bit-CD: Binary Change Mask</span>
+                </div>
+
+                <div className="w-36 h-36 rounded-xl border border-rose-600/60 bg-white shadow-[0_0_35px_rgba(235,50,35,0.25)] flex flex-col items-center justify-center text-center p-3">
+                  <span className="text-[11px] font-black text-black tracking-wider block">
+                    BIT 1: CHANGE
+                  </span>
+                  <span className="text-[9px] font-medium text-slate-500 mt-1 block">
+                    24,500 m² Inundated
+                  </span>
+                </div>
+
+                <div className="text-[10px] font-mono text-slate-500 mt-4 tracking-tight text-center">
+                  Siamese Feature Difference Matrix • Resolution: 512×512 px
+                </div>
+
+                <div className="absolute bottom-2.5 left-2.5 z-20 flex items-center gap-2 text-[10px] font-mono text-slate-400 bg-black/80 px-2 py-0.5 rounded border border-slate-800">
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-sm bg-slate-700" /> [0] Unchanged
+                  </span>
+                  <span className="flex items-center gap-1 text-rose-400 font-semibold">
+                    <span className="w-2 h-2 rounded-sm bg-rose-500" /> [1] Inundation / Change
+                  </span>
+                </div>
               </div>
             </div>
           ) : t1DataUrl ? (
@@ -1376,60 +1374,136 @@ export default function BhuViksanaApp() {
             )
           )}
 
-          <div className="absolute bottom-2 right-4 z-[400] text-[11px] font-mono text-[#5f6368] bg-white/85 backdrop-blur-md px-2.5 py-0.5 rounded-full shadow-sm border border-[#dadce0]">
+          <div className="absolute bottom-2 right-4 z-[400] text-[10px] font-mono text-slate-700 bg-white/95 px-2.5 py-0.5 rounded-full shadow border border-slate-200">
             {liveCoords.lat.toFixed(4)}°N, {liveCoords.lng.toFixed(4)}°E • Zoom: {liveCoords.zoom}x
           </div>
         </div>
 
-        {/* SIDEBAR */}
+        {/* RIGHT SIDEBAR */}
         {isSidebarOpen && (
-          <aside className="w-[410px] h-full bg-white border-l border-[#dadce0] flex flex-col justify-between z-30 relative flex-shrink-0">
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              <div className="space-y-3">
-                {chatMessages.map((msg, idx) => (
-                  <div
-                    key={idx}
-                    className={`text-xs leading-relaxed p-3 rounded-2xl border ${
-                      msg.sender === 'user' ? 'bg-[#e8f0fe] border-[#d2e3fc] text-[#174ea6] ml-6' : 'bg-[#f1f3f4] border-[#dadce0] text-[#202124] mr-4'
-                    }`}
-                  >
-                    <span className="font-semibold text-[11px] block mb-1">
-                      {msg.sender === 'user' ? 'Operator' : 'BhuViksana Assistant'}
-                    </span>
-                    {msg.text}
-                  </div>
-                ))}
-              </div>
-
-              <div className="pt-2">
-                <span className="text-xs font-bold text-[#3c4043] uppercase tracking-wider block mb-2">
-                  Identified Features ({entities.length})
+          <aside className="w-[390px] h-full bg-white border-l border-slate-200 flex flex-col justify-between z-30 relative flex-shrink-0 text-slate-800">
+            <div className="p-3 border-b border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-600">
+              <div className="flex items-center gap-4">
+                <span
+                  onClick={() => setActiveTab('overview')}
+                  className={`pb-1 cursor-pointer transition ${
+                    activeTab === 'overview'
+                      ? 'text-[#1a73e8] border-b-2 border-[#1a73e8]'
+                      : 'text-slate-400 hover:text-slate-600'
+                  }`}
+                >
+                  Overview & Q&A
                 </span>
-                <div className="space-y-2">
-                  {entities.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between p-3 rounded-xl bg-white border border-[#dadce0] shadow-sm">
-                      <div className="text-xs font-semibold text-[#202124]">{item.name}</div>
-                      <div className="text-xs font-bold text-[#188038] bg-[#e6f4ea] px-2 py-0.5 rounded-md">
-                        {(item.confidence * 100).toFixed(1)}%
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <span
+                  onClick={() => setActiveTab('change')}
+                  className={`pb-1 cursor-pointer transition ${
+                    activeTab === 'change'
+                      ? 'text-[#1a73e8] border-b-2 border-[#1a73e8]'
+                      : 'text-slate-400 hover:text-slate-600'
+                  }`}
+                >
+                  Change Detection
+                </span>
+                <span
+                  onClick={() => setActiveTab('audit')}
+                  className={`pb-1 cursor-pointer transition ${
+                    activeTab === 'audit'
+                      ? 'text-[#1a73e8] border-b-2 border-[#1a73e8]'
+                      : 'text-slate-400 hover:text-slate-600'
+                  }`}
+                >
+                  Audit Trace
+                </span>
               </div>
             </div>
 
-            <div className="p-3 border-t border-[#dadce0] bg-white">
-              <div className="flex items-center gap-2 bg-[#f1f3f4] border border-[#dadce0] rounded-full px-3.5 py-1.5 focus-within:bg-white focus-within:border-[#1a73e8]">
+            <div className="px-4 py-2 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-700">
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span>Pipeline: GEOCHAT-7B VQA & GROUNDING</span>
+              </div>
+              <span className="text-[10px] font-bold text-emerald-600 font-mono bg-emerald-50 px-1.5 py-0.5 rounded">
+                READY
+              </span>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              {activeTab === 'audit' ? (
+                <div className="space-y-2 text-xs font-mono text-slate-600">
+                  <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+                    <span className="text-emerald-600">[200 OK]</span> Level-0 ingestion completed
+                  </div>
+                  <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+                    <span className="text-cyan-600">[INFO]</span> Resampled viewport to EPSG:4326
+                  </div>
+                  <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
+                    <span className="text-amber-600">[READY]</span> Siamese feature difference pipeline idle
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="bg-[#eef3fc] p-3 rounded-xl text-xs text-[#174ea6] ml-4">
+                    <div className="text-[10px] font-semibold uppercase text-slate-500 mb-1">Operator</div>
+                    What are the major differences in these images?
+                  </div>
+
+                  {chatMessages.map((msg, idx) => (
+                    <div
+                      key={idx}
+                      className={`p-3 rounded-xl text-xs leading-relaxed ${
+                        msg.sender === 'user'
+                          ? 'bg-[#eef3fc] text-[#174ea6] ml-4'
+                          : 'bg-slate-50 border border-slate-200 text-slate-800 mr-2'
+                      }`}
+                    >
+                      <div className="text-[10px] font-semibold uppercase text-slate-500 mb-1">
+                        {msg.sender === 'user' ? 'Operator' : 'BhuViksana Assistant'}
+                      </div>
+                      {msg.text}
+                    </div>
+                  ))}
+
+                  <div className="pt-2">
+                    <div className="flex items-center justify-between text-xs font-bold text-slate-800 mb-2">
+                      <span>IDENTIFIED FEATURES ({entities.length})</span>
+                      <span className="text-[10px] font-mono text-slate-400">60,650 m² Total</span>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      {entities.map((item) => (
+                        <div key={item.id} className="flex items-center justify-between p-2.5 rounded-xl border border-slate-200 bg-white shadow-sm">
+                          <div>
+                            <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-900">
+                              <span className="w-2 h-2 rounded-full bg-[#1a73e8]" />
+                              <span>{item.name}</span>
+                            </div>
+                            <div className="text-[10px] font-mono text-slate-500 pl-3.5">
+                              Footprint: {item.area_m2.toLocaleString()} m²
+                            </div>
+                          </div>
+                          <div className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-mono">
+                            {(item.confidence * 100).toFixed(1)}%
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="p-3 border-t border-slate-200 bg-white">
+              <div className="flex items-center gap-2 bg-slate-100 border border-slate-200 rounded-full px-3.5 py-1.5 focus-within:bg-white focus-within:border-[#1a73e8]">
                 <Sparkles className="w-4 h-4 text-[#1a73e8]" />
                 <input
                   type="text"
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                  placeholder="Ask about structures or flood water..."
-                  className="w-full bg-transparent text-xs text-[#202124] focus:outline-none"
+                  placeholder="Ask about structures, vessels, or metrics..."
+                  className="w-full bg-transparent text-xs text-slate-900 focus:outline-none placeholder-slate-400"
                 />
-                <button onClick={handleSendMessage} className="p-1.5 rounded-full bg-[#1a73e8] text-white">
+                <button onClick={handleSendMessage} className="p-1 rounded-full bg-[#1a73e8] text-white hover:bg-blue-600 transition">
                   <Send className="w-3 h-3" />
                 </button>
               </div>
@@ -1441,7 +1515,7 @@ export default function BhuViksanaApp() {
       {/* EMERGENCY SMS ALERT MODAL */}
       {showSmsModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-white border border-rose-200 rounded-[26px] p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+          <div className="w-full max-w-md bg-white text-slate-900 border border-rose-200 rounded-[26px] p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600 border border-rose-100">
@@ -1509,18 +1583,53 @@ export default function BhuViksanaApp() {
 
       {/* AUDIT TRACE MODAL */}
       {showAuditModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
-          <div className="w-full max-w-lg bg-white border border-[#dadce0] rounded-[24px] p-6 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-[#dadce0] pb-3">
-              <h3 className="text-sm font-semibold text-[#202124]">Execution Telemetry & Audit Log</h3>
-              <button onClick={() => setShowAuditModal(false)} className="p-1 rounded-full text-[#5f6368] hover:bg-[#f1f3f4]">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
+          <div className="w-full max-w-xl bg-white text-slate-900 border border-slate-200 rounded-[24px] p-6 space-y-5 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <Activity className="w-5 h-5 text-[#1a73e8]" />
+                <h3 className="text-base font-bold text-slate-900">Execution Telemetry & Audit Log</h3>
+              </div>
+              <button
+                onClick={() => setShowAuditModal(false)}
+                className="p-1.5 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition"
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="text-xs text-[#3c4043]">Aligned sensor array to 512x512 tile patches with EPSG:4326 CRS coordinates.</div>
+
+            <div className="space-y-3">
+              <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50/70 flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <div className="text-xs font-bold text-slate-900">1. Input Stream Ingestion & Tiling</div>
+                  <div className="text-xs text-slate-600 mt-0.5">Aligned sensor array to 512x512 tile patches with EPSG:4326 CRS coordinates.</div>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50/70 flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <div className="text-xs font-bold text-slate-900">2. Siamese Feature Extraction & Grounding</div>
+                  <div className="text-xs text-slate-600 mt-0.5">Falcon-0.7B-RS identified spatial coordinates across {entities.length} bounding boxes.</div>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50/70 flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <div className="text-xs font-bold text-slate-900">3. Spatial Clustering & GSD Quantification</div>
+                  <div className="text-xs text-slate-600 mt-0.5">Computed footprint at {entities.reduce((acc, e) => acc + e.area_m2, 0).toLocaleString()} m² (0.5m/px GSD).</div>
+                </div>
+              </div>
+            </div>
+
             <div className="pt-2 flex justify-end">
-              <button onClick={() => setShowAuditModal(false)} className="px-4 py-2 bg-[#1a73e8] text-xs font-semibold text-white rounded-full">
-                Close
+              <button
+                onClick={() => setShowAuditModal(false)}
+                className="px-6 py-2.5 bg-[#1a73e8] hover:bg-blue-600 text-xs font-semibold text-white rounded-xl shadow transition cursor-pointer"
+              >
+                Close Audit Log
               </button>
             </div>
           </div>
