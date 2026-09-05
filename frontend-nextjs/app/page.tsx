@@ -56,7 +56,8 @@ import {
   fetchUserChatThreads,
   ChatThread,
   getAuthToken,
-  removeAuthToken
+  removeAuthToken,
+  API_BASE_URL
 } from '../lib/api';
 import {
   convertVisualEvidenceToEntities,
@@ -64,6 +65,30 @@ import {
 } from '../lib/adapters';
 import AgenticAuditTrace from '@/components/AgenticAuditTrace';
 import ChangeDetectionPanel from '@/components/ChangeDetectionPanel';
+
+const formatMediaUrl = (url?: string | null): string | null => {
+  if (!url || typeof url !== 'string' || url.trim() === '') return null;
+  const trimmed = url.trim();
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:')) {
+    return trimmed;
+  }
+  if (trimmed.startsWith('/media/')) {
+    return `${API_BASE_URL}${trimmed}`;
+  }
+  if (trimmed.startsWith('media/')) {
+    return `${API_BASE_URL}/${trimmed}`;
+  }
+  if (
+    trimmed.startsWith('iVBOR') ||
+    trimmed.startsWith('/9j/') ||
+    trimmed.startsWith('R0lGO') ||
+    trimmed.startsWith('UklGR') ||
+    (trimmed.length > 50 && !trimmed.startsWith('/') && !trimmed.startsWith('.') && !trimmed.includes(' '))
+  ) {
+    return `data:image/png;base64,${trimmed}`;
+  }
+  return trimmed;
+};
 
 // Dynamic SSR-safe import of the standalone Leaflet Map component
 const WorkstationMap = dynamic(() => import('@/components/WorkstationMap'), {
@@ -89,16 +114,42 @@ export default function BhuViksanaApp() {
   const [currentPage, setCurrentPage] = useState<'login' | 'canvas' | 'workstation'>('login');
   const [isClient, setIsClient] = useState(false);
 
+  const navigateTo = (page: 'login' | 'canvas' | 'workstation') => {
+    setCurrentPage(page);
+  };
+
+  const handleSignOut = () => {
+    removeAuthToken();
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('satquery_current_page');
+      localStorage.removeItem('satquery_active_thread_id');
+      localStorage.removeItem('satquery_auth_token');
+      localStorage.removeItem('satquery_user_info');
+    }
+    setEntities([]);
+    setChatMessages([]);
+    setUserThreads([]);
+    setHistoryList([]);
+    setT1DataUrl(null);
+    setT2DataUrl(null);
+    setChangeMaskUrl(null);
+    setCurrentPage('login');
+  };
+
   useEffect(() => {
     setIsClient(true);
     const token = getAuthToken();
     if (token) {
-      const savedPage = typeof window !== 'undefined' ? (localStorage.getItem('satquery_current_page') as 'canvas' | 'workstation' | null) : null;
-      const targetPage = (savedPage === 'canvas' || savedPage === 'workstation') ? savedPage : 'canvas';
-      setCurrentPage(targetPage);
-
-      const savedThreadId = typeof window !== 'undefined' ? (localStorage.getItem('satquery_active_thread_id') || undefined) : undefined;
-      loadThreadsFromBackend(savedThreadId);
+      // Authenticated user -> default landing page is the Setup Canvas
+      setCurrentPage('canvas');
+      loadThreadsFromBackend();
+    } else {
+      // Unauthenticated (Incognito or after logout) -> strictly enforce login page
+      setCurrentPage('login');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('satquery_current_page');
+        localStorage.removeItem('satquery_active_thread_id');
+      }
     }
   }, []);
 
@@ -149,50 +200,17 @@ export default function BhuViksanaApp() {
 
   const [queryText, setQueryText] = useState('');
   const [chatInput, setChatInput] = useState('');
-  const [activeScenario, setActiveScenario] = useState<string>('Visakhapatnam Port & Industrial Corridor');
+  const [activeScenario, setActiveScenario] = useState<string>('Geospatial Intelligence Workstation');
 
   const [fileT1, setFileT1] = useState<File | null>(null);
   const [fileT2, setFileT2] = useState<File | null>(null);
   const [t1DataUrl, setT1DataUrl] = useState<string | null>(null);
   const [t2DataUrl, setT2DataUrl] = useState<string | null>(null);
   const [changeMaskUrl, setChangeMaskUrl] = useState<string | null>(null);
+  const [visualEvidenceData, setVisualEvidenceData] = useState<Record<string, any> | null>(null);
 
-  // Bounding Boxes
-  const [entities, setEntities] = useState<MapEntity[]>([
-    {
-      id: 1,
-      name: 'Container Cargo Ship (Berth 4)',
-      confidence: 0.990,
-      area_m2: 6200,
-      latMin: 17.6940,
-      lngMin: 83.2930,
-      latMax: 17.6985,
-      lngMax: 83.2985,
-      color: '#1a73e8'
-    },
-    {
-      id: 2,
-      name: 'Bulk Carrier (Berth 2)',
-      confidence: 0.978,
-      area_m2: 4850,
-      latMin: 17.6885,
-      lngMin: 83.2875,
-      latMax: 17.6930,
-      lngMax: 83.2930,
-      color: '#e37400'
-    },
-    {
-      id: 3,
-      name: 'Harbor Breakwater Wall',
-      confidence: 0.968,
-      area_m2: 5400,
-      latMin: 17.6820,
-      lngMin: 83.3000,
-      latMax: 17.6850,
-      lngMax: 83.3130,
-      color: '#188038'
-    }
-  ]);
+  // Grounded Bounding Boxes & Entities
+  const [entities, setEntities] = useState<MapEntity[]>([]);
 
   const [chatMessages, setChatMessages] = useState<Array<{ sender: 'user' | 'ai'; text: string }>>([]);
 
@@ -210,6 +228,90 @@ export default function BhuViksanaApp() {
 
   const [activeThreadId, setActiveThreadId] = useState<string>(() => `thread_${Date.now()}`);
   const [userThreads, setUserThreads] = useState<ChatThread[]>([]);
+
+  const applyThreadState = (thread: ChatThread | undefined, fallbackMethod?: string) => {
+    if (!thread) return;
+
+    setActiveScenario(thread.title || 'Conversation Thread');
+    setActiveThreadId(thread.thread_id);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('satquery_active_thread_id', thread.thread_id);
+    }
+
+    const isCD = thread.task === 'change_detection' || fallbackMethod === 'bitemporal';
+
+    // 1. Extract messages
+    if (thread.messages && thread.messages.length > 0) {
+      const loadedMsgs: Array<{ sender: 'user' | 'ai'; text: string }> = thread.messages.flatMap((m) => [
+        { sender: 'user' as const, text: m.query },
+        { sender: 'ai' as const, text: m.model_reply }
+      ]);
+      setChatMessages(loadedMsgs);
+    } else {
+      setChatMessages([]);
+    }
+
+    // 2. Find latest message with media / evidence
+    const lastMsgWithT1 = [...(thread.messages || [])].reverse().find((m) => m.image_t1_url);
+    const lastMsgWithT2 = [...(thread.messages || [])].reverse().find((m) => m.image_t2_url);
+    const lastMsgWithMask = [...(thread.messages || [])].reverse().find((m) =>
+      m.change_mask_url ||
+      m.visual_evidence?.mask_base64 ||
+      m.visual_evidence?.change_mask ||
+      m.visual_evidence?.overlay_base64 ||
+      m.visual_evidence?.evidence_base64
+    );
+    const lastMsgWithEv = [...(thread.messages || [])].reverse().find((m) => m.visual_evidence && Object.keys(m.visual_evidence).length > 0);
+
+    const rawT1 = thread.image_t1_url || lastMsgWithT1?.image_t1_url;
+    const rawT2 = thread.image_t2_url || lastMsgWithT2?.image_t2_url;
+    const rawMask =
+      thread.change_mask_url ||
+      lastMsgWithMask?.change_mask_url ||
+      thread.visual_evidence?.mask_base64 ||
+      thread.visual_evidence?.change_mask ||
+      lastMsgWithMask?.visual_evidence?.mask_base64 ||
+      lastMsgWithMask?.visual_evidence?.change_mask ||
+      thread.visual_evidence?.overlay_base64 ||
+      lastMsgWithMask?.visual_evidence?.overlay_base64 ||
+      thread.visual_evidence?.evidence_base64 ||
+      lastMsgWithMask?.visual_evidence?.evidence_base64;
+    const rawEvidence = thread.visual_evidence || lastMsgWithEv?.visual_evidence;
+
+    const formattedT1 = formatMediaUrl(rawT1);
+    const formattedT2 = formatMediaUrl(rawT2);
+    const formattedMask = formatMediaUrl(rawMask);
+
+    // 3. Set Task & Viewport routing with persistent media
+    if (isCD) {
+      setTargetMethod('bitemporal');
+      setActiveWorkstationTab('bitemporal');
+      setActiveViewTool('tripane');
+      setDetectedPipeline('OPEN-CD (BI-TEMPORAL SIAMESE)');
+      setT1DataUrl(formattedT1);
+      setT2DataUrl(formattedT2);
+      setChangeMaskUrl(formattedMask);
+      if (rawEvidence && Object.keys(rawEvidence).length > 0) {
+        setVisualEvidenceData(rawEvidence);
+      }
+    } else {
+      setTargetMethod('single');
+      setActiveWorkstationTab('rsvqa');
+      setActiveViewTool('single');
+      setDetectedPipeline('GEOCHAT-7B VQA & GROUNDING');
+      setT1DataUrl(formattedT1);
+      setT2DataUrl(null);
+      setChangeMaskUrl(null);
+      if (rawEvidence && Object.keys(rawEvidence).length > 0) {
+        setVisualEvidenceData(rawEvidence);
+        const ents = convertVisualEvidenceToEntities(rawEvidence);
+        setEntities(ents);
+      } else {
+        setVisualEvidenceData(null);
+        setEntities([]);
+      }
+    }
+  };
 
   const loadThreadsFromBackend = async (targetThreadId?: string) => {
     try {
@@ -233,17 +335,8 @@ export default function BhuViksanaApp() {
           selectedThread = data.threads[0];
         }
 
-        if (selectedThread && selectedThread.messages && selectedThread.messages.length > 0) {
-          setActiveThreadId(selectedThread.thread_id);
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('satquery_active_thread_id', selectedThread.thread_id);
-          }
-          setActiveScenario(selectedThread.title);
-          const loadedMsgs: Array<{ sender: 'user' | 'ai'; text: string }> = selectedThread.messages.flatMap((m) => [
-            { sender: 'user' as const, text: m.query },
-            { sender: 'ai' as const, text: m.model_reply }
-          ]);
-          setChatMessages(loadedMsgs);
+        if (selectedThread) {
+          applyThreadState(selectedThread);
         }
       } else {
         setUserThreads([]);
@@ -273,7 +366,7 @@ export default function BhuViksanaApp() {
       // 3. Load user's saved chat history & threads
       await loadThreadsFromBackend();
 
-      setCurrentPage('canvas');
+      navigateTo('canvas');
     } catch (err: any) {
       const msg = typeof err === 'string'
         ? err
@@ -432,7 +525,6 @@ export default function BhuViksanaApp() {
     setActiveThreadId(newThreadId);
     if (typeof window !== 'undefined') {
       localStorage.setItem('satquery_active_thread_id', newThreadId);
-      localStorage.setItem('satquery_current_page', 'workstation');
     }
 
     const initialQ = queryText.trim() || "Analyze target raster scene and ground key features.";
@@ -464,8 +556,10 @@ export default function BhuViksanaApp() {
           title: dynamicTitle
         });
       } else {
+        const paths = [t1DataUrl, t2DataUrl].filter(Boolean) as string[];
         res = await executeSatelliteQueryJson({
           query: initialQ,
+          imagePaths: paths.length > 0 ? paths : undefined,
           useGraph: true,
           threadId: newThreadId,
           title: dynamicTitle
@@ -476,8 +570,43 @@ export default function BhuViksanaApp() {
       setChatMessages((prev) => [...prev, { sender: 'ai', text: replyText }]);
 
       if (res.visual_evidence) {
+        setVisualEvidenceData(res.visual_evidence);
         const newEntities = convertVisualEvidenceToEntities(res.visual_evidence);
         if (newEntities.length > 0) setEntities(newEntities);
+
+        // Wire Binary Mask from Backend to Pane 3 on launch
+        const mask =
+          res.visual_evidence.mask_base64 ||
+          res.visual_evidence.change_mask ||
+          res.visual_evidence.change_mask_url ||
+          res.visual_evidence.mask ||
+          res.visual_evidence.binary_mask ||
+          res.visual_evidence.evidence_base64 ||
+          res.visual_evidence.overlay_base64;
+        if (mask) {
+          const formattedMask = formatMediaUrl(mask);
+          setChangeMaskUrl(formattedMask);
+        }
+
+        const isChangeTask =
+          res.task === 'change_detection' ||
+          initialQ.toLowerCase().includes('change') ||
+          initialQ.toLowerCase().includes('detect change') ||
+          Boolean(mask);
+
+        if (isChangeTask) {
+          setTargetMethod('bitemporal');
+          setActiveWorkstationTab('bitemporal');
+          setActiveViewTool('tripane');
+          setDetectedPipeline('OPEN-CD (BI-TEMPORAL SIAMESE)');
+        } else {
+          setTargetMethod('single');
+          setActiveWorkstationTab('rsvqa');
+          setActiveViewTool('single');
+          setDetectedPipeline('GEOCHAT-7B VQA & GROUNDING');
+          setChangeMaskUrl(null);
+          setT2DataUrl(null);
+        }
       }
 
       await loadThreadsFromBackend();
@@ -492,7 +621,7 @@ export default function BhuViksanaApp() {
       ]);
     } finally {
       setIsLoading(false);
-      setCurrentPage('workstation');
+      navigateTo('workstation');
     }
   };
 
@@ -547,14 +676,14 @@ export default function BhuViksanaApp() {
       setChatMessages([
         {
           sender: 'ai',
-          text: 'Visual Question Answering initialized with Falcon-0.7B-RS. Grounded 3 assets in target viewport.'
+          text: 'Visual Question Answering initialized with GeoChat-7B. Grounded 3 maritime assets in target viewport.'
         }
       ]);
     } else {
       setActiveScenario('Brahmaputra Basin, Assam (Flood Inundation)');
-      setTargetMethod('single');
-      setActiveWorkstationTab('rsvqa');
-      setActiveViewTool('single');
+      setTargetMethod('bitemporal');
+      setActiveWorkstationTab('bitemporal');
+      setActiveViewTool('tripane');
       setMapCenter([26.1900, 91.7300]);
       setMapZoom(14);
       setLiveCoords({ lat: 26.1900, lng: 91.7300, zoom: 14 });
@@ -574,11 +703,11 @@ export default function BhuViksanaApp() {
       setChatMessages([
         {
           sender: 'ai',
-          text: 'Flood Inundation Analysis loaded for Brahmaputra Basin. Displaying high-resolution satellite imagery.'
+          text: 'Flood Inundation Analysis loaded for Brahmaputra Basin. Displaying high-resolution satellite imagery & Open-CD Siamese Change Mask.'
         }
       ]);
     }
-    setCurrentPage('workstation');
+    navigateTo('workstation');
   };
 
   // -------------------------------------------------------------
@@ -603,8 +732,10 @@ export default function BhuViksanaApp() {
           title: activeScenario
         });
       } else {
+        const paths = [t1DataUrl, t2DataUrl].filter(Boolean) as string[];
         res = await executeSatelliteQueryJson({
           query: userQ,
+          imagePaths: paths.length > 0 ? paths : undefined,
           useGraph: true,
           threadId: activeThreadId,
           title: activeScenario
@@ -620,18 +751,40 @@ export default function BhuViksanaApp() {
         res.visual_evidence?.change_mask ||
         res.visual_evidence?.change_mask_url ||
         res.visual_evidence?.mask ||
-        res.visual_evidence?.binary_mask;
+        res.visual_evidence?.binary_mask ||
+        res.visual_evidence?.evidence_base64 ||
+        res.visual_evidence?.overlay_base64;
       if (mask) {
-        const formattedMask =
-          typeof mask === 'string' && (mask.startsWith('data:image') || mask.startsWith('http'))
-            ? mask
-            : `data:image/png;base64,${mask}`;
+        const formattedMask = formatMediaUrl(mask);
         setChangeMaskUrl(formattedMask);
       }
 
       if (res.visual_evidence) {
+        setVisualEvidenceData(res.visual_evidence);
         const newEntities = convertVisualEvidenceToEntities(res.visual_evidence);
         if (newEntities.length > 0) setEntities(newEntities);
+      }
+
+      const isChangeDetectionTask =
+        res.task === 'change_detection' ||
+        userQ.toLowerCase().includes('change') ||
+        userQ.toLowerCase().includes('detect change') ||
+        userQ.toLowerCase().includes('bi-temporal') ||
+        userQ.toLowerCase().includes('bitemporal') ||
+        Boolean(mask);
+
+      if (isChangeDetectionTask) {
+        setTargetMethod('bitemporal');
+        setActiveWorkstationTab('bitemporal');
+        setActiveViewTool('tripane');
+        setDetectedPipeline('OPEN-CD (BI-TEMPORAL SIAMESE)');
+      } else {
+        setTargetMethod('single');
+        setActiveWorkstationTab('rsvqa');
+        setActiveViewTool('single');
+        setDetectedPipeline('GEOCHAT-7B VQA & GROUNDING');
+        setChangeMaskUrl(null);
+        setT2DataUrl(null);
       }
 
       await loadThreadsFromBackend();
@@ -1027,7 +1180,7 @@ export default function BhuViksanaApp() {
           </div>
 
           <button
-            onClick={() => setCurrentPage('login')}
+            onClick={handleSignOut}
             title="Sign Out"
             className="p-2 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition"
           >
@@ -1056,25 +1209,13 @@ export default function BhuViksanaApp() {
                 <div
                   key={item.id}
                   onClick={() => {
-                    setActiveScenario(item.title);
-                    setActiveThreadId(item.id);
-                    if (typeof window !== 'undefined') {
-                      localStorage.setItem('satquery_active_thread_id', item.id);
-                      localStorage.setItem('satquery_current_page', 'workstation');
-                    }
                     setMapCenter([item.coordinates.lat, item.coordinates.lng]);
                     setLiveCoords({ lat: item.coordinates.lat, lng: item.coordinates.lng, zoom: 15 });
 
                     const matchedThread = userThreads.find((t) => t.thread_id === item.id);
-                    if (matchedThread && matchedThread.messages && matchedThread.messages.length > 0) {
-                      const loadedMessages: Array<{ sender: 'user' | 'ai'; text: string }> = matchedThread.messages.flatMap((m) => [
-                        { sender: 'user' as const, text: m.query },
-                        { sender: 'ai' as const, text: m.model_reply }
-                      ]);
-                      setChatMessages(loadedMessages);
-                    }
+                    applyThreadState(matchedThread, item.method);
 
-                    setCurrentPage('workstation');
+                    navigateTo('workstation');
                   }}
                   className="p-3 rounded-2xl border border-slate-100 hover:border-[#1a73e8] bg-white hover:bg-[#f8fafd] transition cursor-pointer shadow-sm group"
                 >
@@ -1272,7 +1413,7 @@ export default function BhuViksanaApp() {
       <div className="absolute top-4 left-4 z-[400] flex flex-col gap-2 pointer-events-auto max-w-[calc(100vw-32px)]">
         <div className="flex items-center h-12 bg-white rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.2)] border border-[#dadce0] px-3 gap-2 w-[360px] sm:w-[390px]">
           <button
-            onClick={() => setCurrentPage('canvas')}
+            onClick={() => navigateTo('canvas')}
             className="p-1.5 rounded-full hover:bg-[#f1f3f4] text-[#5f6368] transition"
             title="Back to Setup Canvas"
           >
@@ -1367,6 +1508,14 @@ export default function BhuViksanaApp() {
             >
               <FileDown className="w-3.5 h-3.5" />
               <span>Export Briefing</span>
+            </button>
+            <button
+              onClick={handleSignOut}
+              title="Sign Out of Session"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white hover:bg-rose-50 border border-[#dadce0] hover:border-rose-300 text-xs font-medium text-slate-600 hover:text-rose-600 shadow-[0_2px_6px_rgba(0,0,0,0.15)] transition"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Sign Out</span>
             </button>
           </div>
 
@@ -1489,10 +1638,10 @@ export default function BhuViksanaApp() {
                   key={idx}
                   className="absolute border-2 border-[#1a73e8] bg-[#1a73e8]/20 rounded pointer-events-none z-20 transition-all duration-300 shadow-[0_0_10px_rgba(26,115,232,0.4)]"
                   style={{
-                    top: `${42 + (idx * 16)}%`,
-                    left: `${26 + (idx * 22)}%`,
-                    width: `24%`,
-                    height: `18%`
+                    top: `${det.yPct != null ? det.yPct : 42 + (idx * 16)}%`,
+                    left: `${det.xPct != null ? det.xPct : 26 + (idx * 22)}%`,
+                    width: `${det.wPct != null ? det.wPct : 24}%`,
+                    height: `${det.hPct != null ? det.hPct : 18}%`
                   }}
                 >
                   <span className="absolute -top-6 left-0 text-[10px] font-sans font-medium px-2 py-0.5 bg-white text-[#1a73e8] border border-[#dadce0] rounded-full shadow whitespace-nowrap">
@@ -1598,7 +1747,7 @@ export default function BhuViksanaApp() {
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-[#188038]" />
                   <span className="text-xs font-medium text-[#3c4043]">
-                    Pipeline: {targetMethod === 'bitemporal' || (activeScenario.includes('Assam') && activeViewTool === 'tripane') ? 'OPEN-CD (BI-TEMPORAL SIAMESE)' : targetMethod === 'opticalsar' ? 'CROSS-ATTENTION OPTICAL-SAR' : 'GEOCHAT-7B VQA & GROUNDING'}
+                    Pipeline: {targetMethod === 'bitemporal' || activeViewTool === 'tripane' || activeWorkstationTab === 'bitemporal' || activeScenario.includes('Assam') ? 'OPEN-CD (BI-TEMPORAL SIAMESE)' : targetMethod === 'opticalsar' ? 'CROSS-ATTENTION OPTICAL-SAR' : 'GEOCHAT-7B VQA & GROUNDING'}
                   </span>
                 </div>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#e6f4ea] text-[#137333]">
@@ -1606,68 +1755,104 @@ export default function BhuViksanaApp() {
                 </span>
               </div>
 
-              {/* Chat & Grounded Entities */}
-              <div className="p-4 space-y-4">
-                <div className="space-y-3">
-                  {chatMessages.map((msg, idx) => (
-                    <div
-                      key={idx}
-                      className={`text-xs leading-relaxed p-3 rounded-2xl border whitespace-pre-wrap ${
-                        msg.sender === 'user'
-                          ? 'bg-[#e8f0fe] border-[#d2e3fc] text-[#174ea6] ml-6'
-                          : 'bg-[#f1f3f4] border-[#dadce0] text-[#202124] mr-4'
-                      }`}
-                    >
-                      <span className="font-semibold text-[11px] block mb-1">
-                        {msg.sender === 'user' ? 'Operator' : 'BhuViksana Assistant'}
-                      </span>
-                      {msg.text}
-                    </div>
-                  ))}
-                  {isLoading && (
-                    <div className="flex items-center gap-2 text-xs font-mono text-[#1a73e8] p-2">
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" /> Querying Siamese Model Engine...
-                    </div>
-                  )}
-                </div>
-
-                {/* Identified Feature Entities List */}
-                <div className="pt-2">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-bold text-[#3c4043] uppercase tracking-wider">
-                      Identified Features ({entities.length})
+              {/* Sidebar Content based on Active Tab */}
+              {activeWorkstationTab === 'bitemporal' ? (
+                <div className="flex flex-col flex-1">
+                  <ChangeDetectionPanel
+                    changeMetrics={extractChangeMetrics(visualEvidenceData || {})}
+                    modelName="OPEN-CD (BI-TEMPORAL SIAMESE)"
+                  />
+                  {/* Chat Messages Section in Change Detection Tab */}
+                  <div className="p-4 border-t border-[#dadce0] space-y-3">
+                    <span className="text-xs font-bold text-[#3c4043] uppercase tracking-wider block">
+                      Analyst Conversation
                     </span>
-                    <span className="text-xs font-semibold text-[#1a73e8]">
-                      {entities.reduce((a, b) => a + b.area_m2, 0).toLocaleString()} m² Total
-                    </span>
-                  </div>
-
-                  <div className="space-y-2">
-                    {entities.map((item) => (
+                    {chatMessages.map((msg, idx) => (
                       <div
-                        key={item.id}
-                        className="flex items-center justify-between p-3 rounded-xl bg-white border border-[#dadce0] hover:border-[#1a73e8] shadow-sm transition"
+                        key={idx}
+                        className={`text-xs leading-relaxed p-3 rounded-2xl border whitespace-pre-wrap ${
+                          msg.sender === 'user'
+                            ? 'bg-[#e8f0fe] border-[#d2e3fc] text-[#174ea6] ml-6'
+                            : 'bg-[#f1f3f4] border-[#dadce0] text-[#202124] mr-4'
+                        }`}
                       >
-                        <div className="flex items-center gap-2.5">
-                          <div
-                            className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: item.color }}
-                          />
-                          <div>
-                            <div className="text-xs font-semibold text-[#202124]">{item.name}</div>
-                            <div className="text-[11px] text-[#5f6368] font-mono">
-                              Footprint: {item.area_m2.toLocaleString()} m²
-                            </div>
-                          </div>
-                        </div>
-                        <div className="text-xs font-bold text-[#188038] bg-[#e6f4ea] px-2 py-0.5 rounded-md">
-                          {(item.confidence * 100).toFixed(1)}%
-                        </div>
+                        <span className="font-semibold text-[11px] block mb-1">
+                          {msg.sender === 'user' ? 'Operator' : 'BhuViksana Assistant'}
+                        </span>
+                        {msg.text}
                       </div>
                     ))}
+                    {isLoading && (
+                      <div className="flex items-center gap-2 text-xs font-mono text-[#1a73e8] p-2">
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" /> Querying Siamese Model Engine...
+                      </div>
+                    )}
                   </div>
                 </div>
-              </div>
+              ) : (
+                /* Overview & Q&A Tab Content */
+                <div className="p-4 space-y-4">
+                  <div className="space-y-3">
+                    {chatMessages.map((msg, idx) => (
+                      <div
+                        key={idx}
+                        className={`text-xs leading-relaxed p-3 rounded-2xl border whitespace-pre-wrap ${
+                          msg.sender === 'user'
+                            ? 'bg-[#e8f0fe] border-[#d2e3fc] text-[#174ea6] ml-6'
+                            : 'bg-[#f1f3f4] border-[#dadce0] text-[#202124] mr-4'
+                        }`}
+                      >
+                        <span className="font-semibold text-[11px] block mb-1">
+                          {msg.sender === 'user' ? 'Operator' : 'BhuViksana Assistant'}
+                        </span>
+                        {msg.text}
+                      </div>
+                    ))}
+                    {isLoading && (
+                      <div className="flex items-center gap-2 text-xs font-mono text-[#1a73e8] p-2">
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" /> Querying Model Engine...
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Identified Feature Entities List */}
+                  <div className="pt-2">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold text-[#3c4043] uppercase tracking-wider">
+                        Identified Features ({entities.length})
+                      </span>
+                      <span className="text-xs font-semibold text-[#1a73e8]">
+                        {entities.reduce((a, b) => a + b.area_m2, 0).toLocaleString()} m² Total
+                      </span>
+                    </div>
+
+                    <div className="space-y-2">
+                      {entities.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between p-3 rounded-xl bg-white border border-[#dadce0] hover:border-[#1a73e8] shadow-sm transition"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <div
+                              className="w-3 h-3 rounded-full"
+                              style={{ backgroundColor: item.color }}
+                            />
+                            <div>
+                              <div className="text-xs font-semibold text-[#202124]">{item.name}</div>
+                              <div className="text-[11px] text-[#5f6368] font-mono">
+                                Footprint: {item.area_m2.toLocaleString()} m²
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-xs font-bold text-[#188038] bg-[#e6f4ea] px-2 py-0.5 rounded-md">
+                            {(item.confidence * 100).toFixed(1)}%
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Bottom Search / Assistant Input Bar */}

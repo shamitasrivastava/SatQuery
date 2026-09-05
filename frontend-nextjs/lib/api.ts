@@ -4,7 +4,7 @@ import {
   BackendHealthResponse
 } from '../types/satquery';
 
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000').replace(/\/+$/, '');
+export const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000').replace(/\/+$/, '');
 
 // -------------------------------------------------------------
 // TOKEN & AUTHENTICATION HELPERS
@@ -372,6 +372,10 @@ export interface MessageExchange {
   model_reply: string;
   task: string;
   request_id: string;
+  image_t1_url?: string;
+  image_t2_url?: string;
+  change_mask_url?: string;
+  visual_evidence?: Record<string, any>;
   created_at: string;
 }
 
@@ -379,6 +383,10 @@ export interface ChatThread {
   thread_id: string;
   title: string;
   task: string;
+  image_t1_url?: string;
+  image_t2_url?: string;
+  change_mask_url?: string;
+  visual_evidence?: Record<string, any>;
   created_at: string;
   updated_at: string;
   message_count: number;
@@ -398,10 +406,19 @@ export async function fetchUserChatThreads(): Promise<ThreadedHistoryResponse> {
   const token = getAuthToken();
   if (!token) throw new Error('Not authenticated');
 
-  const res = await fetch(`${API_BASE_URL}/api/history/threads`, {
+  let res = await fetch(`${API_BASE_URL}/api/history/threads`, {
     method: 'GET',
     headers: getAuthHeaders({ 'Accept': 'application/json' })
   });
+
+  if (!res.ok && res.status >= 500) {
+    // Retry once after 500ms in case backend reconnected from an idle pooler drop
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    res = await fetch(`${API_BASE_URL}/api/history/threads`, {
+      method: 'GET',
+      headers: getAuthHeaders({ 'Accept': 'application/json' })
+    });
+  }
 
   if (!res.ok) {
     const errText = await res.text();

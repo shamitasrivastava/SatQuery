@@ -235,17 +235,53 @@ export function extractChangeMetrics(
   evidence: Record<string, any> = {},
   fallbackSummary: string = 'Bi-temporal comparison complete.'
 ): ChangeMetrics {
-  const changedAreaM2 = evidence.changed_area_m2 || (evidence.changed_pixels ? evidence.changed_pixels * 0.55 : 34250.5);
-  const changedAreaKm2 = evidence.changed_area_km2 ? `${evidence.changed_area_km2} km²` : `${(changedAreaM2 / 1000000).toFixed(4)} km²`;
-  const pct = evidence.change_percentage ? `${evidence.change_percentage}%` : '+38.4%';
-  const clusterCount = evidence.cluster_count || (Array.isArray(evidence.regions) ? evidence.regions.length : 4);
-  const dominantLocation = evidence.dominant_location || 'North-East Sector';
+  const stats = evidence?.stats && typeof evidence.stats === 'object' ? evidence.stats : {};
 
-  let riskLevel: 'LOW' | 'MODERATE' | 'HIGH' | 'CRITICAL' = 'HIGH';
-  const rawPct = evidence.change_percentage || 38.4;
-  if (rawPct > 35) riskLevel = 'CRITICAL';
-  else if (rawPct > 20) riskLevel = 'HIGH';
-  else if (rawPct > 10) riskLevel = 'MODERATE';
+  const changedPixels =
+    typeof evidence.changed_pixels === 'number' ? evidence.changed_pixels :
+    typeof stats.changed_pixels === 'number' ? stats.changed_pixels :
+    0;
+
+  const rawAreaM2 =
+    typeof evidence.changed_area_m2 === 'number' ? evidence.changed_area_m2 :
+    typeof stats.changed_area_m2 === 'number' ? stats.changed_area_m2 :
+    (changedPixels > 0 ? changedPixels * 0.25 : 0);
+
+  const changedAreaM2 = Math.round(rawAreaM2 * 100) / 100;
+
+  const rawAreaKm2 =
+    typeof evidence.changed_area_km2 === 'number' ? evidence.changed_area_km2 :
+    typeof stats.changed_area_km2 === 'number' ? stats.changed_area_km2 :
+    (changedAreaM2 / 1000000);
+
+  const changedAreaKm2 = `${Number(rawAreaKm2).toFixed(4)} km²`;
+
+  const rawPct =
+    typeof evidence.change_percentage === 'number' ? evidence.change_percentage :
+    typeof stats.change_percentage === 'number' ? stats.change_percentage :
+    0;
+
+  const pct = rawPct > 0 ? `+${rawPct.toFixed(1)}%` : '0.0%';
+
+  const regionsList =
+    Array.isArray(evidence.regions) ? evidence.regions :
+    Array.isArray(stats.regions) ? stats.regions :
+    [];
+
+  const clusterCount =
+    typeof evidence.cluster_count === 'number' ? evidence.cluster_count :
+    typeof stats.cluster_count === 'number' ? stats.cluster_count :
+    regionsList.length;
+
+  const dominantLocation =
+    evidence.dominant_location ||
+    stats.dominant_location ||
+    (regionsList[0]?.location ? `${regionsList[0].location} Sector` : 'Center Quadrant');
+
+  let riskLevel: 'LOW' | 'MODERATE' | 'HIGH' | 'CRITICAL' = 'LOW';
+  if (rawPct > 30) riskLevel = 'CRITICAL';
+  else if (rawPct > 15) riskLevel = 'HIGH';
+  else if (rawPct > 5) riskLevel = 'MODERATE';
   else riskLevel = 'LOW';
 
   return {
@@ -253,12 +289,12 @@ export function extractChangeMetrics(
     areaM2: changedAreaM2,
     relativeDeltaPercent: pct,
     riskLevel,
-    waterInundationPercent: Math.min(85, Math.round(rawPct * 1.5)),
-    agriculturalLossPercent: Math.min(70, Math.round(rawPct * 0.8)),
-    settlementImpactPercent: Math.min(60, Math.round(rawPct * 0.6)),
+    waterInundationPercent: Math.min(95, Math.round(rawPct * 1.5)),
+    agriculturalLossPercent: Math.min(85, Math.round(rawPct * 0.8)),
+    settlementImpactPercent: Math.min(75, Math.round(rawPct * 0.6)),
     dominantLocation,
     clusterCount,
-    changeType: evidence.change_type || 'Urban & Structural Transformation',
+    changeType: evidence.change_type || stats.change_type || 'Optical Feature & Land Cover Transformation',
     executiveSummary: fallbackSummary
   };
 }

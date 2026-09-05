@@ -20,17 +20,17 @@ export default function ChangeDetectionPanel({
   modelName = 'BIT-LEVIR-CD (Bi-Temporal Transformer)'
 }: ChangeDetectionPanelProps) {
   const metrics = changeMetrics || scenario?.changeMetrics || {
-    areaKm2: '0.0343 km²',
-    areaM2: 34250.5,
-    relativeDeltaPercent: '+38.4%',
-    riskLevel: 'HIGH' as const,
-    waterInundationPercent: 42,
-    agriculturalLossPercent: 28,
-    settlementImpactPercent: 35,
-    dominantLocation: 'North-East & Central Corridor',
-    clusterCount: 4,
-    changeType: 'Urban Expansion & Structural Modification',
-    executiveSummary: 'Bi-temporal feature comparison confirms significant structural variation across active quadrants.'
+    areaKm2: '0.0000 km²',
+    areaM2: 0,
+    relativeDeltaPercent: '0.0%',
+    riskLevel: 'LOW' as const,
+    waterInundationPercent: 0,
+    agriculturalLossPercent: 0,
+    settlementImpactPercent: 0,
+    dominantLocation: 'None',
+    clusterCount: 0,
+    changeType: 'Awaiting Temporal Analytics',
+    executiveSummary: 'Run change detection query to inspect dynamic spatial delta.'
   };
 
   const t1Label = t1Date || scenario?.t1Date || 'Baseline (T1 Pre-Event)';
