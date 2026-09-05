@@ -186,45 +186,6 @@ export function convertVisualEvidenceToEntities(
     ];
   }
 
-  // 5. General building & urban structure entity fallback
-  if (entities.length === 0) {
-    return [
-      {
-        id: 1,
-        name: 'Identified Building Sector A',
-        confidence: 0.985,
-        area_m2: 4200,
-        latMin: centerLat - 0.002,
-        lngMin: centerLng - 0.003,
-        latMax: centerLat + 0.001,
-        lngMax: centerLng,
-        color: PALETTE[0]
-      },
-      {
-        id: 2,
-        name: 'Building Structure Sector B',
-        confidence: 0.972,
-        area_m2: 3800,
-        latMin: centerLat - 0.003,
-        lngMin: centerLng + 0.001,
-        latMax: centerLat,
-        lngMax: centerLng + 0.004,
-        color: PALETTE[1]
-      },
-      {
-        id: 3,
-        name: 'Access Road & Utility Corridor',
-        confidence: 0.964,
-        area_m2: 2400,
-        latMin: centerLat + 0.001,
-        lngMin: centerLng - 0.002,
-        latMax: centerLat + 0.003,
-        lngMax: centerLng + 0.002,
-        color: PALETTE[2]
-      }
-    ];
-  }
-
   return entities;
 }
 

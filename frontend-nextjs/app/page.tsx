@@ -35,7 +35,8 @@ import {
   Trash2,
   Columns3,
   Binary,
-  AlertCircle
+  AlertCircle,
+  Copy
 } from 'lucide-react';
 import * as GeoTIFF from 'geotiff';
 import { jsPDF } from 'jspdf';
@@ -65,6 +66,7 @@ import {
 } from '../lib/adapters';
 import AgenticAuditTrace from '@/components/AgenticAuditTrace';
 import ChangeDetectionPanel from '@/components/ChangeDetectionPanel';
+import MarkdownRenderer from '@/components/MarkdownRenderer';
 
 const formatMediaUrl = (url?: string | null): string | null => {
   if (!url || typeof url !== 'string' || url.trim() === '') return null;
@@ -213,6 +215,16 @@ export default function BhuViksanaApp() {
   const [entities, setEntities] = useState<MapEntity[]>([]);
 
   const [chatMessages, setChatMessages] = useState<Array<{ sender: 'user' | 'ai'; text: string }>>([]);
+
+  // In-place Setup Canvas AI response state (for text & fallback queries without imagery)
+  const [canvasResponse, setCanvasResponse] = useState<{
+    query: string;
+    text: string;
+    model: string;
+    duration_ms?: number;
+    timestamp?: string;
+  } | null>(null);
+  const [copyStatus, setCopyStatus] = useState<string | null>(null);
 
   const fileInputT1Ref = useRef<HTMLInputElement>(null);
   const fileInputT2Ref = useRef<HTMLInputElement>(null);
@@ -411,9 +423,14 @@ export default function BhuViksanaApp() {
   // -------------------------------------------------------------
   // AUTONOMOUS ROUTING LOGIC
   // -------------------------------------------------------------
-  const autoDetectPipeline = (f1: File | null, f2: File | null) => {
+  const autoDetectPipeline = (f1: File | null, f2: File | null, qText?: string) => {
+    const currentQ = (qText !== undefined ? qText : queryText).trim();
     if (!f1 && !f2) {
-      setDetectedPipeline('Auto-Routing Engine Idle');
+      if (currentQ) {
+        setDetectedPipeline('GEMINI FLASH-LITE (TEXT QUERY / FALLBACK ENGINE)');
+      } else {
+        setDetectedPipeline('Autonomous Dispatcher Idle (Ready for input)');
+      }
       return;
     }
     if (f1 && !f2) {
@@ -437,6 +454,12 @@ export default function BhuViksanaApp() {
       }
     }
   };
+
+  useEffect(() => {
+    if (currentPage === 'canvas') {
+      autoDetectPipeline(fileT1, fileT2, queryText);
+    }
+  }, [fileT1, fileT2, queryText, currentPage]);
 
   const handleMultiFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -531,13 +554,20 @@ export default function BhuViksanaApp() {
     const dynamicTitle = initialQ.length > 40 ? initialQ.slice(0, 40) + "..." : initialQ;
 
     // Save to Inspection History
+    const isTextOnlyQuery = !fileT1 && !fileT2;
     const newHistory: HistoryItem = {
       id: newThreadId,
       title: dynamicTitle,
       timestamp: 'Just now',
-      method: effectiveMethod,
-      pipeline: effectiveMethod === 'bitemporal' ? 'Open-CD (Bi-Temporal Siamese)' : effectiveMethod === 'opticalsar' ? 'Cross-Attention Optical-SAR' : 'GEOCHAT-7B VQA & GROUNDING',
-      entitiesCount: 1,
+      method: isTextOnlyQuery ? 'text_qa' : effectiveMethod,
+      pipeline: isTextOnlyQuery
+        ? 'GEMINI FLASH-LITE (INTELLIGENT ASSISTANT)'
+        : effectiveMethod === 'bitemporal'
+        ? 'Open-CD (Bi-Temporal Siamese)'
+        : effectiveMethod === 'opticalsar'
+        ? 'Cross-Attention Optical-SAR'
+        : 'GEOCHAT-7B VQA & GROUNDING',
+      entitiesCount: isTextOnlyQuery ? 0 : 1,
       coordinates: { lat: liveCoords.lat, lng: liveCoords.lng }
     };
     setHistoryList((prev) => [newHistory, ...prev]);
@@ -556,10 +586,14 @@ export default function BhuViksanaApp() {
           title: dynamicTitle
         });
       } else {
-        const paths = [t1DataUrl, t2DataUrl].filter(Boolean) as string[];
+        // Pure text query without uploaded rasters -> route to Gemini Flash-Lite fallback
+        setT1DataUrl(null);
+        setT2DataUrl(null);
+        setChangeMaskUrl(null);
+        setEntities([]);
         res = await executeSatelliteQueryJson({
           query: initialQ,
-          imagePaths: paths.length > 0 ? paths : undefined,
+          imagePaths: [],
           useGraph: true,
           threadId: newThreadId,
           title: dynamicTitle
@@ -569,12 +603,27 @@ export default function BhuViksanaApp() {
       const replyText = res.result || `Autonomous router initialized [Pipeline: ${effectiveMethod.toUpperCase()}]. Grounded features across active raster swath.`;
       setChatMessages((prev) => [...prev, { sender: 'ai', text: replyText }]);
 
+      // For text-only queries, set in-place Canvas response
+      if (isTextOnlyQuery) {
+        const modelName = (res.model && res.model.toLowerCase().includes('lite'))
+          ? 'Gemini Flash-Lite'
+          : res.model || 'Gemini Flash-Lite';
+
+        setCanvasResponse({
+          query: initialQ,
+          text: replyText,
+          model: modelName,
+          duration_ms: res.execution_trace?.total_duration_ms,
+          timestamp: 'Just now'
+        });
+      }
+
+      // Visual Evidence & Mask Handling
       if (res.visual_evidence) {
         setVisualEvidenceData(res.visual_evidence);
         const newEntities = convertVisualEvidenceToEntities(res.visual_evidence);
         if (newEntities.length > 0) setEntities(newEntities);
 
-        // Wire Binary Mask from Backend to Pane 3 on launch
         const mask =
           res.visual_evidence.mask_base64 ||
           res.visual_evidence.change_mask ||
@@ -587,41 +636,78 @@ export default function BhuViksanaApp() {
           const formattedMask = formatMediaUrl(mask);
           setChangeMaskUrl(formattedMask);
         }
+      }
 
-        const isChangeTask =
-          res.task === 'change_detection' ||
-          initialQ.toLowerCase().includes('change') ||
-          initialQ.toLowerCase().includes('detect change') ||
-          Boolean(mask);
+      // Update Active Pipeline State
+      const hasChangeMask = Boolean(
+        res.visual_evidence?.mask_base64 ||
+        res.visual_evidence?.change_mask ||
+        res.visual_evidence?.change_mask_url
+      );
+      const isChangeTask =
+        res.task === 'change_detection' ||
+        (fileT1 && fileT2 && (initialQ.toLowerCase().includes('change') || initialQ.toLowerCase().includes('detect change'))) ||
+        hasChangeMask;
 
-        if (isChangeTask) {
-          setTargetMethod('bitemporal');
-          setActiveWorkstationTab('bitemporal');
-          setActiveViewTool('tripane');
-          setDetectedPipeline('OPEN-CD (BI-TEMPORAL SIAMESE)');
-        } else {
-          setTargetMethod('single');
-          setActiveWorkstationTab('rsvqa');
-          setActiveViewTool('single');
-          setDetectedPipeline('GEOCHAT-7B VQA & GROUNDING');
-          setChangeMaskUrl(null);
-          setT2DataUrl(null);
-        }
+      if (isChangeTask) {
+        setTargetMethod('bitemporal');
+        setActiveWorkstationTab('bitemporal');
+        setActiveViewTool('tripane');
+        setDetectedPipeline('OPEN-CD (BI-TEMPORAL SIAMESE)');
+      } else if (res.task === 'general_qa' || isTextOnlyQuery || (res.model && res.model.toLowerCase().includes('gemini') && !res.task?.includes('vision'))) {
+        setTargetMethod('single');
+        setActiveWorkstationTab('rsvqa');
+        setActiveViewTool('single');
+        const modelLabel = (res.model && res.model.toLowerCase().includes('lite'))
+          ? 'GEMINI FLASH-LITE'
+          : 'GEMINI 2.5 FLASH';
+        setDetectedPipeline(`${modelLabel} (INTELLIGENT GEOSPATIAL ASSISTANT)`);
+        setChangeMaskUrl(null);
+        setT2DataUrl(null);
+      } else if (res.task === 'fallback_vision' || (res.model && res.model.toLowerCase().includes('gemini'))) {
+        setTargetMethod('single');
+        setActiveWorkstationTab('rsvqa');
+        setActiveViewTool('single');
+        const modelLabel = (res.model && res.model.toLowerCase().includes('lite'))
+          ? 'GEMINI FLASH-LITE'
+          : 'GEMINI 2.5 FLASH';
+        setDetectedPipeline(`${modelLabel} (MULTIMODAL RS FALLBACK)`);
+        setChangeMaskUrl(null);
+        setT2DataUrl(null);
+      } else {
+        setTargetMethod('single');
+        setActiveWorkstationTab('rsvqa');
+        setActiveViewTool('single');
+        setDetectedPipeline('GEOCHAT-7B VQA & GROUNDING');
+        setChangeMaskUrl(null);
+        setT2DataUrl(null);
       }
 
       await loadThreadsFromBackend();
     } catch (err) {
       console.warn("Launch query API error:", err);
+      const fallbackError = `Autonomous router initialized [Pipeline: ${effectiveMethod.toUpperCase()}]. Grounded ${entities.length} features across active raster swath.`;
       setChatMessages((prev) => [
         ...prev,
         {
           sender: 'ai',
-          text: `Autonomous router initialized [Pipeline: ${effectiveMethod.toUpperCase()}]. Grounded ${entities.length} features across active raster swath.`
+          text: fallbackError
         }
       ]);
+      if (isTextOnlyQuery) {
+        setCanvasResponse({
+          query: initialQ,
+          text: `Gemini Fallback encountered an issue contacting the backend. Please ensure the Django backend is running at http://127.0.0.1:8000 and your GEMINI_API_KEY is configured in backend/.env.`,
+          model: 'Gemini Flash-Lite (Fallback Engine)',
+          timestamp: 'Just now'
+        });
+      }
     } finally {
       setIsLoading(false);
-      navigateTo('workstation');
+      // Only navigate to GIS workstation if an actual raster file was uploaded!
+      if (fileT1) {
+        navigateTo('workstation');
+      }
     }
   };
 
@@ -735,7 +821,7 @@ export default function BhuViksanaApp() {
         const paths = [t1DataUrl, t2DataUrl].filter(Boolean) as string[];
         res = await executeSatelliteQueryJson({
           query: userQ,
-          imagePaths: paths.length > 0 ? paths : undefined,
+          imagePaths: paths.length > 0 ? paths : [],
           useGraph: true,
           threadId: activeThreadId,
           title: activeScenario
@@ -778,6 +864,26 @@ export default function BhuViksanaApp() {
         setActiveWorkstationTab('bitemporal');
         setActiveViewTool('tripane');
         setDetectedPipeline('OPEN-CD (BI-TEMPORAL SIAMESE)');
+      } else if (res.task === 'general_qa' || (res.model && res.model.toLowerCase().includes('gemini') && !res.task?.includes('vision'))) {
+        setTargetMethod('single');
+        setActiveWorkstationTab('rsvqa');
+        setActiveViewTool('single');
+        const modelLabel = (res.model && res.model.toLowerCase().includes('lite'))
+          ? 'GEMINI FLASH-LITE'
+          : 'GEMINI 2.5 FLASH';
+        setDetectedPipeline(`${modelLabel} (INTELLIGENT GEOSPATIAL ASSISTANT)`);
+        setChangeMaskUrl(null);
+        setT2DataUrl(null);
+      } else if (res.task === 'fallback_vision' || (res.model && res.model.toLowerCase().includes('gemini'))) {
+        setTargetMethod('single');
+        setActiveWorkstationTab('rsvqa');
+        setActiveViewTool('single');
+        const modelLabel = (res.model && res.model.toLowerCase().includes('lite'))
+          ? 'GEMINI FLASH-LITE'
+          : 'GEMINI 2.5 FLASH';
+        setDetectedPipeline(`${modelLabel} (MULTIMODAL RS FALLBACK)`);
+        setChangeMaskUrl(null);
+        setT2DataUrl(null);
       } else {
         setTargetMethod('single');
         setActiveWorkstationTab('rsvqa');
@@ -1250,8 +1356,8 @@ export default function BhuViksanaApp() {
         )}
 
         {/* MAIN CANVAS */}
-        <main className="flex-1 flex flex-col justify-center items-center p-8 relative z-10">
-          <div className="w-full max-w-3xl mx-auto flex flex-col items-center space-y-6">
+        <main className="flex-1 flex flex-col items-center p-6 sm:p-8 relative z-10 overflow-y-auto">
+          <div className="w-full max-w-3xl mx-auto flex flex-col items-center space-y-6 my-auto">
             <h1 className="text-4xl font-semibold tracking-tight text-center text-slate-900 leading-snug">
               <span className="text-[#0284c7]">Good Afternoon,</span> What Satellite<br />
               scene you would like to <span className="text-[#f37021]">Discover?</span>
@@ -1358,22 +1464,119 @@ export default function BhuViksanaApp() {
                 <button
                   onClick={handleLaunchWorkstation}
                   disabled={isLoading}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#f37021] to-[#f97316] hover:from-[#ea580c] hover:to-[#f37021] text-white text-xs font-semibold shadow-md active:scale-[0.98] transition disabled:opacity-50"
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-xs font-semibold shadow-md active:scale-[0.98] transition disabled:opacity-50 ${
+                    fileT1
+                      ? 'bg-gradient-to-r from-[#f37021] to-[#f97316] hover:from-[#ea580c] hover:to-[#f37021]'
+                      : 'bg-gradient-to-r from-[#0284c7] to-[#0ea5e9] hover:from-[#0369a1] hover:to-[#0284c7]'
+                  }`}
                 >
                   {isLoading ? (
                     <>
                       <span>Processing...</span>
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
                     </>
-                  ) : (
+                  ) : fileT1 ? (
                     <>
                       <span>Launch Workstation</span>
                       <Rocket className="w-3.5 h-3.5 fill-white" />
+                    </>
+                  ) : (
+                    <>
+                      <span>Ask Gemini Assistant</span>
+                      <Sparkles className="w-3.5 h-3.5" />
                     </>
                   )}
                 </button>
               </div>
             </div>
+
+            {/* INLINE AI ASSISTANT RESPONSE CARD (FOR TEXT & GENERAL QA FALLBACK) */}
+            {(canvasResponse || (isLoading && !fileT1 && !fileT2)) && (
+              <div className="w-full bg-white rounded-[24px] border border-sky-100 shadow-[0_12px_40px_-15px_rgba(2,132,199,0.12)] p-6 space-y-4 animate-in fade-in-50 duration-300 text-left">
+                {/* Card Header */}
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#0284c7] to-[#38bdf8] flex items-center justify-center text-white shadow-sm shadow-cyan-500/30">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-slate-900 text-xs sm:text-sm">
+                          BhuVikshana Geospatial Intelligence
+                        </span>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-sky-50 text-[#0284c7] font-semibold border border-sky-200 font-mono">
+                          {canvasResponse?.model || 'Gemini Flash-Lite'}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 truncate max-w-[280px] sm:max-w-md">
+                        Query: "{canvasResponse?.query || queryText}"
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {canvasResponse?.duration_ms && (
+                      <span className="text-[10px] font-mono text-slate-400 bg-slate-50 border border-slate-200/80 px-2 py-1 rounded-lg">
+                        {canvasResponse.duration_ms} ms
+                      </span>
+                    )}
+                    <button
+                      onClick={() => navigateTo('workstation')}
+                      className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 hover:border-[#0284c7] hover:text-[#0284c7] text-slate-600 text-xs font-medium transition shadow-sm"
+                      title="Open in Full GIS Workstation"
+                    >
+                      <span>Open Workstation</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => setCanvasResponse(null)}
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition"
+                      title="Dismiss Answer"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Card Body */}
+                {isLoading && !fileT1 && !fileT2 ? (
+                  <div className="py-8 flex flex-col items-center justify-center gap-3">
+                    <Loader2 className="w-6 h-6 text-[#0284c7] animate-spin" />
+                    <span className="text-xs text-slate-600 font-medium">
+                      Consulting Gemini Flash-Lite Geospatial Engine...
+                    </span>
+                  </div>
+                ) : canvasResponse ? (
+                  <div className="max-h-[380px] overflow-y-auto pr-2">
+                    <MarkdownRenderer content={canvasResponse.text} />
+                  </div>
+                ) : null}
+
+                {/* Card Footer Actions */}
+                {canvasResponse && !isLoading && (
+                  <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs">
+                    <span className="text-[11px] text-slate-400 font-mono">
+                      Fallback Engine • No Image Swaths Attached
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          if (canvasResponse?.text) {
+                            navigator.clipboard.writeText(canvasResponse.text);
+                            setCopyStatus('Copied!');
+                            setTimeout(() => setCopyStatus(null), 2000);
+                          }
+                        }}
+                        className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 text-xs font-medium transition"
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>{copyStatus || 'Copy Answer'}</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* PRE-CONFIGURED BENCHMARK SCENARIOS */}
             <div className="flex flex-col items-center gap-2 pt-2">
@@ -1746,8 +1949,8 @@ export default function BhuViksanaApp() {
               <div className="p-3.5 bg-[#f8fafd] border-b border-[#dadce0] flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-[#188038]" />
-                  <span className="text-xs font-medium text-[#3c4043]">
-                    Pipeline: {targetMethod === 'bitemporal' || activeViewTool === 'tripane' || activeWorkstationTab === 'bitemporal' || activeScenario.includes('Assam') ? 'OPEN-CD (BI-TEMPORAL SIAMESE)' : targetMethod === 'opticalsar' ? 'CROSS-ATTENTION OPTICAL-SAR' : 'GEOCHAT-7B VQA & GROUNDING'}
+                  <span className="text-xs font-medium text-[#3c4043] truncate max-w-[280px]">
+                    Pipeline: {detectedPipeline}
                   </span>
                 </div>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#e6f4ea] text-[#137333]">
@@ -1770,7 +1973,7 @@ export default function BhuViksanaApp() {
                     {chatMessages.map((msg, idx) => (
                       <div
                         key={idx}
-                        className={`text-xs leading-relaxed p-3 rounded-2xl border whitespace-pre-wrap ${
+                        className={`text-xs leading-relaxed p-3 rounded-2xl border ${
                           msg.sender === 'user'
                             ? 'bg-[#e8f0fe] border-[#d2e3fc] text-[#174ea6] ml-6'
                             : 'bg-[#f1f3f4] border-[#dadce0] text-[#202124] mr-4'
@@ -1779,7 +1982,11 @@ export default function BhuViksanaApp() {
                         <span className="font-semibold text-[11px] block mb-1">
                           {msg.sender === 'user' ? 'Operator' : 'BhuViksana Assistant'}
                         </span>
-                        {msg.text}
+                        {msg.sender === 'user' ? (
+                          <div className="whitespace-pre-wrap">{msg.text}</div>
+                        ) : (
+                          <MarkdownRenderer content={msg.text} />
+                        )}
                       </div>
                     ))}
                     {isLoading && (
@@ -1796,7 +2003,7 @@ export default function BhuViksanaApp() {
                     {chatMessages.map((msg, idx) => (
                       <div
                         key={idx}
-                        className={`text-xs leading-relaxed p-3 rounded-2xl border whitespace-pre-wrap ${
+                        className={`text-xs leading-relaxed p-3 rounded-2xl border ${
                           msg.sender === 'user'
                             ? 'bg-[#e8f0fe] border-[#d2e3fc] text-[#174ea6] ml-6'
                             : 'bg-[#f1f3f4] border-[#dadce0] text-[#202124] mr-4'
@@ -1805,7 +2012,11 @@ export default function BhuViksanaApp() {
                         <span className="font-semibold text-[11px] block mb-1">
                           {msg.sender === 'user' ? 'Operator' : 'BhuViksana Assistant'}
                         </span>
-                        {msg.text}
+                        {msg.sender === 'user' ? (
+                          <div className="whitespace-pre-wrap">{msg.text}</div>
+                        ) : (
+                          <MarkdownRenderer content={msg.text} />
+                        )}
                       </div>
                     ))}
                     {isLoading && (
