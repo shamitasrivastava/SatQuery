@@ -41,7 +41,9 @@ import {
   FileImage,
   Flame,
   Terminal,
-  Clock
+  Clock,
+  Map as MapIcon,
+  Globe
 } from 'lucide-react';
 import * as GeoTIFF from 'geotiff';
 import { jsPDF } from 'jspdf';
@@ -350,6 +352,7 @@ export default function BhuViksanaApp() {
 
   const handleLoadScenario = (scenario: 'port' | 'flood') => {
     handleClearFiles();
+    setBaseMapType('esri');
     if (scenario === 'port') {
       setActiveScenario('Visakhapatnam Port & Industrial Corridor');
       setTargetMethod('single');
@@ -727,7 +730,7 @@ export default function BhuViksanaApp() {
     doc.setFontSize(7.5);
     doc.setTextColor(100, 116, 139);
     doc.text('Geo-Analytics & Earth Observation Division', signX + 48, signY + 4, { align: 'right' });
-    doc.text('Bhuviksana Platform', signX + 48, signY + 8, { align: 'right' });
+    doc.text('BHUVIKSANA Platform', signX + 48, signY + 8, { align: 'right' });
 
     renderFooter(2);
 
@@ -1073,7 +1076,7 @@ export default function BhuViksanaApp() {
           </div>
         </aside>
 
-        <main className="flex-1 flex flex-col justify-center items-center p-8 relative z-10 overflow-hidden scale-95 origin-center">
+        <main className="flex-1 flex flex-col justify-center items-center p-8 relative z-10 overflow-hidden scale-[0.88] origin-center">
           {/* WATERMARK BACKGROUND LOGO - LARGER & SAME OPACITY */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.035] transform scale-150">
             <img src="/logo.png" alt="Watermark" className="w-[520px] h-[520px] object-contain" />
@@ -1093,7 +1096,7 @@ export default function BhuViksanaApp() {
                     onChange={(e) => setTargetMethod(e.target.value as any)}
                     className="w-full text-sm font-semibold text-slate-900 bg-slate-50 border border-slate-400/80 rounded-xl px-4 py-2.5 pr-10 outline-none focus:border-[#0284c7] focus:bg-white transition appearance-none cursor-pointer shadow-sm"
                   >
-                    <option value="auto">Auto-Detect</option>
+                    <option value="auto">Autodetect</option>
                     <option value="single">Single Satellite Imagery</option>
                     <option value="bitemporal">Bi-Temporal (Change Detection)</option>
                     <option value="opticalsar">Optical and SAR Fusion</option>
@@ -1205,155 +1208,81 @@ export default function BhuViksanaApp() {
       className="flex h-screen w-screen overflow-hidden bg-[#090d16] font-sans text-slate-200 select-none relative"
       onMouseUp={() => { isDraggingSwipe.current = false; }}
     >
-      <div className="absolute top-3 left-3 z-[400] flex flex-col gap-2 pointer-events-auto max-w-[calc(100vw-32px)]">
-        <div className="flex items-center h-10 bg-white/95 backdrop-blur-md rounded-full shadow-lg border border-slate-200 px-3 gap-2 w-[340px] sm:w-[380px]">
-          <button onClick={() => setCurrentPage('canvas')} className="p-1 rounded-full hover:bg-slate-100 text-slate-600 transition">
-            <ArrowLeft className="w-4 h-4" />
-          </button>
-          <div className="flex-1 truncate text-xs font-medium text-slate-800">
-            Swath: {activeScenario}
-          </div>
-          <button onClick={() => handleLoadScenario(activeScenario.includes('Visakhapatnam') ? 'flood' : 'port')} className="p-1 rounded-full hover:bg-slate-100 text-slate-600 transition">
-            <SlidersHorizontal className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        <div className="flex items-center gap-1.5 overflow-x-auto py-0.5 no-scrollbar">
-          <button
-            onClick={() => handleLoadScenario('port')}
-            className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium shadow transition whitespace-nowrap ${
-              activeScenario.includes('Visakhapatnam') ? 'bg-[#1a73e8] text-white' : 'bg-white/90 text-slate-700 hover:bg-white border border-slate-200'
-            }`}
-          >
-            <Anchor className="w-3 h-3" />
-            <span>Port Recon</span>
-          </button>
-          <button
-            onClick={() => handleLoadScenario('flood')}
-            className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium shadow transition whitespace-nowrap ${
-              activeScenario.includes('Assam') ? 'bg-[#1a73e8] text-white' : 'bg-white/90 text-slate-700 hover:bg-white border border-slate-200'
-            }`}
-          >
-            <CloudRain className="w-3 h-3" />
-            <span>Flood Analysis</span>
-          </button>
-
-          <button
-            onClick={() => {
-              setActiveViewTool(activeViewTool === 'tripane' ? 'single' : 'tripane');
-              setActiveWorkstationTab('bitemporal');
-            }}
-            className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium shadow transition whitespace-nowrap ${
-              activeViewTool === 'tripane' ? 'bg-[#1a73e8] text-white font-bold' : 'bg-white/90 text-slate-700 hover:bg-white border border-slate-200'
-            }`}
-          >
-            <Columns3 className="w-3 h-3" />
-            <span>3-Pane Bit-CD</span>
-          </button>
-
-          <button
-            onClick={() => setActiveViewTool(activeViewTool === 'swipe' ? 'single' : 'swipe')}
-            className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium shadow transition whitespace-nowrap ${
-              activeViewTool === 'swipe' ? 'bg-[#e37400] text-white' : 'bg-white/90 text-slate-700 hover:bg-white border border-slate-200'
-            }`}
-          >
-            <MoveHorizontal className="w-3 h-3" />
-            <span>Swipe Tool</span>
-          </button>
-        </div>
-      </div>
-
       {/* VIEWPORT CANVAS */}
       <div className="flex flex-1 h-full w-full relative">
         <div ref={containerRef} onMouseMove={handleMouseMove} className="flex-1 relative bg-[#090d16] overflow-hidden select-none">
           
-          <div className="absolute top-3 right-4 z-[400] flex items-center gap-2 pointer-events-auto">
-            <button
-              onClick={() => setShowSmsModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-600/90 hover:bg-rose-600 text-xs font-semibold text-white shadow transition"
-            >
-              <Radio className="w-3 h-3" />
-              <span>SMS Alert</span>
-            </button>
-
-            <button
-              onClick={() => setShowAuditModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 text-slate-700 hover:bg-white border border-slate-200 text-xs font-medium shadow transition"
-            >
-              <Activity className="w-3 h-3 text-[#1a73e8]" />
-              <span>Audit Trace</span>
-            </button>
-
-            <button
-              onClick={handleExportPDF}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#1a73e8] hover:bg-[#1557b0] text-xs font-semibold text-white shadow transition"
-            >
-              <FileDown className="w-3 h-3" />
-              <span>Export Briefing</span>
-            </button>
-          </div>
+          {/* CONDITIONAL SATELLITE & STREET MAP TOGGLE FOR VISAKHAPATNAM & ASSAM PRESETS */}
+          {(activeScenario.includes('Visakhapatnam') || activeScenario.includes('Assam')) && (
+            <div className="absolute top-3 left-3 z-[400] flex items-center bg-white/95 backdrop-blur-md rounded-full shadow-md border border-slate-200 p-0.5 pointer-events-auto">
+              <button
+                onClick={() => setBaseMapType('esri')}
+                className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold transition ${
+                  baseMapType === 'esri' ? 'bg-[#1a73e8] text-white' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Globe className="w-3 h-3" />
+                <span>Satellite View</span>
+              </button>
+              <button
+                onClick={() => setBaseMapType('osm')}
+                className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold transition ${
+                  baseMapType === 'osm' ? 'bg-[#1a73e8] text-white' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <MapIcon className="w-3 h-3" />
+                <span>Street Map View</span>
+              </button>
+            </div>
+          )}
 
           {activeViewTool === 'tripane' ? (
             <div className="w-full h-full grid grid-cols-1 md:grid-cols-3 gap-1.5 bg-[#090d16] p-1.5 pb-8">
               
-              {/* PANEL 1: T1 BASELINE */}
+              {/* PANEL 1: T1 IMAGE */}
               <div className="relative w-full h-full rounded-xl overflow-hidden border border-slate-800/80 bg-black flex flex-col shadow-2xl">
-                <div className="absolute top-2.5 left-2.5 z-20 bg-black/85 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-semibold text-cyan-300 border border-cyan-800/60 flex items-center gap-1.5 shadow">
+                <div className="absolute top-3 left-3 z-20 bg-black/85 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-cyan-300 border border-cyan-800/60 flex items-center gap-1.5 shadow">
                   <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                  <span>T1: Pre-Event Swath (Baseline)</span>
+                  <span>T1 Image</span>
                 </div>
 
                 {t1DataUrl ? (
-                  <img src={t1DataUrl} alt="T1 Baseline" className="w-full h-full object-cover" />
+                  <img src={t1DataUrl} alt="T1 Image" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 text-xs">
                     <FileImage className="w-7 h-7 mb-2 opacity-40" />
-                    <span>Pre-Event Baseline Swath</span>
+                    <span>T1 Image Viewport</span>
                   </div>
                 )}
-
-                <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 z-20">
-                  <div className="bg-black/80 backdrop-blur-md px-2.5 py-0.5 rounded text-[10px] font-mono text-slate-200 border border-slate-700/80">
-                    LAYERS Satellite
-                  </div>
-                  <div className="bg-black/80 backdrop-blur-md px-2.5 py-0.5 rounded text-[10px] font-mono text-cyan-300 border border-slate-700/80 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-                    <span>Bounding Box: ON</span>
-                  </div>
-                </div>
               </div>
 
-              {/* PANEL 2: T2 TARGET */}
+              {/* PANEL 2: T2 IMAGE */}
               <div className="relative w-full h-full rounded-xl overflow-hidden border border-slate-800/80 bg-black flex flex-col shadow-2xl">
-                <div className="absolute top-2.5 left-2.5 z-20 bg-black/85 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-semibold text-amber-300 border border-amber-800/60 flex items-center gap-1.5 shadow">
+                <div className="absolute top-3 left-3 z-20 bg-black/85 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-amber-300 border border-amber-800/60 flex items-center gap-1.5 shadow">
                   <span className="w-2 h-2 rounded-full bg-amber-400" />
-                  <span>T2: Post-Event Swath (Target)</span>
+                  <span>T2 Image</span>
                 </div>
 
                 {t2DataUrl || t1DataUrl ? (
-                  <img src={t2DataUrl || t1DataUrl} alt="T2 Target" className="w-full h-full object-cover" />
+                  <img src={t2DataUrl || t1DataUrl} alt="T2 Image" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 text-xs">
                     <FileImage className="w-7 h-7 mb-2 opacity-40" />
-                    <span>Post-Event Target Swath</span>
+                    <span>T2 Image Viewport</span>
                   </div>
                 )}
-
-                <div className="absolute bottom-2.5 left-2.5 z-20 bg-black/80 backdrop-blur-md px-2.5 py-0.5 rounded text-[10px] font-mono text-slate-300 border border-slate-700/80">
-                  Acquisition: 2026-07-28 (Optical/SAR)
-                </div>
               </div>
 
-              {/* PANEL 3: BIT-CD BINARY CHANGE MASK */}
+              {/* PANEL 3: MASKING */}
               <div className="relative w-full h-full rounded-xl overflow-hidden border border-rose-900/60 bg-[#070b13] flex flex-col justify-center items-center shadow-2xl p-4">
-                <div className="absolute top-2.5 left-2.5 z-20 bg-rose-950/80 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-semibold text-rose-400 border border-rose-800 flex items-center gap-1.5 shadow">
+                <div className="absolute top-3 left-3 z-20 bg-rose-950/80 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-rose-400 border border-rose-800 flex items-center gap-1.5 shadow">
                   <Binary className="w-3 h-3 text-rose-400" />
-                  <span>Bit-CD: Binary Change Mask</span>
+                  <span>Masking</span>
                 </div>
 
                 <div className="w-36 h-36 rounded-xl border border-rose-600/60 bg-white shadow-[0_0_35px_rgba(235,50,35,0.25)] flex flex-col items-center justify-center text-center p-3">
                   <span className="text-[11px] font-black text-black tracking-wider block">
-                    BIT 1: CHANGE
+                    CHANGE MASK
                   </span>
                   <span className="text-[9px] font-medium text-slate-500 mt-1 block">
                     24,500 m² Inundated
@@ -1363,20 +1292,15 @@ export default function BhuViksanaApp() {
                 <div className="text-[10px] font-mono text-slate-500 mt-4 tracking-tight text-center">
                   Siamese Feature Difference Matrix • Resolution: 512×512 px
                 </div>
-
-                <div className="absolute bottom-2.5 left-2.5 z-20 flex items-center gap-2 text-[10px] font-mono text-slate-400 bg-black/80 px-2 py-0.5 rounded border border-slate-800">
-                  <span className="flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-sm bg-slate-700" /> [0] Unchanged
-                  </span>
-                  <span className="flex items-center gap-1 text-rose-400 font-semibold">
-                    <span className="w-2 h-2 rounded-sm bg-rose-500" /> [1] Inundation / Change
-                  </span>
-                </div>
               </div>
             </div>
           ) : t1DataUrl ? (
             <div className="w-full h-full relative overflow-hidden flex items-center justify-center bg-black">
-              <img src={t2DataUrl || t1DataUrl} alt="Post" className="absolute inset-0 w-full h-full object-cover" />
+              <div className="absolute top-3 left-3 z-20 bg-black/85 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-cyan-300 border border-cyan-800/60 flex items-center gap-1.5 shadow">
+                <span className="w-2 h-2 rounded-full bg-cyan-400" />
+                <span>Single Satellite Imagery Viewport</span>
+              </div>
+              <img src={t2DataUrl || t1DataUrl} alt="Satellite View" className="absolute inset-0 w-full h-full object-cover" />
               {showBBoxes && entities.map((box, idx) => (
                 <div
                   key={box.id ?? idx}
@@ -1396,14 +1320,16 @@ export default function BhuViksanaApp() {
             </div>
           ) : (
             isClient && (
-              <WorkstationMap
-                center={mapCenter}
-                zoom={mapZoom}
-                baseMapType={baseMapType}
-                showBBoxes={showBBoxes}
-                entities={entities}
-                onUpdate={handleMapUpdate}
-              />
+              <div className="w-full h-full relative">
+                <WorkstationMap
+                  center={mapCenter}
+                  zoom={mapZoom}
+                  baseMapType={baseMapType}
+                  showBBoxes={showBBoxes}
+                  entities={entities}
+                  onUpdate={handleMapUpdate}
+                />
+              </div>
             )
           )}
 
@@ -1525,7 +1451,42 @@ export default function BhuViksanaApp() {
               )}
             </div>
 
-            <div className="p-3 border-t border-slate-200 bg-white">
+            {/* ACTION BUTTONS & CHAT INPUT */}
+            <div className="p-3 border-t border-slate-200 bg-white space-y-2.5">
+              <div className="flex items-center justify-between gap-1.5">
+                <button
+                  onClick={() => setCurrentPage('canvas')}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-[11px] font-semibold transition"
+                >
+                  <ArrowLeft className="w-3 h-3" />
+                  <span>Canvas</span>
+                </button>
+
+                <button
+                  onClick={() => setShowSmsModal(true)}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[#f43f5e] hover:bg-[#e11d48] text-[11px] font-semibold text-white shadow transition"
+                >
+                  <Radio className="w-3 h-3" />
+                  <span>SMS</span>
+                </button>
+
+                <button
+                  onClick={() => setShowAuditModal(true)}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[#10b981] hover:bg-[#059669] text-[11px] font-semibold text-white shadow transition"
+                >
+                  <Activity className="w-3 h-3" />
+                  <span>Audit</span>
+                </button>
+
+                <button
+                  onClick={handleExportPDF}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#1a73e8] hover:bg-[#1557b0] text-[11px] font-semibold text-white shadow transition"
+                >
+                  <FileDown className="w-3 h-3" />
+                  <span>Export</span>
+                </button>
+              </div>
+
               <div className="flex items-center gap-2 bg-slate-100 border border-slate-200 rounded-full px-3.5 py-1.5 focus-within:bg-white focus-within:border-[#1a73e8]">
                 <Sparkles className="w-4 h-4 text-[#1a73e8]" />
                 <input
@@ -1620,7 +1581,7 @@ export default function BhuViksanaApp() {
           <div className="w-full max-w-xl bg-white text-slate-900 border border-slate-200 rounded-[24px] p-6 space-y-5 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <Activity className="w-5 h-5 text-[#1a73e8]" />
+                <Activity className="w-5 h-5 text-[#10b981]" />
                 <h3 className="text-base font-bold text-slate-900">Execution Telemetry & Audit Log</h3>
               </div>
               <button
@@ -1660,7 +1621,7 @@ export default function BhuViksanaApp() {
             <div className="pt-2 flex justify-end">
               <button
                 onClick={() => setShowAuditModal(false)}
-                className="px-6 py-2.5 bg-[#1a73e8] hover:bg-blue-600 text-xs font-semibold text-white rounded-xl shadow transition cursor-pointer"
+                className="px-6 py-2.5 bg-[#10b981] hover:bg-[#059669] text-xs font-semibold text-white rounded-xl shadow transition cursor-pointer"
               >
                 Close Audit Log
               </button>
