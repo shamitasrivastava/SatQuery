@@ -85,6 +85,7 @@ interface HistoryItem {
 
 export default function BhuViksanaApp() {
   const [currentPage, setCurrentPage] = useState<'login' | 'canvas' | 'workstation' | 'reset-password'>('login');
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -272,7 +273,7 @@ export default function BhuViksanaApp() {
       setActiveViewTool('single');
       setActiveWorkstationTab('rsvqa');
       setActiveTab('overview');
-      setDetectedPipeline('1 Image detected → Auto-routed to Falcon-0.7B-RS (Single RS-VQA)');
+      setDetectedPipeline('1 Image detected → Auto-routed to Single Satellite Imagery');
     } else if (combined.length >= 2) {
       const url1 = await processRaster(combined[0]);
       const url2 = await processRaster(combined[1]);
@@ -282,7 +283,7 @@ export default function BhuViksanaApp() {
       setActiveViewTool('tripane');
       setActiveWorkstationTab('bitemporal');
       setActiveTab('change');
-      setDetectedPipeline('2+ Images detected → Auto-routed to Open-CD (Bi-Temporal Siamese 3-Pane Bit-CD)');
+      setDetectedPipeline('2+ Images detected → Auto-routed to Bi-Temporal Comparison');
     }
 
     if (singleUploadInputRef.current) {
@@ -310,6 +311,7 @@ export default function BhuViksanaApp() {
           ? `${uploadedFiles[0].name} vs ${uploadedFiles[1].name}`
           : uploadedFiles[0].name
       );
+      setEntities([]);
     }
 
     if (isDual) {
@@ -337,7 +339,7 @@ export default function BhuViksanaApp() {
       title: uploadedFiles.length > 0 ? uploadedFiles[0].name : activeScenario,
       timestamp: 'Just now',
       method: isDual ? 'bitemporal' : 'single',
-      pipeline: isDual ? 'Open-CD (Bi-Temporal Siamese)' : 'Falcon-0.7B-RS (Single RS-VQA)',
+      pipeline: isDual ? 'Bi-Temporal Comparison' : 'Single Satellite Imagery',
       entitiesCount: isDual ? 1 : 0,
       coordinates: { lat: liveCoords.lat, lng: liveCoords.lng }
     };
@@ -746,60 +748,75 @@ export default function BhuViksanaApp() {
   if (currentPage === 'login') {
     return (
       <div 
-        className="flex flex-col min-h-screen w-screen overflow-hidden font-sans select-none relative justify-between"
+        className="flex flex-col min-h-screen w-screen overflow-hidden font-sans select-none relative justify-between scale-100 origin-top"
         style={{
-          background: 'linear-gradient(135deg, #ffe3c2 0%, #fff1e0 22%, #f4f9ff 50%, #e2f0ff 72%, #d7ecff 100%)'
+          background: 'linear-gradient(135deg, #ffe3c2 0%, #fff1e0 22%, #f4f9ff 50%, #e2f0ff 72%, #d7ecff 100%)',
+          height: '100vh'
         }}
       >
         <div className="absolute -top-[6%] -left-[6%] w-[34rem] h-[34rem] rounded-full bg-[#f97316] blur-[95px] pointer-events-none opacity-30" />
         <div className="absolute -bottom-[8%] -right-[6%] w-[36rem] h-[36rem] rounded-full bg-[#0284c7] blur-[100px] pointer-events-none opacity-30" />
 
-        <header className="w-full bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-8 py-5 flex items-center justify-between shadow-sm z-30 relative">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-3">
-              <img src="/isro-logo.png" alt="ISRO Logo" className="h-14 w-auto object-contain" />
-              <div className="hidden sm:flex flex-col text-left leading-tight">
-                <span className="text-sm font-bold text-slate-800 tracking-tight uppercase">Department of Space</span>
-                <span className="text-xs font-medium text-slate-500">Government of India</span>
+        <header className="w-full bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 py-3 flex items-center justify-between shadow-sm z-30 relative">
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2.5">
+              <img src="/isro-logo.png" alt="ISRO Logo" className="h-11 w-auto object-contain" />
+              <div className="flex flex-col text-left leading-tight">
+                <span className="text-[11px] font-bold text-slate-900 tracking-tight uppercase">DEPARTMENT OF SPACE</span>
+                <span className="text-[10px] font-medium text-slate-500">Government of India</span>
               </div>
             </div>
-            <div className="h-10 w-[1px] bg-slate-300 hidden sm:block" />
-            <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="BhuViksana Logo" className="h-12 w-auto object-contain drop-shadow-sm" />
-              <div className="flex flex-col text-left">
-                <span className="text-lg font-extrabold text-slate-900 tracking-tight leading-none">
-                  BhuViksana <span className="text-sm font-mono text-[#0284c7]">AI</span>
-                </span>
-                <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mt-1">
-                  Earth Observation Portal
-                </span>
-              </div>
+            
+            <div className="h-7 w-[1px] bg-slate-300 ml-1.5 mr-0.5 hidden sm:block" />
+
+            <div className="flex items-center gap-2 ml-1">
+              <img src="/logo.png" alt="BhuViksana Logo" className="h-9 w-auto object-contain drop-shadow-sm scale-105" />
+              <span className="text-base font-extrabold text-[#0284c7] tracking-tight leading-none">
+                BhuViksana
+              </span>
             </div>
-          </div>
-          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs text-slate-700 font-mono">
-            <ShieldCheck className="w-4 h-4 text-[#0284c7]" />
-            <span className="hidden md:inline">NIC Security Certified • AES-256</span>
           </div>
         </header>
 
-        <main className="flex-1 flex flex-col justify-center items-center px-4 py-8 relative z-20">
-          <div className="w-full max-w-[460px] bg-white/95 rounded-[26px] border border-white/80 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.12)] p-8 sm:p-10 backdrop-blur-xl relative">
-            <div className="text-center mb-7">
-              <div className="w-14 h-14 mx-auto mb-3.5 flex items-center justify-center rounded-2xl bg-slate-50 border border-slate-200/80 shadow-sm">
-                <img src="/logo.png" alt="BhuViksana" className="w-9 h-9 object-contain" />
+        <main className="flex-1 flex flex-col justify-center items-center px-4 py-4 relative z-20">
+          <div className="w-full max-w-[420px] bg-white rounded-[26px] border border-slate-200/90 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.12)] p-6 sm:p-7 backdrop-blur-xl relative">
+            <div className="text-center mb-4">
+              <div className="w-12 h-12 mx-auto mb-2.5 flex items-center justify-center rounded-2xl bg-slate-50 border border-slate-200/80 shadow-sm">
+                <img src="/logo.png" alt="BhuViksana" className="w-8 h-8 object-contain" />
               </div>
-              <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Sign in to your account</h2>
-              <p className="text-xs text-slate-500 mt-1">Enter official credentials to access the geospatial workstation.</p>
+              <h2 className="text-lg font-bold text-slate-900 tracking-tight">Sign in to your account</h2>
+              <p className="text-[10px] text-slate-500 mt-0.5">Enter official credentials to access the geospatial workstation.</p>
             </div>
 
-            <form onSubmit={handleLoginSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 bg-slate-100 p-1 rounded-xl mb-4">
+              <button
+                type="button"
+                onClick={() => setAuthMode('signin')}
+                className={`py-1.5 text-xs font-semibold rounded-lg transition ${
+                  authMode === 'signin' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                Sign In
+              </button>
+              <button
+                type="button"
+                onClick={() => setAuthMode('signup')}
+                className={`py-1.5 text-xs font-semibold rounded-lg transition ${
+                  authMode === 'signup' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                Sign Up
+              </button>
+            </div>
+
+            <form onSubmit={handleLoginSubmit} className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5 text-left">Designated Command Unit</label>
+                <label className="block text-[11px] font-semibold text-slate-700 mb-1 text-left">Designated Command Unit</label>
                 <div className="relative">
                   <select
                     value={agencyCode}
                     onChange={(e) => setAgencyCode(e.target.value)}
-                    className="w-full text-xs font-medium text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 outline-none focus:border-[#0284c7] focus:bg-white transition appearance-none cursor-pointer"
+                    className="w-full text-xs font-medium text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 outline-none focus:border-[#0284c7] focus:bg-white transition appearance-none cursor-pointer"
                   >
                     <option value="ISRO-SAC">ISRO — Space Applications Centre (SAC)</option>
                     <option value="ISRO-NRSC">ISRO — National Remote Sensing Centre (NRSC)</option>
@@ -807,12 +824,12 @@ export default function BhuViksanaApp() {
                     <option value="STATE-DMA">State Disaster Management Authority (SDMA)</option>
                     <option value="SIH-JURY">SIH2026 Evaluation Panel / Auditor</option>
                   </select>
-                  <Building2 className="w-4 h-4 text-slate-400 absolute right-3.5 top-3 pointer-events-none" />
+                  <Building2 className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-2.5 pointer-events-none" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5 text-left">Official Government Email ID</label>
+                <label className="block text-[11px] font-semibold text-slate-700 mb-1 text-left">Official Government Email ID</label>
                 <div className="relative">
                   <input
                     type="email"
@@ -820,22 +837,24 @@ export default function BhuViksanaApp() {
                     onChange={(e) => setLoginEmail(e.target.value)}
                     placeholder="officer.name@isro.gov.in / @nic.in"
                     required
-                    className="w-full text-xs text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 pl-10 outline-none focus:border-[#0284c7] focus:bg-white transition"
+                    className="w-full text-xs text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 pl-9 outline-none focus:border-[#0284c7] focus:bg-white transition"
                   />
-                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                  <Mail className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                 </div>
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-semibold text-slate-700">Security Passkey</label>
-                  <button
-                    type="button"
-                    onClick={() => setCurrentPage('reset-password')}
-                    className="text-[11px] font-medium text-[#0284c7] hover:underline"
-                  >
-                    Forgot Password?
-                  </button>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-[11px] font-semibold text-slate-700">Security Passkey</label>
+                  {authMode === 'signin' && (
+                    <button
+                      type="button"
+                      onClick={() => setCurrentPage('reset-password')}
+                      className="text-[10px] font-medium text-[#0284c7] hover:underline"
+                    >
+                      Forgot Password?
+                    </button>
+                  )}
                 </div>
                 <div className="relative">
                   <input
@@ -844,29 +863,33 @@ export default function BhuViksanaApp() {
                     onChange={(e) => setLoginPassword(e.target.value)}
                     placeholder="••••••••••••"
                     required
-                    className="w-full text-xs text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 pl-10 pr-10 outline-none focus:border-[#0284c7] focus:bg-white transition"
+                    className="w-full text-xs text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 pl-9 pr-9 outline-none focus:border-[#0284c7] focus:bg-white transition"
                   />
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                  <Lock className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-600 focus:outline-none"
+                    className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 focus:outline-none"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                   </button>
                 </div>
               </div>
 
               <button
                 type="submit"
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-semibold shadow-md active:scale-[0.98] transition mt-2"
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-semibold shadow-md active:scale-[0.98] transition mt-1 cursor-pointer"
               >
-                <span>Sign In with Gov Auth</span>
+                <span>{authMode === 'signin' ? 'Sign In with Gov Auth' : 'Register New Account'}</span>
                 <ArrowRight className="w-3.5 h-3.5 text-cyan-400" />
               </button>
             </form>
           </div>
         </main>
+
+        <footer className="w-full bg-[#070b13] text-slate-300 py-2.5 px-6 text-center text-[10px] font-medium border-t border-slate-800">
+          Official Notice: Authorized access only for ISRO, NRSC, and State Disaster Command personnel under the Information Technology Act, 2000. All access activities and telemetry queries are monitored and audited.
+        </footer>
       </div>
     );
   }
@@ -1050,33 +1073,32 @@ export default function BhuViksanaApp() {
           </div>
         </aside>
 
-        <main className="flex-1 flex flex-col justify-center items-center p-8 relative z-10">
-          <div className="w-full max-w-3xl mx-auto flex flex-col items-center space-y-6">
+        <main className="flex-1 flex flex-col justify-center items-center p-8 relative z-10 overflow-hidden scale-95 origin-center">
+          {/* WATERMARK BACKGROUND LOGO - LARGER & SAME OPACITY */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.035] transform scale-150">
+            <img src="/logo.png" alt="Watermark" className="w-[520px] h-[520px] object-contain" />
+          </div>
+
+          <div className="w-full max-w-3xl mx-auto flex flex-col items-center space-y-6 relative z-10">
             <h1 className="text-4xl font-semibold tracking-tight text-center text-slate-900 leading-snug">
               <span className="text-[#0284c7]">Good Afternoon,</span> What Satellite<br />
               scene you would like to <span className="text-[#f37021]">Discover?</span>
             </h1>
 
             <div className="w-full bg-white rounded-[24px] border border-slate-200/80 shadow-[0_12px_40px_-15px_rgba(0,0,0,0.08)] p-6 space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-slate-800 text-xs">Model Pipeline Mode</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#e8f0fe] text-[#1a73e8] font-mono">
-                    Autonomous Dispatcher
-                  </span>
-                </div>
-                <div className="relative">
+              <div className="flex justify-end">
+                <div className="relative w-[340px]">
                   <select
                     value={targetMethod}
                     onChange={(e) => setTargetMethod(e.target.value as any)}
-                    className="text-xs font-semibold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 pr-9 outline-none focus:border-[#0284c7] focus:bg-white transition cursor-pointer appearance-none shadow-sm"
+                    className="w-full text-sm font-semibold text-slate-900 bg-slate-50 border border-slate-400/80 rounded-xl px-4 py-2.5 pr-10 outline-none focus:border-[#0284c7] focus:bg-white transition appearance-none cursor-pointer shadow-sm"
                   >
-                    <option value="auto">Auto-Detect (Routes model by uploaded swaths)</option>
-                    <option value="single">Single Swath (Falcon-0.7B-RS VQA)</option>
-                    <option value="bitemporal">Bi-Temporal (Open-CD 3-Pane Bit-CD)</option>
-                    <option value="opticalsar">Optical SAR (Cross-Attention Fusion)</option>
+                    <option value="auto">Auto-Detect</option>
+                    <option value="single">Single Satellite Imagery</option>
+                    <option value="bitemporal">Bi-Temporal (Change Detection)</option>
+                    <option value="opticalsar">Optical and SAR Fusion</option>
                   </select>
-                  <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-2.5 pointer-events-none" />
+                  <ChevronDown className="w-4 h-4 text-slate-500 absolute right-3.5 top-3.5 pointer-events-none" />
                 </div>
               </div>
 
@@ -1093,8 +1115,13 @@ export default function BhuViksanaApp() {
               <div className="space-y-3 pt-3 border-t border-slate-100">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
-                    <label className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 cursor-pointer text-xs font-medium text-slate-700 shadow-sm transition">
-                      <UploadCloud className="w-4 h-4 text-[#0284c7]" />
+                    {/* BOUNDING BOX DYNAMIC THEME TRANSITION */}
+                    <label className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-semibold shadow-sm transition cursor-pointer ${
+                      uploadedFiles.length > 0 
+                        ? 'bg-[#1a73e8] border-[#1a73e8] text-white shadow-md' 
+                        : 'bg-slate-50 border-slate-300 text-slate-700 hover:bg-slate-100'
+                    }`}>
+                      <UploadCloud className={`w-4 h-4 ${uploadedFiles.length > 0 ? 'text-white' : 'text-[#0284c7]'}`} />
                       <span>
                         {uploadedFiles.length === 0
                           ? 'Upload Satellite Images (Select 1 or more)'
@@ -1142,21 +1169,27 @@ export default function BhuViksanaApp() {
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => handleLoadScenario('port')}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white/80 hover:bg-white text-xs font-medium text-slate-700 shadow-sm transition hover:scale-105"
-              >
-                <Anchor className="w-3.5 h-3.5 text-[#0284c7]" />
-                <span>Visakhapatnam Port</span>
-              </button>
-              <button
-                onClick={() => handleLoadScenario('flood')}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white/80 hover:bg-white text-xs font-medium text-slate-700 shadow-sm transition hover:scale-105"
-              >
-                <CloudRain className="w-3.5 h-3.5 text-[#f37021]" />
-                <span>Assam Flood Inundation</span>
-              </button>
+            {/* USE CASES PROMPT LINE & SCENARIO BUTTONS */}
+            <div className="w-full flex flex-col items-center space-y-3 pt-2">
+              <span className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
+                Explore Real-World Remote-Sensing Use Cases
+              </span>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => handleLoadScenario('port')}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white/80 hover:bg-white text-xs font-medium text-slate-700 shadow-sm transition hover:scale-105"
+                >
+                  <Anchor className="w-3.5 h-3.5 text-[#0284c7]" />
+                  <span>Visakhapatnam Port</span>
+                </button>
+                <button
+                  onClick={() => handleLoadScenario('flood')}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white/80 hover:bg-white text-xs font-medium text-slate-700 shadow-sm transition hover:scale-105"
+                >
+                  <CloudRain className="w-3.5 h-3.5 text-[#f37021]" />
+                  <span>Assam Flood Inundation</span>
+                </button>
+              </div>
             </div>
           </div>
         </main>
