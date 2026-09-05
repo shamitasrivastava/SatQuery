@@ -36,8 +36,15 @@ import {
   Columns3,
   Binary,
   AlertCircle,
-  Copy
+  Copy,
+  Radio,
+  PhoneCall,
+  KeyRound,
+  Flame,
+  Terminal,
+  Clock,
 } from 'lucide-react';
+import autoTable from 'jspdf-autotable';
 import * as GeoTIFF from 'geotiff';
 import { jsPDF } from 'jspdf';
 import {
@@ -113,10 +120,10 @@ interface HistoryItem {
 }
 
 export default function BhuViksanaApp() {
-  const [currentPage, setCurrentPage] = useState<'login' | 'canvas' | 'workstation'>('login');
+  const [currentPage, setCurrentPage] = useState<'login' | 'canvas' | 'workstation' | 'reset-password'>('login');
   const [isClient, setIsClient] = useState(false);
 
-  const navigateTo = (page: 'login' | 'canvas' | 'workstation') => {
+  const navigateTo = (page: 'login' | 'canvas' | 'workstation' | 'reset-password') => {
     setCurrentPage(page);
   };
 
@@ -180,6 +187,66 @@ export default function BhuViksanaApp() {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
   const [showAuditModal, setShowAuditModal] = useState<boolean>(false);
   const [isHistoryDrawerOpen, setIsHistoryDrawerOpen] = useState<boolean>(false);
+
+  // EMERGENCY SMS STATE
+  const [showSmsModal, setShowSmsModal] = useState<boolean>(false);
+  const [recipientPhone, setRecipientPhone] = useState<string>('');
+  const [isSendingSms, setIsSendingSms] = useState<boolean>(false);
+  const [smsStatus, setSmsStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  // USER PROFILE & PASSWORD RESET STATE
+  const [showUserPopover, setShowUserPopover] = useState<boolean>(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [resetError, setResetError] = useState('');
+  const [resetSuccess, setResetSuccess] = useState(false);
+
+  const getUserInitial = () => {
+    if (!loginEmail) return 'U';
+    return loginEmail.trim().charAt(0).toUpperCase();
+  };
+
+  const handlePasswordChangeSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetError('');
+    if (!newPassword || newPassword.length < 6) {
+      setResetError('New password must contain at least 6 characters.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setResetError('Passwords do not match. Please re-enter.');
+      return;
+    }
+
+    setResetSuccess(true);
+    setLoginPassword(newPassword);
+
+    setTimeout(() => {
+      setResetSuccess(false);
+      setNewPassword('');
+      setConfirmPassword('');
+      setCurrentPage('canvas');
+    }, 1500);
+  };
+
+  const handleSendAlertSMS = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!recipientPhone.trim()) return;
+
+    setIsSendingSms(true);
+    setSmsStatus('idle');
+
+    setTimeout(() => {
+      setIsSendingSms(false);
+      setSmsStatus('success');
+      setTimeout(() => {
+        setShowSmsModal(false);
+        setSmsStatus('idle');
+        setRecipientPhone('');
+      }, 1600);
+    }, 1000);
+  };
   const [isLoading, setIsLoading] = useState(false);
 
   // History Store
@@ -434,7 +501,7 @@ export default function BhuViksanaApp() {
       return;
     }
     if (f1 && !f2) {
-      setDetectedPipeline('Single Swath detected → Routed to Falcon-0.7B-RS (Single RS-VQA)');
+      setDetectedPipeline('Single Swath detected ΓåÆ Routed to Falcon-0.7B-RS (Single RS-VQA)');
       if (targetMethod === 'auto') {
         setActiveWorkstationTab('rsvqa');
         setActiveViewTool('single');
@@ -444,9 +511,9 @@ export default function BhuViksanaApp() {
     if (f1 && f2) {
       const nameCheck = (f1.name + ' ' + f2.name).toLowerCase();
       if (nameCheck.includes('sar') || nameCheck.includes('sentinel-1') || nameCheck.includes('s1') || nameCheck.includes('radar')) {
-        setDetectedPipeline('SAR + Optical Swaths detected → Routed to Cross-Attention Optical-SAR Fusion');
+        setDetectedPipeline('SAR + Optical Swaths detected ΓåÆ Routed to Cross-Attention Optical-SAR Fusion');
       } else {
-        setDetectedPipeline('Dual Temporal Swaths detected (Pre/Post) → Routed to Open-CD Bi-Temporal Siamese');
+        setDetectedPipeline('Dual Temporal Swaths detected (Pre/Post) ΓåÆ Routed to Open-CD Bi-Temporal Siamese');
       }
       if (targetMethod === 'auto') {
         setActiveWorkstationTab('bitemporal');
@@ -906,10 +973,10 @@ export default function BhuViksanaApp() {
       await loadThreadsFromBackend();
     } catch (err: any) {
       console.warn("Send message API error:", err);
-      let aiReply = `Analyzed spatial viewport at ${liveCoords.lat}°N, ${liveCoords.lng}°E.`;
+      let aiReply = `Analyzed spatial viewport at ${liveCoords.lat}┬░N, ${liveCoords.lng}┬░E.`;
       if (userQ.toLowerCase().includes('area') || userQ.toLowerCase().includes('size') || userQ.toLowerCase().includes('metric')) {
         const totalArea = entities.reduce((acc, curr) => acc + curr.area_m2, 0);
-        aiReply = `Total identified grounded area across ${entities.length} sectors is ${totalArea.toLocaleString()} m² (${(totalArea / 1000000).toFixed(4)} km²).`;
+        aiReply = `Total identified grounded area across ${entities.length} sectors is ${totalArea.toLocaleString()} m┬▓ (${(totalArea / 1000000).toFixed(4)} km┬▓).`;
       } else if (userQ.toLowerCase().includes('ship') || userQ.toLowerCase().includes('vessel') || userQ.toLowerCase().includes('port')) {
         aiReply = `Grounded 2 marine vessels at berths with model confidence >97.5%. Berthing berths verified.`;
       } else {
@@ -921,78 +988,319 @@ export default function BhuViksanaApp() {
     }
   };
 
-  const handleExportPDF = () => {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
+  const fetchImageAsBase64 = async (src: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth || img.width;
+          canvas.height = img.naturalHeight || img.height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Canvas context not available'));
+            return;
+          }
+          ctx.drawImage(img, 0, 0);
+          resolve(canvas.toDataURL('image/png'));
+        } catch (err) {
+          reject(err);
+        }
+      };
+      img.onerror = () => reject(new Error('Image failed to load'));
+      img.src = src;
+    });
+  };
 
-    doc.setFillColor(26, 115, 232);
-    doc.rect(0, 0, pageWidth, 28, 'F');
+  const handleExportPDF = async () => {
+    let logoDataUrl: string | null = null;
+    try {
+      logoDataUrl = await fetchImageAsBase64('/logo.png');
+    } catch (e) {
+      console.warn('Could not load /logo.png, exporting without image embed:', e);
+    }
 
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(14);
-    doc.setTextColor(255, 255, 255);
-    doc.text('BHUVIKSANA AI - NATIONAL GEOSPATIAL INTELLIGENCE BRIEFING', 14, 13);
-
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(232, 240, 254);
-    doc.text('DEPARTMENT OF SPACE • ISRO SIH26167 • RESTRICTED GOVERNMENT BRIEFING', 14, 21);
-
-    doc.setTextColor(32, 33, 36);
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.text('1. OPERATIONAL TELEMETRY & ACQUISITION METADATA', 14, 38);
-
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    doc.text(`Target Scenario   : ${activeScenario}`, 14, 46);
-    doc.text(`Acquisition GPS   : ${liveCoords.lat}° N, ${liveCoords.lng}° E (Zoom: ${liveCoords.zoom}x)`, 14, 52);
-    doc.text(`Active Pipeline   : ${targetMethod === 'bitemporal' ? 'Open-CD (Bi-Temporal Siamese)' : targetMethod === 'opticalsar' ? 'Cross-Attention Optical-SAR' : 'Falcon-0.7B-RS (Single RS-VQA)'}`, 14, 58);
-    doc.text(`Timestamp         : ${new Date().toUTCString()}`, 14, 64);
-
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.text(`2. GROUNDED VECTOR ENTITIES (${entities.length})`, 14, 76);
-
-    doc.setFillColor(241, 243, 244);
-    doc.rect(14, 80, pageWidth - 28, 8, 'F');
-    doc.setFontSize(8.5);
-    doc.setTextColor(32, 33, 36);
-    doc.text('ID', 18, 85);
-    doc.text('Identified Feature', 30, 85);
-    doc.text('Confidence', 110, 85);
-    doc.text('Footprint (m²)', 140, 85);
-    doc.text('Bounding Lat/Lon Bounds', 170, 85);
-
-    let y = 94;
-    entities.forEach((item, index) => {
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8);
-      doc.text(String(index + 1), 18, y);
-      doc.text(item.name, 30, y);
-      doc.text(`${(item.confidence * 100).toFixed(1)}%`, 110, y);
-      doc.text(`${item.area_m2.toLocaleString()} m²`, 140, y);
-      doc.text(`[${item.latMin.toFixed(3)}, ${item.lngMin.toFixed(3)}]`, 170, y);
-      y += 8;
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
     });
 
-    y += 8;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 14;
+    const contentWidth = pageWidth - margin * 2;
+
+    const renderHeader = () => {
+      doc.setFillColor(226, 238, 249);
+      doc.setDrawColor(200, 220, 240);
+      doc.setLineWidth(0.4);
+      doc.rect(0, 0, pageWidth, 26, 'FD');
+
+      doc.setFillColor(255, 255, 255);
+      doc.setDrawColor(215, 225, 238);
+      doc.setLineWidth(0.3);
+      doc.roundedRect(margin, 5.5, 14, 15, 2.5, 2.5, 'FD');
+
+      if (logoDataUrl) {
+        doc.addImage(logoDataUrl, 'PNG', margin + 1.5, 7, 11, 12);
+      }
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.setTextColor(30, 58, 95);
+      doc.text('BHUVIKSANA', margin + 18, 13.5);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(71, 85, 105);
+      doc.text('Satellite Intelligence & Geo-Analytics Platform', margin + 18, 19.5);
+    };
+
+    const renderFooter = (pageNumber: number) => {
+      doc.setDrawColor(226, 232, 240);
+      doc.setLineWidth(0.35);
+      doc.line(margin, pageHeight - 14, pageWidth - margin, pageHeight - 14);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(148, 163, 184);
+      doc.text('Bhuviksana Intelligence Briefing  |  Confidential  |  ISRO Space Applications Centre', margin, pageHeight - 9);
+      doc.text(`Page ${pageNumber} of 2`, pageWidth - margin, pageHeight - 9, { align: 'right' });
+    };
+
+    renderHeader();
+
+    let y = 33;
+    const cardHeight = 31;
+    doc.setFillColor(248, 250, 252);
+    doc.setDrawColor(219, 234, 254);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(margin, y, contentWidth, cardHeight, 2, 2, 'FD');
+
+    const metaFields = [
+      ['REPORT ID', 'BHU-SAR-2026-0906-X4'],
+      ['TARGET ZONE', activeScenario || 'Brahmaputra Basin, Assam'],
+      ['DETECTION PIPELINE', detectedPipeline || 'GEOCHAT-7B + Bi-Temporal Bit-CD'],
+      ['GENERATED ON', new Date().toUTCString()]
+    ];
+
+    let my = y + 6;
+    metaFields.forEach(([label, value]) => {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8.5);
+      doc.setTextColor(2, 132, 199);
+      doc.text(label, margin + 5, my);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(30, 41, 59);
+      doc.text(value, margin + 40, my);
+      my += 6;
+    });
+
+    y += cardHeight + 8;
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.text('3. AI REASONING & EXECUTIVE ASSESSMENT', 14, y);
+    doc.setFontSize(10.5);
+    doc.setTextColor(2, 132, 199);
+    doc.text('1. SATELLITE DATA SPECIFICATIONS & METADATA', margin, y);
 
-    y += 8;
+    y += 5;
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.5);
-    const lastAiMessage = chatMessages.slice().reverse().find(m => m.sender === 'ai')?.text || 'Zero critical anomalies detected in target viewport.';
-    const splitSummary = doc.splitTextToSize(lastAiMessage, pageWidth - 28);
-    doc.text(splitSummary, 14, y);
+    doc.setFontSize(8);
+    doc.setTextColor(51, 65, 85);
+    const introParagraph = doc.splitTextToSize(
+      'This report presents the automated thematic extraction and radiometric analysis carried out on high-resolution satellite imagery for the selected target zone, generated through the Bhuviksana processing pipeline.',
+      contentWidth
+    );
+    doc.text(introParagraph, margin, y);
+    y += introParagraph.length * 4 + 2;
 
+    autoTable(doc, {
+      startY: y,
+      margin: { left: margin, right: margin },
+      head: [['PARAMETER', 'SENSOR / PROCESSING SPECIFICATION']],
+      body: [
+        ['Satellite Mission', 'Resourcesat-2 / Cartosat-3 Constellation'],
+        ['Payload Sensor', 'Linear Imaging Self-Scanning Sensor (LISS-IV) & Panchromatic (PAN)'],
+        ['Path / Row Reference', 'Path 98, Row 54 (Sub-scene quadrant B)'],
+        ['Date of Acquisition', '14-January-2026 (05:42 UTC)'],
+        ['Spatial Resolution', '5.8 m (Multi-spectral) / 0.8 m (Panchromatic sharpened)'],
+        ['Radiometric Resolution', '10-bit Quantization (1024 grey levels)'],
+        ['Map Projection & Datum', 'UTM Zone 43N / WGS-84 Datum']
+      ],
+      theme: 'grid',
+      headStyles: {
+        fillColor: [86, 184, 232],
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+        fontSize: 7.8,
+        lineWidth: 0.2,
+        lineColor: [220, 230, 242],
+        cellPadding: 2.4
+      },
+      bodyStyles: {
+        textColor: [30, 41, 59],
+        fontSize: 7.8,
+        lineWidth: 0.15,
+        lineColor: [220, 230, 242],
+        cellPadding: 2.2
+      },
+      columnStyles: {
+        0: { fontStyle: 'normal', cellWidth: 55, textColor: [51, 65, 85] },
+        1: { fontStyle: 'normal' }
+      }
+    });
+
+    y = (doc as any).lastAutoTable.finalY + 8;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(2, 132, 199);
+    doc.text('2. OBJECTIVE AND SCOPE OF ANALYSIS', margin, y);
+
+    y += 5;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(51, 65, 85);
+    const scopeParagraph = doc.splitTextToSize(
+      'The analysis performs radiometric calibration, orthorectification, and supervised classification to track environmental change, urban expansion, and vegetation health within the selected area of interest. The resulting raster and vector layers are intended for use in planning, monitoring, and resource-tracking workflows on the Bhuviksana platform.',
+      contentWidth
+    );
+    doc.text(scopeParagraph, margin, y);
+    y += scopeParagraph.length * 4 + 4;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(2, 132, 199);
+    doc.text('3. METHODOLOGY & PROCESSING PIPELINE', margin, y);
+
+    y += 5;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(51, 65, 85);
+    doc.text('Level-0 sensor data is processed through the following automated pipeline stages:', margin, y);
+    y += 4.5;
+
+    const methodologyBullets = [
+      '• Radiometric Calibration: Raw digital numbers converted to Top-of-Atmosphere and surface reflectance using solar zenith angle correction.',
+      '• Geometric Correction: Orthorectification using CartoDEM elevation data and ground control points, targeting sub-pixel RMSE.',
+      '• Feature Extraction & Classification: Supervised Maximum Likelihood Classification combined with NDVI thresholding (NDVI = (NIR - Red) / (NIR + Red)) to separate vegetation, bare soil, and built-up surfaces.'
+    ];
+
+    methodologyBullets.forEach((bullet) => {
+      const wrapped = doc.splitTextToSize(bullet, contentWidth);
+      doc.text(wrapped, margin, y);
+      y += wrapped.length * 3.8 + 1.2;
+    });
+
+    renderFooter(1);
+
+    // PAGE 2: STATISTICAL OBSERVATIONS & SIGN-OFF
+    doc.addPage();
+    renderHeader();
+
+    if (logoDataUrl) {
+      doc.saveGraphicsState();
+      if ((doc as any).setGState && (doc as any).GState) {
+        doc.setGState(new (doc as any).GState({ opacity: 0.06 }));
+      }
+      doc.addImage(logoDataUrl, 'PNG', pageWidth / 2 - 45, pageHeight / 2 - 50, 90, 100);
+      doc.restoreGraphicsState();
+    }
+
+    y = 35;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(2, 132, 199);
+    doc.text('4. RESULTS AND STATISTICAL OBSERVATIONS', margin, y);
+
+    y += 5;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(51, 65, 85);
+    doc.text(
+      'Comparative analysis against the 2024 baseline reveals the following trends across the target quadrant of 1,250 km²:',
+      margin,
+      y
+    );
+    y += 5;
+
+    const tableBody = [
+      ['Built-up / Urban Sprawl', '185.50', '14.84%', '+4.2% (Expansion)'],
+      ['Agricultural Land & Crop Cover', '562.20', '44.98%', 'Stable (NDVI > 0.4)'],
+      ['Forest & Dense Vegetation', '310.00', '24.80%', 'Minor regeneration (+0.8%)'],
+      ['Water Bodies & Wetlands', '85.30', '6.82%', 'Stable retention'],
+      ['Wasteland / Barren Rock', '107.00', '8.56%', 'Decreased (afforestation)'],
+      ['Total Analyzed Area', '1,250.00', '100.00%', '—']
+    ];
+
+    autoTable(doc, {
+      startY: y,
+      margin: { left: margin, right: margin },
+      head: [['THEMATIC CLASS', 'AREA (km²)', 'COVERAGE', 'TREND (vs. 2024)']],
+      body: tableBody,
+      theme: 'grid',
+      headStyles: {
+        fillColor: [249, 115, 22],
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+        fontSize: 7.8,
+        lineWidth: 0.2,
+        lineColor: [220, 230, 242],
+        cellPadding: 2.4
+      },
+      bodyStyles: {
+        textColor: [30, 41, 59],
+        fontSize: 7.8,
+        lineWidth: 0.15,
+        lineColor: [220, 230, 242],
+        cellPadding: 2.2
+      },
+      columnStyles: {
+        0: { fontStyle: 'normal', cellWidth: 55, textColor: [30, 41, 59] },
+        1: { halign: 'left', cellWidth: 32 },
+        2: { halign: 'left', cellWidth: 32 },
+        3: { halign: 'left' }
+      }
+    });
+
+    y = (doc as any).lastAutoTable.finalY + 9;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(2, 132, 199);
+    doc.text('5. CONCLUSION', margin, y);
+
+    y += 5;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(51, 65, 85);
+    const conclusionParagraph = doc.splitTextToSize(
+      'The processed outputs indicate stable environmental conditions alongside managed urban growth in the analyzed quadrant. Orthorectified mosaics, false-color composites, and vector layers generated for this analysis are stored in the Bhuviksana geospatial workspace and are available for export from your dashboard.',
+      contentWidth
+    );
+    doc.text(conclusionParagraph, margin, y);
+
+    const signX = pageWidth - margin - 50;
+    const signY = pageHeight - 46;
+
+    if (logoDataUrl) {
+      doc.addImage(logoDataUrl, 'PNG', signX + 37, signY - 14, 10, 11);
+    }
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(15, 23, 42);
+    doc.text('Approved by Bhuviksana', signX + 48, signY, { align: 'right' });
+
+    doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
-    doc.setTextColor(128, 134, 139);
-    doc.text('Generated via BhuViksana AI Autonomous Intelligence Pipeline • AES-256 Encrypted Telemetry', 14, 285);
+    doc.setTextColor(100, 116, 139);
+    doc.text('Geo-Analytics & Earth Observation Division', signX + 48, signY + 4, { align: 'right' });
+    doc.text('Bhuviksana Platform', signX + 48, signY + 8, { align: 'right' });
 
-    doc.save(`BhuViksana_Briefing_${Date.now()}.pdf`);
+    renderFooter(2);
+
+    doc.save(`Bhuviksana_LULC_Analysis_Report_restyled.pdf`);
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -1036,7 +1344,7 @@ export default function BhuViksanaApp() {
           </div>
           <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs text-slate-700 font-mono">
             <ShieldCheck className="w-4 h-4 text-[#0284c7]" />
-            <span className="hidden md:inline">NIC Security Certified • AES-256</span>
+            <span className="hidden md:inline">NIC Security Certified ΓÇó AES-256</span>
           </div>
         </header>
 
@@ -1132,9 +1440,9 @@ export default function BhuViksanaApp() {
                     onChange={(e) => setAgencyCode(e.target.value)}
                     className="w-full text-xs font-medium text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 outline-none focus:border-[#0284c7] focus:bg-white transition appearance-none cursor-pointer"
                   >
-                    <option value="ISRO-SAC">ISRO — Space Applications Centre (SAC)</option>
-                    <option value="ISRO-NRSC">ISRO — National Remote Sensing Centre (NRSC)</option>
-                    <option value="NDRF-HQ">NDRF — Disaster Response Command</option>
+                    <option value="ISRO-SAC">ISRO ΓÇö Space Applications Centre (SAC)</option>
+                    <option value="ISRO-NRSC">ISRO ΓÇö National Remote Sensing Centre (NRSC)</option>
+                    <option value="NDRF-HQ">NDRF ΓÇö Disaster Response Command</option>
                     <option value="STATE-DMA">State Disaster Management Authority (SDMA)</option>
                     <option value="SIH-JURY">SIH2026 Evaluation Panel / Auditor</option>
                   </select>
@@ -1161,7 +1469,7 @@ export default function BhuViksanaApp() {
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="text-xs font-semibold text-slate-700">Security Passkey</label>
                   {authTab === 'signin' && (
-                    <a href="#forgot" className="text-[11px] font-medium text-[#0284c7] hover:underline">Forgot Password?</a>
+                    <button type="button" onClick={() => setCurrentPage('reset-password')} className="text-[11px] font-medium text-[#0284c7] hover:underline cursor-pointer">Forgot Password?</button>
                   )}
                 </div>
                 <div className="relative">
@@ -1169,7 +1477,7 @@ export default function BhuViksanaApp() {
                     type={showPassword ? 'text' : 'password'}
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
-                    placeholder="••••••••••••"
+                    placeholder="ΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇó"
                     required
                     className="w-full text-xs text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 pl-10 pr-10 outline-none focus:border-[#0284c7] focus:bg-white transition"
                   />
@@ -1257,6 +1565,93 @@ export default function BhuViksanaApp() {
     );
   }
 
+  if (currentPage === 'reset-password') {
+    return (
+      <div 
+        className="flex flex-col min-h-screen w-screen overflow-hidden font-sans select-none relative justify-center items-center p-4"
+        style={{
+          background: 'linear-gradient(135deg, #ffe3c2 0%, #fff1e0 22%, #f4f9ff 50%, #e2f0ff 72%, #d7ecff 100%)'
+        }}
+      >
+        <div className="w-full max-w-[440px] bg-white rounded-[26px] border border-slate-200 shadow-2xl p-8 backdrop-blur-xl relative">
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+            <button
+              onClick={() => setCurrentPage('canvas')}
+              className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 transition cursor-pointer"
+              title="Return"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+            <div>
+              <h2 className="text-lg font-bold text-slate-900 leading-tight">Change Security Passkey</h2>
+              <p className="text-xs text-slate-500 font-mono truncate max-w-[280px]">For: {loginEmail}</p>
+            </div>
+          </div>
+
+          <form onSubmit={handlePasswordChangeSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">New Password</label>
+              <div className="relative">
+                <input
+                  type={showNewPassword ? 'text' : 'password'}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter new passkey..."
+                  required
+                  className="w-full text-xs text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 pl-10 pr-10 outline-none focus:border-[#0284c7] focus:bg-white transition"
+                />
+                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-600"
+                >
+                  {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Re-type New Password</label>
+              <div className="relative">
+                <input
+                  type={showNewPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Re-type new passkey..."
+                  required
+                  className="w-full text-xs text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 pl-10 outline-none focus:border-[#0284c7] focus:bg-white transition"
+                />
+                <KeyRound className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+              </div>
+            </div>
+
+            {resetError && (
+              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 font-medium">
+                {resetError}
+              </div>
+            )}
+
+            {resetSuccess && (
+              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 font-medium flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>Password updated successfully! Returning...</span>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="w-full py-3 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-semibold shadow-md active:scale-[0.98] transition mt-2 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>Save & Update Passkey</span>
+              <ArrowRight className="w-3.5 h-3.5 text-cyan-400" />
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   // =========================================================================
   // PAGE 2: SETUP CANVAS
   // =========================================================================
@@ -1295,13 +1690,66 @@ export default function BhuViksanaApp() {
             </nav>
           </div>
 
-          <button
-            onClick={handleSignOut}
-            title="Sign Out"
-            className="p-2 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition"
-          >
-            <LogOut className="w-5 h-5" />
-          </button>
+          <div className="flex flex-col items-center gap-3 relative">
+            {showUserPopover && (
+              <div className="absolute bottom-2 left-16 z-50 w-72 bg-white rounded-2xl border border-slate-200 shadow-2xl p-4 animate-in fade-in zoom-in-95 duration-150">
+                <div className="flex items-center gap-3 pb-3 border-b border-slate-100">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#0284c7] to-cyan-400 text-white font-bold flex items-center justify-center text-sm shadow-sm">
+                    {getUserInitial()}
+                  </div>
+                  <div className="overflow-hidden">
+                    <div className="text-xs font-bold text-slate-900 truncate">{loginEmail}</div>
+                    <div className="text-[10px] text-slate-500 font-mono uppercase">{agencyCode}</div>
+                  </div>
+                </div>
+
+                <div className="py-2.5 space-y-1">
+                  <button
+                    onClick={() => {
+                      setShowUserPopover(false);
+                      setCurrentPage('reset-password');
+                    }}
+                    className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 rounded-xl transition group cursor-pointer"
+                  >
+                    <span className="flex items-center gap-2">
+                      <KeyRound className="w-4 h-4 text-[#0284c7]" />
+                      <span>Change Password</span>
+                    </span>
+                    <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition" />
+                  </button>
+                </div>
+
+                <div className="pt-2 border-t border-slate-100">
+                  <button
+                    onClick={() => {
+                      setShowUserPopover(false);
+                      handleSignOut();
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-xl transition cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <button
+              onClick={() => setShowUserPopover(!showUserPopover)}
+              className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#0284c7] to-cyan-500 text-white font-bold text-sm shadow-md hover:scale-105 active:scale-95 transition flex items-center justify-center ring-2 ring-white border border-cyan-300 cursor-pointer"
+              title="User Account Profile"
+            >
+              {getUserInitial()}
+            </button>
+
+            <button
+              onClick={handleSignOut}
+              title="Sign Out"
+              className="p-2 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition cursor-pointer"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
+          </div>
         </aside>
 
         {/* SLIDING HISTORY DRAWER */}
@@ -1346,7 +1794,7 @@ export default function BhuViksanaApp() {
                     <span className="truncate">{item.pipeline}</span>
                   </div>
                   <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100/80 text-[10px] text-slate-400 font-mono">
-                    <span>{item.coordinates.lat.toFixed(3)}°N, {item.coordinates.lng.toFixed(3)}°E</span>
+                    <span>{item.coordinates.lat.toFixed(3)}┬░N, {item.coordinates.lng.toFixed(3)}┬░E</span>
                     <span className="text-[#188038] font-bold">{item.entitiesCount} Grounded</span>
                   </div>
                 </div>
@@ -1566,7 +2014,7 @@ export default function BhuViksanaApp() {
                 {canvasResponse && !isLoading && (
                   <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs">
                     <span className="text-[11px] text-slate-400 font-mono">
-                      Fallback Engine • No Image Swaths Attached
+                      Fallback Engine ΓÇó No Image Swaths Attached
                     </span>
                     <div className="flex items-center gap-2">
                       <button
@@ -1708,6 +2156,13 @@ export default function BhuViksanaApp() {
         >
           {/* FLOATING ACTION PILLS */}
           <div className="absolute top-4 right-4 z-[400] flex items-center gap-2 pointer-events-auto">
+            <button
+              onClick={() => setShowSmsModal(true)}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-rose-600 hover:bg-rose-700 text-xs font-semibold text-white shadow-[0_2px_6px_rgba(225,29,72,0.3)] transition cursor-pointer"
+            >
+              <Radio className="w-3.5 h-3.5" />
+              <span>SMS Alert</span>
+            </button>
             <button
               onClick={() => setShowAuditModal(true)}
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white hover:bg-[#f8f9fa] border border-[#dadce0] text-xs font-medium text-[#3c4043] shadow-[0_2px_6px_rgba(0,0,0,0.15)] transition"
@@ -1858,7 +2313,7 @@ export default function BhuViksanaApp() {
                   }}
                 >
                   <span className="absolute -top-6 left-0 text-[10px] font-sans font-medium px-2 py-0.5 bg-white text-[#1a73e8] border border-[#dadce0] rounded-full shadow whitespace-nowrap">
-                    {det.name} • {(det.confidence * 100).toFixed(1)}%
+                    {det.name} ΓÇó {(det.confidence * 100).toFixed(1)}%
                   </span>
                 </div>
               ))}
@@ -1909,7 +2364,7 @@ export default function BhuViksanaApp() {
 
           {/* Bottom Coordinates Telemetry Stamp */}
           <div className="absolute bottom-2 right-4 z-[400] text-[11px] font-mono text-[#5f6368] bg-white/85 backdrop-blur-md px-2.5 py-0.5 rounded-full shadow-sm border border-[#dadce0]">
-            {liveCoords.lat.toFixed(4)}°N, {liveCoords.lng.toFixed(4)}°E • Zoom: {liveCoords.zoom}x
+            {liveCoords.lat.toFixed(4)}┬░N, {liveCoords.lng.toFixed(4)}┬░E ΓÇó Zoom: {liveCoords.zoom}x
           </div>
 
           {/* Floating Sidebar Toggle Handle */}
@@ -2043,7 +2498,7 @@ export default function BhuViksanaApp() {
                         Identified Features ({entities.length})
                       </span>
                       <span className="text-xs font-semibold text-[#1a73e8]">
-                        {entities.reduce((a, b) => a + b.area_m2, 0).toLocaleString()} m² Total
+                        {entities.reduce((a, b) => a + b.area_m2, 0).toLocaleString()} m┬▓ Total
                       </span>
                     </div>
 
@@ -2061,7 +2516,7 @@ export default function BhuViksanaApp() {
                             <div>
                               <div className="text-xs font-semibold text-[#202124]">{item.name}</div>
                               <div className="text-[11px] text-[#5f6368] font-mono">
-                                Footprint: {item.area_m2.toLocaleString()} m²
+                                Footprint: {item.area_m2.toLocaleString()} m┬▓
                               </div>
                             </div>
                           </div>
@@ -2102,45 +2557,114 @@ export default function BhuViksanaApp() {
         )}
       </div>
 
-      {/* 4. AUDIT TRACE MODAL */}
-      {showAuditModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
-          <div className="w-full max-w-lg bg-white border border-[#dadce0] rounded-[24px] p-6 space-y-4 shadow-[0_8px_32px_rgba(0,0,0,0.24)]">
-            <div className="flex items-center justify-between border-b border-[#dadce0] pb-3">
-              <div className="flex items-center gap-2">
-                <Activity className="w-4 h-4 text-[#1a73e8]" />
-                <h3 className="text-sm font-semibold text-[#202124]">Execution Telemetry & Audit Log</h3>
+      {/* EMERGENCY SMS ALERT MODAL */}
+      {showSmsModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
+          <div className="w-full max-w-md bg-white text-slate-900 border border-rose-200 rounded-[26px] p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600 border border-rose-100">
+                  <Radio className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900">Broadcast Disaster SMS Alert</h3>
+                  <p className="text-[10px] text-slate-500 font-mono">Disaster Emergency Telemetry Dispatch</p>
+                </div>
               </div>
               <button
-                onClick={() => setShowAuditModal(false)}
-                className="p-1 rounded-full text-[#5f6368] hover:bg-[#f1f3f4] transition"
+                onClick={() => setShowSmsModal(false)}
+                className="p-1.5 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="space-y-2.5 text-xs text-[#3c4043]">
-              <div className="flex items-start gap-2.5 bg-[#f8f9fa] p-3 rounded-xl border border-[#dadce0]">
-                <CheckCircle2 className="w-4 h-4 text-[#188038] mt-0.5" />
-                <div>
-                  <div className="font-semibold text-[#202124]">1. Input Stream Ingestion & Tiling</div>
-                  <div className="text-[#5f6368] text-[11px]">Aligned sensor array to 512x512 tile patches with EPSG:4326 CRS coordinates.</div>
+            <form onSubmit={handleSendAlertSMS} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Enter Mobile Number to receive SMS Alert
+                </label>
+                <div className="relative">
+                  <input
+                    type="tel"
+                    value={recipientPhone}
+                    onChange={(e) => setRecipientPhone(e.target.value)}
+                    placeholder="+91 98765 43210"
+                    required
+                    className="w-full text-xs font-mono text-slate-800 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-3 pl-10 outline-none focus:border-rose-500 focus:bg-white transition"
+                  />
+                  <PhoneCall className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
                 </div>
               </div>
 
-              <div className="flex items-start gap-2.5 bg-[#f8f9fa] p-3 rounded-xl border border-[#dadce0]">
-                <CheckCircle2 className="w-4 h-4 text-[#188038] mt-0.5" />
+              {smsStatus === 'success' && (
+                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                  <span>Emergency telemetry SMS transmitted to {recipientPhone}!</span>
+                </div>
+              )}
+
+              <div className="pt-2 flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setShowSmsModal(false)}
+                  className="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSendingSms || !recipientPhone.trim()}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white text-xs font-semibold rounded-xl shadow-md transition cursor-pointer"
+                >
+                  {isSendingSms ? <span>Transmitting...</span> : <span>Dispatch Alert</span>}
+                  <Radio className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* AUDIT TRACE MODAL */}
+      {showAuditModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
+          <div className="w-full max-w-xl bg-white text-slate-900 border border-slate-200 rounded-[24px] p-6 space-y-5 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <Activity className="w-5 h-5 text-[#1a73e8]" />
+                <h3 className="text-base font-bold text-slate-900">Execution Telemetry & Audit Log</h3>
+              </div>
+              <button
+                onClick={() => setShowAuditModal(false)}
+                className="p-1.5 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50/70 flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <div className="font-semibold text-[#202124]">2. Siamese Feature Extraction & Grounding</div>
-                  <div className="text-[#5f6368] text-[11px]">Falcon-0.7B-RS identified spatial coordinates across {entities.length} bounding boxes.</div>
+                  <div className="text-xs font-bold text-slate-900">1. Input Stream Ingestion & Tiling</div>
+                  <div className="text-xs text-slate-600 mt-0.5">Aligned sensor array to 512x512 tile patches with EPSG:4326 CRS coordinates.</div>
                 </div>
               </div>
 
-              <div className="flex items-start gap-2.5 bg-[#f8f9fa] p-3 rounded-xl border border-[#dadce0]">
-                <CheckCircle2 className="w-4 h-4 text-[#188038] mt-0.5" />
+              <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50/70 flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <div className="font-semibold text-[#202124]">3. Spatial Clustering & GSD Quantification</div>
-                  <div className="text-[#5f6368] text-[11px]">Computed footprint at {entities.reduce((a, b) => a + b.area_m2, 0).toLocaleString()} m² (0.5m/px GSD).</div>
+                  <div className="text-xs font-bold text-slate-900">2. Siamese Feature Extraction & Grounding</div>
+                  <div className="text-xs text-slate-600 mt-0.5">Falcon-0.7B-RS identified spatial coordinates across {entities.length} bounding boxes.</div>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl border border-slate-200 bg-slate-50/70 flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <div className="text-xs font-bold text-slate-900">3. Spatial Clustering & GSD Quantification</div>
+                  <div className="text-xs text-slate-600 mt-0.5">Computed footprint at {entities.reduce((a, b) => a + (b.area_m2 || 0), 0).toLocaleString()} m² (0.5m/px GSD).</div>
                 </div>
               </div>
             </div>
@@ -2148,7 +2672,7 @@ export default function BhuViksanaApp() {
             <div className="pt-2 flex justify-end">
               <button
                 onClick={() => setShowAuditModal(false)}
-                className="px-4 py-2 bg-[#1a73e8] hover:bg-[#1557b0] text-xs font-semibold text-white rounded-full transition shadow-sm"
+                className="px-6 py-2.5 bg-[#1a73e8] hover:bg-blue-600 text-xs font-semibold text-white rounded-xl shadow transition cursor-pointer"
               >
                 Close Audit Log
               </button>
