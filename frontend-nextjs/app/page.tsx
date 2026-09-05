@@ -678,7 +678,12 @@ export default function BhuViksanaApp() {
         setTargetMethod('single');
         setActiveWorkstationTab('rsvqa');
         setActiveViewTool('single');
-        setDetectedPipeline('GEOCHAT-7B VQA & GROUNDING');
+        const isEnhanced = Boolean(res.model && res.model.toLowerCase().includes('gemini'));
+        if (isEnhanced) {
+          setDetectedPipeline('GEOCHAT-7B + GEMINI REFINER (VQA & GROUNDING)');
+        } else {
+          setDetectedPipeline('GEOCHAT-7B VQA & GROUNDING');
+        }
         setChangeMaskUrl(null);
         setT2DataUrl(null);
       }
@@ -888,7 +893,12 @@ export default function BhuViksanaApp() {
         setTargetMethod('single');
         setActiveWorkstationTab('rsvqa');
         setActiveViewTool('single');
-        setDetectedPipeline('GEOCHAT-7B VQA & GROUNDING');
+        const isEnhanced = Boolean(res.model && res.model.toLowerCase().includes('gemini'));
+        if (isEnhanced) {
+          setDetectedPipeline('GEOCHAT-7B + GEMINI REFINER (VQA & GROUNDING)');
+        } else {
+          setDetectedPipeline('GEOCHAT-7B VQA & GROUNDING');
+        }
         setChangeMaskUrl(null);
         setT2DataUrl(null);
       }

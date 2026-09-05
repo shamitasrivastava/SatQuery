@@ -279,38 +279,13 @@ export async function executeSatelliteQueryUpload({
     });
 
     if (!res.ok) {
-      if (useGraph) {
-        console.warn('LangGraph upload failed, retrying with baseline upload endpoint...');
-        return await executeSatelliteQueryUpload({
-          query,
-          imageT1,
-          imageT2,
-          temperature,
-          maxNewTokens,
-          useGraph: false,
-          threadId,
-          title
-        });
-      }
       const errText = await res.text();
-      throw new Error(`Query upload failed (${res.status}): ${errText}`);
+      const message = parseApiErrorMessage(errText, `Query upload failed (${res.status})`);
+      throw new Error(message);
     }
 
     return await res.json() as QueryResponseSchema;
   } catch (err) {
-    if (useGraph) {
-      console.warn('Network error on LangGraph endpoint, trying baseline upload...');
-      return await executeSatelliteQueryUpload({
-        query,
-        imageT1,
-        imageT2,
-        temperature,
-        maxNewTokens,
-        useGraph: false,
-        threadId,
-        title
-      });
-    }
     throw err;
   }
 }
