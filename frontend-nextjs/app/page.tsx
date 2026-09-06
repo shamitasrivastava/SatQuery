@@ -2180,39 +2180,6 @@ export default function BhuViksanaApp() {
           onMouseMove={handleMouseMove}
           className="flex-1 relative bg-[#090d16] overflow-hidden select-none"
         >
-          {/* FLOATING ACTION PILLS */}
-          <div className="absolute top-4 right-4 z-[400] flex items-center gap-2 pointer-events-auto">
-            <button
-              onClick={() => setShowSmsModal(true)}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-rose-600 hover:bg-rose-700 text-xs font-semibold text-white shadow-[0_2px_6px_rgba(225,29,72,0.3)] transition cursor-pointer"
-            >
-              <Radio className="w-3.5 h-3.5" />
-              <span>SMS Alert</span>
-            </button>
-            <button
-              onClick={() => setShowAuditModal(true)}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white hover:bg-[#f8f9fa] border border-[#dadce0] text-xs font-medium text-[#3c4043] shadow-[0_2px_6px_rgba(0,0,0,0.15)] transition"
-            >
-              <Activity className="w-3.5 h-3.5 text-[#1a73e8]" />
-              <span>Audit Trace</span>
-            </button>
-            <button
-              onClick={handleExportPDF}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#1a73e8] hover:bg-[#1557b0] text-xs font-semibold text-white shadow-[0_2px_6px_rgba(0,0,0,0.2)] transition"
-            >
-              <FileDown className="w-3.5 h-3.5" />
-              <span>Export Briefing</span>
-            </button>
-            <button
-              onClick={handleSignOut}
-              title="Sign Out of Session"
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white hover:bg-rose-50 border border-[#dadce0] hover:border-rose-300 text-xs font-medium text-slate-600 hover:text-rose-600 shadow-[0_2px_6px_rgba(0,0,0,0.15)] transition"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Sign Out</span>
-            </button>
-          </div>
-
           {/* CONDITION 1: 3-PANE SPLIT VIEW FOR BIT-CD */}
           {activeViewTool === 'tripane' ? (
             <div className="w-full h-full grid grid-cols-3 gap-1.5 bg-slate-950 p-2.5">
@@ -2220,8 +2187,8 @@ export default function BhuViksanaApp() {
               {/* PANEL 1: T1 IMAGE */}
               <div className="relative w-full h-full rounded-xl overflow-hidden border border-slate-800/80 bg-black flex flex-col shadow-2xl">
                 <div className="absolute top-3 left-3 z-20 bg-black/85 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-cyan-300 border border-cyan-800/60 flex items-center gap-1.5 shadow">
-                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                  <span>T1: Pre-Event Swath</span>
+                  <span className="w-2 h-2 rounded-full bg-cyan-400" />
+                  <span>T1 Image</span>
                 </div>
                 {t1DataUrl ? (
                   <img src={t1DataUrl} alt="T1 Pre-Event" className="w-full h-full object-cover" />
@@ -2231,8 +2198,8 @@ export default function BhuViksanaApp() {
                     <span>Baseline Raster [Assam Brahmaputra Basin - Pre Flood]</span>
                   </div>
                 )}
-                <div className="absolute bottom-3 left-3 z-10 text-[10px] font-mono text-slate-400 bg-black/75 px-2 py-0.5 rounded">
-                  Acquisition: 2026-06-12 (Optical)
+                <div className="absolute bottom-3 left-3 z-10 w-7 h-7 rounded-full bg-black/80 border border-slate-700/80 flex items-center justify-center text-white text-[11px] font-serif font-bold shadow">
+                  N
                 </div>
               </div>
 
@@ -2240,7 +2207,7 @@ export default function BhuViksanaApp() {
               <div className="relative w-full h-full rounded-xl overflow-hidden border border-slate-800/80 bg-black flex flex-col shadow-2xl">
                 <div className="absolute top-3 left-3 z-20 bg-black/85 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-amber-300 border border-amber-800/60 flex items-center gap-1.5 shadow">
                   <span className="w-2 h-2 rounded-full bg-amber-400" />
-                  <span>T2: Post-Event Swath</span>
+                  <span>T2 Image</span>
                 </div>
                 {t2DataUrl || t1DataUrl ? (
                   <img src={(t2DataUrl || t1DataUrl) ?? undefined} alt="T2 Post-Event" className="w-full h-full object-cover filter contrast-125" />
@@ -2250,26 +2217,25 @@ export default function BhuViksanaApp() {
                     <span>Target Raster [Assam Brahmaputra Basin - Inundated]</span>
                   </div>
                 )}
-                <div className="absolute bottom-3 left-3 z-10 text-[10px] font-mono text-slate-400 bg-black/75 px-2 py-0.5 rounded">
-                  Acquisition: 2026-07-28 (Optical/SAR)
-                </div>
               </div>
 
               {/* PANEL 3: MASKING & BINARY MAP */}
               <div className="relative w-full h-full rounded-xl overflow-hidden border border-rose-950/60 bg-black flex flex-col shadow-2xl">
-                <div className="absolute top-3 left-3 z-20 bg-rose-950/80 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-rose-400 border border-rose-800 flex items-center gap-1.5 shadow">
-                  <Binary className="w-3.5 h-3.5 text-rose-400 animate-pulse" />
-                  <span>Masking: Bit-CD Binary Change Mask</span>
+                <div className="absolute top-3 left-3 z-20 bg-rose-950/80 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-rose-400 border border-rose-800/80 flex items-center gap-1.5 shadow">
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-rose-400" />
+                  <span>Masking</span>
                 </div>
 
-                <div className="absolute bottom-3 left-3 z-20 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-mono border border-slate-700 flex items-center gap-3">
-                  <span className="flex items-center gap-1.5 text-slate-300">
-                    <span className="w-2.5 h-2.5 rounded-sm bg-black border border-slate-500" /> [0] Unchanged
-                  </span>
-                  <span className="flex items-center gap-1.5 text-rose-300 font-bold">
-                    <span className="w-2.5 h-2.5 rounded-sm bg-white border border-rose-500 shadow-[0_0_6px_rgba(255,255,255,0.8)]" /> [1] Inundation / Change
-                  </span>
-                </div>
+                {changeMaskUrl && (
+                  <div className="absolute bottom-3 left-3 z-20 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-mono border border-slate-700 flex items-center gap-3">
+                    <span className="flex items-center gap-1.5 text-slate-300">
+                      <span className="w-2.5 h-2.5 rounded-sm bg-black border border-slate-500" /> [0] Unchanged
+                    </span>
+                    <span className="flex items-center gap-1.5 text-rose-300 font-bold">
+                      <span className="w-2.5 h-2.5 rounded-sm bg-white border border-rose-500 shadow-[0_0_6px_rgba(255,255,255,0.8)]" /> [1] Inundation / Change
+                    </span>
+                  </div>
+                )}
 
                 {changeMaskUrl ? (
                   <img
@@ -2367,35 +2333,37 @@ export default function BhuViksanaApp() {
             )
           )}
 
-          {/* Bottom-Left Layers Card */}
-          <div className="absolute bottom-6 left-4 z-[400] flex items-center gap-2">
-            <button
-              onClick={() => setBaseMapType(baseMapType === 'esri' ? 'osm' : 'esri')}
-              className="flex items-center gap-2 bg-white rounded-2xl p-1.5 pr-3 shadow-[0_2px_6px_rgba(0,0,0,0.2)] border border-[#dadce0] hover:bg-[#f8f9fa] transition group"
-            >
-              <div className="w-9 h-9 rounded-xl bg-[#e8f0fe] flex items-center justify-center text-[#1a73e8] border border-[#dadce0]">
-                <Layers className="w-4 h-4" />
-              </div>
-              <div className="text-left">
-                <div className="text-[10px] font-medium text-[#5f6368] uppercase">Layers</div>
-                <div className="text-xs font-semibold text-[#202124]">
-                  {baseMapType === 'esri' ? 'Satellite' : 'Street Map'}
+          {/* Bottom-Left Layers Card (Leaflet Only) */}
+          {activeViewTool !== 'tripane' && !t1DataUrl && (
+            <div className="absolute bottom-6 left-4 z-[400] flex items-center gap-2">
+              <button
+                onClick={() => setBaseMapType(baseMapType === 'esri' ? 'osm' : 'esri')}
+                className="flex items-center gap-2 bg-white rounded-2xl p-1.5 pr-3 shadow-[0_2px_6px_rgba(0,0,0,0.2)] border border-[#dadce0] hover:bg-[#f8f9fa] transition group"
+              >
+                <div className="w-9 h-9 rounded-xl bg-[#e8f0fe] flex items-center justify-center text-[#1a73e8] border border-[#dadce0]">
+                  <Layers className="w-4 h-4" />
                 </div>
-              </div>
-            </button>
+                <div className="text-left">
+                  <div className="text-[10px] font-medium text-[#5f6368] uppercase">Layers</div>
+                  <div className="text-xs font-semibold text-[#202124]">
+                    {baseMapType === 'esri' ? 'Satellite' : 'Street Map'}
+                  </div>
+                </div>
+              </button>
 
-            <button
-              onClick={() => setShowBBoxes(!showBBoxes)}
-              className={`px-3 py-2 rounded-2xl border text-xs font-medium shadow-[0_2px_6px_rgba(0,0,0,0.15)] transition flex items-center gap-1.5 ${
-                showBBoxes
-                  ? 'bg-white border-[#1a73e8] text-[#1a73e8]'
-                  : 'bg-white border-[#dadce0] text-[#5f6368]'
-              }`}
-            >
-              <span className={`w-2 h-2 rounded-full ${showBBoxes ? 'bg-[#188038]' : 'bg-[#9aa0a6]'}`} />
-              <span>Bounding Box: {showBBoxes ? 'ON' : 'OFF'}</span>
-            </button>
-          </div>
+              <button
+                onClick={() => setShowBBoxes(!showBBoxes)}
+                className={`px-3 py-2 rounded-2xl border text-xs font-medium shadow-[0_2px_6px_rgba(0,0,0,0.15)] transition flex items-center gap-1.5 ${
+                  showBBoxes
+                    ? 'bg-white border-[#1a73e8] text-[#1a73e8]'
+                    : 'bg-white border-[#dadce0] text-[#5f6368]'
+                }`}
+              >
+                <span className={`w-2 h-2 rounded-full ${showBBoxes ? 'bg-[#188038]' : 'bg-[#9aa0a6]'}`} />
+                <span>Bounding Box: {showBBoxes ? 'ON' : 'OFF'}</span>
+              </button>
+            </div>
+          )}
 
           {/* Bottom Coordinates Telemetry Stamp */}
           <div className="absolute bottom-2 right-4 z-[400] text-[11px] font-mono text-[#5f6368] bg-white/85 backdrop-blur-md px-2.5 py-0.5 rounded-full shadow-sm border border-[#dadce0]">
