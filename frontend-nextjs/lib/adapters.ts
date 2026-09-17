@@ -14,15 +14,34 @@ const PALETTE = [
  * Normalizes bounding box coordinates from varying specialist formats (e.g. 0-1000, 0-1, or pixels)
  * into percentage [0-100] coordinates for raster swath overlay.
  */
-function normalizeBoxToPercentages(box: [number, number, number, number]): {
+function normalizeBoxToPercentages(
+  box: [number, number, number, number],
+  format: 'ymin_xmin_ymax_xmax' | 'xmin_ymin_xmax_ymax' | 'xywh' = 'ymin_xmin_ymax_xmax',
+  imgW: number = 512,
+  imgH: number = 512
+): {
   xPct: number;
   yPct: number;
   wPct: number;
   hPct: number;
 } {
-  const [ymin, xmin, ymax, xmax] = box;
-  const maxVal = Math.max(ymin, xmin, ymax, xmax);
+  if (format === 'xywh') {
+    const [x, y, w, h] = box;
+    const xPct = Math.max(0, Math.min(98, (x / imgW) * 100));
+    const yPct = Math.max(0, Math.min(98, (y / imgH) * 100));
+    const wPct = Math.max(2, Math.min(100 - xPct, (w / imgW) * 100));
+    const hPct = Math.max(2, Math.min(100 - yPct, (h / imgH) * 100));
+    return { xPct, yPct, wPct, hPct };
+  }
 
+  let x1: number, y1: number, x2: number, y2: number;
+  if (format === 'xmin_ymin_xmax_ymax') {
+    [x1, y1, x2, y2] = box;
+  } else {
+    [y1, x1, y2, x2] = box;
+  }
+
+  const maxVal = Math.max(x1, y1, x2, y2);
   let scale = 1.0;
   if (maxVal > 100) {
     // 0-1000 coordinate range (standard VLM format)
@@ -35,15 +54,15 @@ function normalizeBoxToPercentages(box: [number, number, number, number]): {
     scale = 1.0;
   }
 
-  const x1 = Math.max(0, Math.min(100, xmin * scale));
-  const y1 = Math.max(0, Math.min(100, ymin * scale));
-  const x2 = Math.max(0, Math.min(100, xmax * scale));
-  const y2 = Math.max(0, Math.min(100, ymax * scale));
+  const normX1 = Math.max(0, Math.min(100, x1 * scale));
+  const normY1 = Math.max(0, Math.min(100, y1 * scale));
+  const normX2 = Math.max(0, Math.min(100, x2 * scale));
+  const normY2 = Math.max(0, Math.min(100, y2 * scale));
 
-  const xPct = Math.min(x1, x2);
-  const yPct = Math.min(y1, y2);
-  const wPct = Math.max(2, Math.abs(x2 - x1));
-  const hPct = Math.max(2, Math.abs(y2 - y1));
+  const xPct = Math.min(normX1, normX2);
+  const yPct = Math.min(normY1, normY2);
+  const wPct = Math.max(2, Math.abs(normX2 - normX1));
+  const hPct = Math.max(2, Math.abs(normY2 - normY1));
 
   return { xPct, yPct, wPct, hPct };
 }
@@ -62,9 +81,39 @@ export function convertVisualEvidenceToEntities(
 
   // 1. GeoChat VQA & Grounding bboxes format
   if (Array.isArray(evidence.bboxes) && evidence.bboxes.length > 0) {
+    const imgW = evidence.image_dimensions?.[0] || 512;
+    const imgH = evidence.image_dimensions?.[1] || 512;
+
     evidence.bboxes.forEach((b: any, idx: number) => {
-      const box = (b.box_2d || b.bbox || [200, 200, 400, 400]) as [number, number, number, number];
-      const { xPct, yPct, wPct, hPct } = normalizeBoxToPercentages(box);
+      let xPct = 20, yPct = 20, wPct = 20, hPct = 20;
+
+      if (Array.isArray(b.norm_coords) && b.norm_coords.length >= 4) {
+        // Direct [x0, y0, x1, y1] normalized coords (0-100)
+        const [x0, y0, x1, y1] = b.norm_coords;
+        xPct = Math.min(x0, x1);
+        yPct = Math.min(y0, y1);
+        wPct = Math.max(2, Math.abs(x1 - x0));
+        hPct = Math.max(2, Math.abs(y1 - y0));
+      } else if (Array.isArray(b.abs_pixel_coords) && b.abs_pixel_coords.length >= 4) {
+        const [px0, py0, px1, py1] = b.abs_pixel_coords;
+        xPct = (Math.min(px0, px1) / imgW) * 100;
+        yPct = (Math.min(py0, py1) / imgH) * 100;
+        wPct = Math.max(2, (Math.abs(px1 - px0) / imgW) * 100);
+        hPct = Math.max(2, (Math.abs(py1 - py0) / imgH) * 100);
+      } else if (Array.isArray(b.box_2d) && b.box_2d.length >= 4) {
+        const norm = normalizeBoxToPercentages(b.box_2d as [number, number, number, number], 'ymin_xmin_ymax_xmax');
+        xPct = norm.xPct;
+        yPct = norm.yPct;
+        wPct = norm.wPct;
+        hPct = norm.hPct;
+      } else if (Array.isArray(b.bbox) && b.bbox.length >= 4) {
+        const norm = normalizeBoxToPercentages(b.bbox as [number, number, number, number], 'ymin_xmin_ymax_xmax');
+        xPct = norm.xPct;
+        yPct = norm.yPct;
+        wPct = norm.wPct;
+        hPct = norm.hPct;
+      }
+
       const color = PALETTE[idx % PALETTE.length];
 
       // Geo coordinates mapping offset from center
@@ -99,7 +148,7 @@ export function convertVisualEvidenceToEntities(
   // 2. Single object grounding with coordinates
   if (evidence.coordinates && Array.isArray(evidence.coordinates)) {
     const box = evidence.coordinates as [number, number, number, number];
-    const { xPct, yPct, wPct, hPct } = normalizeBoxToPercentages(box);
+    const { xPct, yPct, wPct, hPct } = normalizeBoxToPercentages(box, 'ymin_xmin_ymax_xmax');
     entities.push({
       id: 1,
       name: evidence.detected_class ? evidence.detected_class.replace(/_/g, ' ').toUpperCase() : 'Grounded Asset',
@@ -119,10 +168,28 @@ export function convertVisualEvidenceToEntities(
   }
 
   // 3. Bi-Temporal Change Detection regions format
-  if (Array.isArray(evidence.regions) && evidence.regions.length > 0) {
-    evidence.regions.forEach((r: any, idx: number) => {
-      const box = (r.bbox || [150 + idx * 80, 150 + idx * 80, 250 + idx * 80, 250 + idx * 80]) as [number, number, number, number];
-      const { xPct, yPct, wPct, hPct } = normalizeBoxToPercentages(box);
+  const rawRegions = Array.isArray(evidence.regions) ? evidence.regions : (evidence.stats?.regions || []);
+  if (Array.isArray(rawRegions) && rawRegions.length > 0) {
+    // Only display top 10 prominent change sectors to prevent screen clutter
+    const displayRegions = rawRegions.slice(0, 10);
+    const imgW = evidence.image_width || evidence.stats?.image_width || 512;
+    const imgH = evidence.image_height || evidence.stats?.image_height || 512;
+
+    displayRegions.forEach((r: any, idx: number) => {
+      let xPct = 15 + (idx % 4) * 20;
+      let yPct = 15 + Math.floor(idx / 4) * 20;
+      let wPct = 15;
+      let hPct = 15;
+
+      if (Array.isArray(r.bbox) && r.bbox.length >= 4) {
+        // r.bbox is OpenCV [x, y, w, h] pixel coordinates
+        const [x, y, w, h] = r.bbox;
+        xPct = Math.max(0, Math.min(98, (x / imgW) * 100));
+        yPct = Math.max(0, Math.min(98, (y / imgH) * 100));
+        wPct = Math.max(2, Math.min(100 - xPct, (w / imgW) * 100));
+        hPct = Math.max(2, Math.min(100 - yPct, (h / imgH) * 100));
+      }
+
       const color = PALETTE[idx % PALETTE.length];
 
       const latOffset = ((50 - (yPct + hPct / 2)) / 100) * 0.015;

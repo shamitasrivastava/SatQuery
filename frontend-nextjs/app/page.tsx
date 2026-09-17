@@ -45,7 +45,10 @@ import {
   Clock,
   FileImage,
   Map as MapIcon,
-  Globe
+  Globe,
+  ZoomIn,
+  ZoomOut,
+  Maximize2
 } from 'lucide-react';
 import autoTable from 'jspdf-autotable';
 import * as GeoTIFF from 'geotiff';
@@ -285,6 +288,26 @@ export default function BhuViksanaApp() {
   // Grounded Bounding Boxes & Entities
   const [entities, setEntities] = useState<MapEntity[]>([]);
 
+  // Raster Viewport Zoom & Pan State
+  const [imageZoom, setImageZoom] = useState<number>(1.0);
+  const [panOffset, setPanOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState<boolean>(false);
+  const panStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  const handleZoomIn = () => setImageZoom((prev) => Math.min(4.0, Number((prev + 0.25).toFixed(2))));
+  const handleZoomOut = () => setImageZoom((prev) => Math.max(0.5, Number((prev - 0.25).toFixed(2))));
+  const handleResetZoom = () => {
+    setImageZoom(1.0);
+    setPanOffset({ x: 0, y: 0 });
+  };
+
+  const handleMouseDownPan = (e: React.MouseEvent) => {
+    if (activeViewTool === 'swipe') return;
+    if (e.button !== 0) return;
+    setIsPanning(true);
+    panStartRef.current = { x: e.clientX - panOffset.x, y: e.clientY - panOffset.y };
+  };
+
   const [chatMessages, setChatMessages] = useState<Array<{ sender: 'user' | 'ai'; text: string }>>([]);
 
   // In-place Setup Canvas AI response state (for text & fallback queries without imagery)
@@ -321,7 +344,8 @@ export default function BhuViksanaApp() {
       localStorage.setItem('satquery_active_thread_id', thread.thread_id);
     }
 
-    const isCD = thread.task === 'change_detection' || fallbackMethod === 'bitemporal';
+    const isOpticalSar = thread.task === 'optical_sar' || fallbackMethod === 'opticalsar';
+    const isCD = !isOpticalSar && (thread.task === 'change_detection' || fallbackMethod === 'bitemporal');
 
     // 1. Extract messages
     if (thread.messages && thread.messages.length > 0) {
@@ -346,27 +370,45 @@ export default function BhuViksanaApp() {
     );
     const lastMsgWithEv = [...(thread.messages || [])].reverse().find((m) => m.visual_evidence && Object.keys(m.visual_evidence).length > 0);
 
-    const rawT1 = thread.image_t1_url || lastMsgWithT1?.image_t1_url;
-    const rawT2 = thread.image_t2_url || lastMsgWithT2?.image_t2_url;
+    const rawEvidence = thread.visual_evidence || lastMsgWithEv?.visual_evidence;
+
+    const rawT1 = rawEvidence?.s2_base64 || thread.image_t1_url || lastMsgWithT1?.image_t1_url;
+    const rawT2 = rawEvidence?.s1_base64 || thread.image_t2_url || lastMsgWithT2?.image_t2_url;
     const rawMask =
+      rawEvidence?.mask_base64 ||
+      rawEvidence?.change_mask ||
+      rawEvidence?.change_mask_url ||
+      rawEvidence?.overlay_base64 ||
+      rawEvidence?.evidence_base64 ||
       thread.change_mask_url ||
       lastMsgWithMask?.change_mask_url ||
-      thread.visual_evidence?.mask_base64 ||
-      thread.visual_evidence?.change_mask ||
       lastMsgWithMask?.visual_evidence?.mask_base64 ||
       lastMsgWithMask?.visual_evidence?.change_mask ||
-      thread.visual_evidence?.overlay_base64 ||
       lastMsgWithMask?.visual_evidence?.overlay_base64 ||
-      thread.visual_evidence?.evidence_base64 ||
       lastMsgWithMask?.visual_evidence?.evidence_base64;
-    const rawEvidence = thread.visual_evidence || lastMsgWithEv?.visual_evidence;
 
     const formattedT1 = formatMediaUrl(rawT1);
     const formattedT2 = formatMediaUrl(rawT2);
     const formattedMask = formatMediaUrl(rawMask);
 
     // 3. Set Task & Viewport routing with persistent media
-    if (isCD) {
+    if (isOpticalSar) {
+      setTargetMethod('opticalsar');
+      setActiveWorkstationTab('bitemporal');
+      setActiveViewTool('tripane');
+      setDetectedPipeline('CROSS-ATTENTION OPTICAL-SAR FUSION (CROMA)');
+      setT1DataUrl(formattedT1);
+      setT2DataUrl(formattedT2);
+      setChangeMaskUrl(formattedMask);
+      if (rawEvidence && Object.keys(rawEvidence).length > 0) {
+        setVisualEvidenceData(rawEvidence);
+        const ents = convertVisualEvidenceToEntities(rawEvidence);
+        setEntities(ents);
+      } else {
+        setVisualEvidenceData(null);
+        setEntities([]);
+      }
+    } else if (isCD) {
       setTargetMethod('bitemporal');
       setActiveWorkstationTab('bitemporal');
       setActiveViewTool('tripane');
@@ -376,6 +418,11 @@ export default function BhuViksanaApp() {
       setChangeMaskUrl(formattedMask);
       if (rawEvidence && Object.keys(rawEvidence).length > 0) {
         setVisualEvidenceData(rawEvidence);
+        const ents = convertVisualEvidenceToEntities(rawEvidence);
+        setEntities(ents);
+      } else {
+        setVisualEvidenceData(null);
+        setEntities([]);
       }
     } else {
       setTargetMethod('single');
@@ -396,7 +443,7 @@ export default function BhuViksanaApp() {
     }
   };
 
-  const loadThreadsFromBackend = async (targetThreadId?: string) => {
+  const loadThreadsFromBackend = async (targetThreadId?: string, skipApply: boolean = false) => {
     try {
       const data = await fetchUserChatThreads();
       if (data.threads && data.threads.length > 0) {
@@ -405,21 +452,25 @@ export default function BhuViksanaApp() {
           id: t.thread_id,
           title: t.title || "Conversation Thread",
           timestamp: new Date(t.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          method: t.task === 'change_detection' ? 'bitemporal' : 'single',
-          pipeline: t.task === 'change_detection' ? 'Open-CD (Bi-Temporal Siamese)' : 'GEOCHAT-7B VQA & GROUNDING',
+          method: t.task === 'optical_sar' ? 'opticalsar' : (t.task === 'change_detection' ? 'bitemporal' : 'single'),
+          pipeline: t.task === 'optical_sar'
+            ? 'Cross-Attention Optical-SAR'
+            : (t.task === 'change_detection' ? 'Open-CD (Bi-Temporal Siamese)' : 'GEOCHAT-7B VQA & GROUNDING'),
           entitiesCount: t.message_count,
           coordinates: { lat: 17.6965, lng: 83.2980 }
         }));
         setHistoryList(convertedHistory);
 
-        // Find target thread (by targetThreadId or fallback to 1st/latest thread)
-        let selectedThread = targetThreadId ? data.threads.find((t) => t.thread_id === targetThreadId) : null;
-        if (!selectedThread) {
-          selectedThread = data.threads[0];
-        }
+        if (!skipApply) {
+          // Find target thread (by targetThreadId or fallback to 1st/latest thread)
+          let selectedThread = targetThreadId ? data.threads.find((t) => t.thread_id === targetThreadId) : null;
+          if (!selectedThread) {
+            selectedThread = data.threads[0];
+          }
 
-        if (selectedThread) {
-          applyThreadState(selectedThread);
+          if (selectedThread) {
+            applyThreadState(selectedThread);
+          }
         }
       } else {
         setUserThreads([]);
@@ -463,30 +514,42 @@ export default function BhuViksanaApp() {
   };
 
   const processRaster = async (file: File): Promise<string> => {
-    if (file.name.endsWith('.tif') || file.name.endsWith('.tiff')) {
-      const arrayBuffer = await file.arrayBuffer();
-      const tiff = await GeoTIFF.fromArrayBuffer(arrayBuffer);
-      const image = await tiff.getImage();
-      const width = image.getWidth();
-      const height = image.getHeight();
-      const rgb = await image.readRGB({ interleave: true });
+    try {
+      if (file.name.endsWith('.tif') || file.name.endsWith('.tiff')) {
+        const arrayBuffer = await file.arrayBuffer();
+        const tiff = await GeoTIFF.fromArrayBuffer(arrayBuffer);
+        const image = await tiff.getImage();
+        const width = image.getWidth();
+        const height = image.getHeight();
+        const numBands = image.getSamplesPerPixel ? image.getSamplesPerPixel() : 3;
 
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
+        // Only use browser canvas readRGB for standard 1, 3, or 4 band uint8 rasters
+        if (numBands === 1 || numBands === 3 || numBands === 4) {
+          try {
+            const rgb = await image.readRGB({ interleave: true });
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
 
-      if (ctx) {
-        const imgData = ctx.createImageData(width, height);
-        for (let i = 0, j = 0; i < imgData.data.length; i += 4, j += 3) {
-          imgData.data[i] = rgb[j];
-          imgData.data[i + 1] = rgb[j + 1];
-          imgData.data[i + 2] = rgb[j + 2];
-          imgData.data[i + 3] = 255;
+            if (ctx) {
+              const imgData = ctx.createImageData(width, height);
+              for (let i = 0, j = 0; i < imgData.data.length; i += 4, j += 3) {
+                imgData.data[i] = rgb[j];
+                imgData.data[i + 1] = rgb[j + 1];
+                imgData.data[i + 2] = rgb[j + 2];
+                imgData.data[i + 3] = 255;
+              }
+              ctx.putImageData(imgData, 0, 0);
+              return canvas.toDataURL('image/png');
+            }
+          } catch (rgbErr) {
+            console.warn("GeoTIFF readRGB skipped (multi-band or float32):", rgbErr);
+          }
         }
-        ctx.putImageData(imgData, 0, 0);
-        return canvas.toDataURL('image/png');
       }
+    } catch (err) {
+      console.warn("processRaster could not parse GeoTIFF locally, using object URL:", err);
     }
     return URL.createObjectURL(file);
   };
@@ -516,10 +579,17 @@ export default function BhuViksanaApp() {
       const nameCheck = (f1.name + ' ' + f2.name).toLowerCase();
       if (nameCheck.includes('sar') || nameCheck.includes('sentinel-1') || nameCheck.includes('s1') || nameCheck.includes('radar')) {
         setDetectedPipeline('SAR + Optical Swaths detected → Routed to Cross-Attention Optical-SAR Fusion');
+        setTargetMethod('opticalsar');
+        if (!queryText.trim() || queryText === "Analyze target raster scene and ground key features." || queryText.toLowerCase().includes('change')) {
+          setQueryText("Classify the water vs built-up areas using optical and SAR fusion.");
+        }
       } else {
         setDetectedPipeline('Dual Temporal Swaths detected (Pre/Post) → Routed to Open-CD Bi-Temporal Siamese');
+        if (targetMethod === 'opticalsar') {
+          setTargetMethod('bitemporal');
+        }
       }
-      if (targetMethod === 'auto') {
+      if (targetMethod === 'auto' || targetMethod === 'opticalsar') {
         setActiveWorkstationTab('bitemporal');
         setActiveViewTool('tripane');
       }
@@ -535,6 +605,10 @@ export default function BhuViksanaApp() {
   const handleMultiFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const files = Array.from(e.target.files);
+      setEntities([]);
+      setVisualEvidenceData(null);
+      handleResetZoom();
+
       if (files.length === 1) {
         const f1 = files[0];
         setFileT1(f1);
@@ -562,6 +636,9 @@ export default function BhuViksanaApp() {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setFileT1(file);
+      setEntities([]);
+      setVisualEvidenceData(null);
+      handleResetZoom();
       const url = await processRaster(file);
       setT1DataUrl(url);
       autoDetectPipeline(file, fileT2);
@@ -572,6 +649,9 @@ export default function BhuViksanaApp() {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setFileT2(file);
+      setEntities([]);
+      setVisualEvidenceData(null);
+      handleResetZoom();
       const url = await processRaster(file);
       setT2DataUrl(url);
       autoDetectPipeline(fileT1, file);
@@ -584,6 +664,9 @@ export default function BhuViksanaApp() {
     setT1DataUrl(null);
     setT2DataUrl(null);
     setChangeMaskUrl(null);
+    setEntities([]);
+    setVisualEvidenceData(null);
+    handleResetZoom();
     setDetectedPipeline('Auto-Routing Engine Idle');
     if (fileInputT1Ref.current) fileInputT1Ref.current.value = '';
     if (fileInputT2Ref.current) fileInputT2Ref.current.value = '';
@@ -594,23 +677,39 @@ export default function BhuViksanaApp() {
     setIsLoading(true);
 
     let effectiveMethod = targetMethod;
-    if (targetMethod === 'auto') {
+    const nameCheck = (fileT1 && fileT2) ? (fileT1.name + ' ' + fileT2.name).toLowerCase() : '';
+    const isSarPair = Boolean(fileT1 && fileT2 && (nameCheck.includes('sar') || nameCheck.includes('s1') || nameCheck.includes('radar')));
+
+    if (targetMethod === 'auto' || (targetMethod === 'bitemporal' && isSarPair)) {
       if (fileT1 && fileT2) {
-        const nameCheck = (fileT1.name + ' ' + fileT2.name).toLowerCase();
-        effectiveMethod = (nameCheck.includes('sar') || nameCheck.includes('s1')) ? 'opticalsar' : 'bitemporal';
+        effectiveMethod = isSarPair ? 'opticalsar' : 'bitemporal';
       } else {
         effectiveMethod = 'single';
       }
     }
 
+    const defaultQuery = (effectiveMethod === 'opticalsar' || isSarPair)
+      ? "Classify the water vs built-up areas using optical and SAR fusion."
+      : "Analyze target raster scene and ground key features.";
+    const initialQ = queryText.trim() || defaultQuery;
+    const dynamicTitle = (effectiveMethod === 'opticalsar' || isSarPair)
+      ? initialQ
+      : (initialQ.length > 40 ? initialQ.slice(0, 40) + "..." : initialQ);
+
     if (fileT1) {
-      setActiveScenario(`Swath: ${fileT1.name}${fileT2 ? ' vs ' + fileT2.name : ''}`);
+      if (effectiveMethod === 'opticalsar' || isSarPair) {
+        setActiveScenario(dynamicTitle);
+      } else {
+        setActiveScenario(`Swath: ${fileT1.name}${fileT2 ? ' vs ' + fileT2.name : ''}`);
+      }
     }
 
     if (effectiveMethod === 'bitemporal' || effectiveMethod === 'opticalsar') {
+      setTargetMethod(effectiveMethod);
       setActiveWorkstationTab('bitemporal');
       setActiveViewTool('tripane');
     } else {
+      setTargetMethod(effectiveMethod);
       setActiveWorkstationTab('rsvqa');
       setActiveViewTool('single');
     }
@@ -620,9 +719,6 @@ export default function BhuViksanaApp() {
     if (typeof window !== 'undefined') {
       localStorage.setItem('satquery_active_thread_id', newThreadId);
     }
-
-    const initialQ = queryText.trim() || "Analyze target raster scene and ground key features.";
-    const dynamicTitle = initialQ.length > 40 ? initialQ.slice(0, 40) + "..." : initialQ;
 
     // Save to Inspection History
     const isTextOnlyQuery = !fileT1 && !fileT2;
@@ -672,7 +768,10 @@ export default function BhuViksanaApp() {
       }
 
       const replyText = res.result || `Autonomous router initialized [Pipeline: ${effectiveMethod.toUpperCase()}]. Grounded features across active raster swath.`;
-      setChatMessages((prev) => [...prev, { sender: 'ai', text: replyText }]);
+      setChatMessages([
+        { sender: 'user', text: initialQ },
+        { sender: 'ai', text: replyText }
+      ]);
 
       // For text-only queries, set in-place Canvas response
       if (isTextOnlyQuery) {
@@ -693,7 +792,14 @@ export default function BhuViksanaApp() {
       if (res.visual_evidence) {
         setVisualEvidenceData(res.visual_evidence);
         const newEntities = convertVisualEvidenceToEntities(res.visual_evidence);
-        if (newEntities.length > 0) setEntities(newEntities);
+        setEntities(newEntities);
+
+        if (res.visual_evidence.s2_base64) {
+          setT1DataUrl(formatMediaUrl(res.visual_evidence.s2_base64));
+        }
+        if (res.visual_evidence.s1_base64) {
+          setT2DataUrl(formatMediaUrl(res.visual_evidence.s1_base64));
+        }
 
         const mask =
           res.visual_evidence.mask_base64 ||
@@ -715,12 +821,24 @@ export default function BhuViksanaApp() {
         res.visual_evidence?.change_mask ||
         res.visual_evidence?.change_mask_url
       );
-      const isChangeTask =
-        res.task === 'change_detection' ||
-        (fileT1 && fileT2 && (initialQ.toLowerCase().includes('change') || initialQ.toLowerCase().includes('detect change'))) ||
-        hasChangeMask;
+      const isOpticalSarTask =
+        res.task === 'optical_sar' ||
+        (res.model && res.model.toLowerCase().includes('optical-sar')) ||
+        effectiveMethod === 'opticalsar';
 
-      if (isChangeTask) {
+      const isChangeTask =
+        !isOpticalSarTask && (
+          res.task === 'change_detection' ||
+          (fileT1 && fileT2 && (initialQ.toLowerCase().includes('change') || initialQ.toLowerCase().includes('detect change'))) ||
+          hasChangeMask
+        );
+
+      if (isOpticalSarTask) {
+        setTargetMethod('opticalsar');
+        setActiveWorkstationTab('bitemporal');
+        setActiveViewTool('tripane');
+        setDetectedPipeline('CROSS-ATTENTION OPTICAL-SAR FUSION (CROMA)');
+      } else if (isChangeTask) {
         setTargetMethod('bitemporal');
         setActiveWorkstationTab('bitemporal');
         setActiveViewTool('tripane');
@@ -759,7 +877,7 @@ export default function BhuViksanaApp() {
         setT2DataUrl(null);
       }
 
-      await loadThreadsFromBackend();
+      await loadThreadsFromBackend(newThreadId, true);
     } catch (err) {
       console.warn("Launch query API error:", err);
       const fallbackError = `Autonomous router initialized [Pipeline: ${effectiveMethod.toUpperCase()}]. Grounded ${entities.length} features across active raster swath.`;
@@ -924,18 +1042,37 @@ export default function BhuViksanaApp() {
       if (res.visual_evidence) {
         setVisualEvidenceData(res.visual_evidence);
         const newEntities = convertVisualEvidenceToEntities(res.visual_evidence);
-        if (newEntities.length > 0) setEntities(newEntities);
+        setEntities(newEntities);
+
+        if (res.visual_evidence.s2_base64) {
+          setT1DataUrl(formatMediaUrl(res.visual_evidence.s2_base64));
+        }
+        if (res.visual_evidence.s1_base64) {
+          setT2DataUrl(formatMediaUrl(res.visual_evidence.s1_base64));
+        }
       }
 
-      const isChangeDetectionTask =
-        res.task === 'change_detection' ||
-        userQ.toLowerCase().includes('change') ||
-        userQ.toLowerCase().includes('detect change') ||
-        userQ.toLowerCase().includes('bi-temporal') ||
-        userQ.toLowerCase().includes('bitemporal') ||
-        Boolean(mask);
+      const isOpticalSarTask =
+        res.task === 'optical_sar' ||
+        (res.model && res.model.toLowerCase().includes('optical-sar')) ||
+        targetMethod === 'opticalsar';
 
-      if (isChangeDetectionTask) {
+      const isChangeDetectionTask =
+        !isOpticalSarTask && (
+          res.task === 'change_detection' ||
+          userQ.toLowerCase().includes('change') ||
+          userQ.toLowerCase().includes('detect change') ||
+          userQ.toLowerCase().includes('bi-temporal') ||
+          userQ.toLowerCase().includes('bitemporal') ||
+          Boolean(mask)
+        );
+
+      if (isOpticalSarTask) {
+        setTargetMethod('opticalsar');
+        setActiveWorkstationTab('bitemporal');
+        setActiveViewTool('tripane');
+        setDetectedPipeline('CROSS-ATTENTION OPTICAL-SAR FUSION (CROMA)');
+      } else if (isChangeDetectionTask) {
         setTargetMethod('bitemporal');
         setActiveWorkstationTab('bitemporal');
         setActiveViewTool('tripane');
@@ -974,7 +1111,7 @@ export default function BhuViksanaApp() {
         setT2DataUrl(null);
       }
 
-      await loadThreadsFromBackend();
+      await loadThreadsFromBackend(activeThreadId, true);
     } catch (err: any) {
       console.warn("Send message API error:", err);
       let aiReply = `Analyzed spatial viewport at ${liveCoords.lat}°N, ${liveCoords.lng}°E.`;
@@ -1308,11 +1445,22 @@ export default function BhuViksanaApp() {
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDraggingSwipe.current || !containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const pct = Math.max(5, Math.min(95, (x / rect.width) * 100));
-    setSwipePos(pct);
+    if (isDraggingSwipe.current && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const pct = Math.max(5, Math.min(95, (x / rect.width) * 100));
+      setSwipePos(pct);
+    } else if (isPanning) {
+      setPanOffset({
+        x: e.clientX - panStartRef.current.x,
+        y: e.clientY - panStartRef.current.y
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    isDraggingSwipe.current = false;
+    setIsPanning(false);
   };
 
   // =========================================================================
@@ -1830,7 +1978,11 @@ export default function BhuViksanaApp() {
                   <select
                     value={targetMethod}
                     onChange={(e) => {
-                      setTargetMethod(e.target.value as any);
+                      const val = e.target.value as any;
+                      setTargetMethod(val);
+                      if (val === 'opticalsar' && (!queryText.trim() || queryText === "Analyze target raster scene and ground key features." || queryText.toLowerCase().includes('change'))) {
+                        setQueryText("Classify the water vs built-up areas using optical and SAR fusion.");
+                      }
                       autoDetectPipeline(fileT1, fileT2);
                     }}
                     className="w-full text-sm font-semibold text-slate-900 bg-slate-50 border border-slate-400/80 rounded-xl px-4 py-2.5 pr-10 outline-none focus:border-[#0284c7] focus:bg-white transition appearance-none cursor-pointer shadow-sm"
@@ -1864,7 +2016,11 @@ export default function BhuViksanaApp() {
                   value={queryText}
                   onChange={(e) => setQueryText(e.target.value)}
                   rows={3}
-                  placeholder="Ask Question or Analysis Requirements (e.g., 'Detect changes in urban infrastructure' or 'Identify all cargo vessels')..."
+                  placeholder={
+                    targetMethod === 'opticalsar'
+                      ? "Classify the water vs built-up areas using optical and SAR fusion."
+                      : "Ask Question or Analysis Requirements (e.g., 'Detect changes in urban infrastructure' or 'Identify all cargo vessels')..."
+                  }
                   className="w-full text-sm text-slate-800 placeholder-slate-400 bg-transparent border-none resize-none focus:outline-none focus:ring-0 leading-relaxed"
                 />
               </div>
@@ -2119,7 +2275,7 @@ export default function BhuViksanaApp() {
             <span>Flood Analysis</span>
           </button>
 
-          {/* 3-PANE BIT-CD VIEW TOGGLE BUTTON */}
+          {/* 3-PANE BIT-CD / DUAL-SENSOR VIEW TOGGLE BUTTON */}
           <button
             onClick={() => {
               setActiveViewTool(activeViewTool === 'tripane' ? 'single' : 'tripane');
@@ -2132,7 +2288,7 @@ export default function BhuViksanaApp() {
             }`}
           >
             <Columns3 className="w-3.5 h-3.5" />
-            <span>3-Pane Bit-CD</span>
+            <span>{targetMethod === 'opticalsar' ? 'Dual-Sensor Fusion' : '3-Pane Bit-CD'}</span>
           </button>
 
           <button
@@ -2180,22 +2336,26 @@ export default function BhuViksanaApp() {
           onMouseMove={handleMouseMove}
           className="flex-1 relative bg-[#090d16] overflow-hidden select-none"
         >
-          {/* CONDITION 1: 3-PANE SPLIT VIEW FOR BIT-CD */}
+          {/* CONDITION 1: 3-PANE SPLIT VIEW FOR BIT-CD OR 2-PANE DUAL SENSOR FOR OPTICAL-SAR */}
           {activeViewTool === 'tripane' ? (
-            <div className="w-full h-full grid grid-cols-3 gap-1.5 bg-slate-950 p-2.5">
+            <div className={`w-full h-full grid ${targetMethod === 'opticalsar' ? 'grid-cols-2' : 'grid-cols-3'} gap-1.5 bg-slate-950 p-2.5`}>
               
-              {/* PANEL 1: T1 IMAGE */}
-              <div className="relative w-full h-full rounded-xl overflow-hidden border border-slate-800/80 bg-black flex flex-col shadow-2xl">
+              {/* PANEL 1: T1 / S2 IMAGE */}
+              <div className="relative w-full h-full rounded-xl overflow-hidden border border-slate-800/80 bg-slate-950 flex items-center justify-center shadow-2xl">
                 <div className="absolute top-3 left-3 z-20 bg-black/85 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-cyan-300 border border-cyan-800/60 flex items-center gap-1.5 shadow">
                   <span className="w-2 h-2 rounded-full bg-cyan-400" />
-                  <span>T1 Image</span>
+                  <span>{targetMethod === 'opticalsar' ? 'Sentinel-2 (Optical)' : 'T1 Image'}</span>
                 </div>
                 {t1DataUrl ? (
-                  <img src={t1DataUrl} alt="T1 Pre-Event" className="w-full h-full object-cover" />
+                  <img
+                    src={t1DataUrl}
+                    alt={targetMethod === 'opticalsar' ? 'Sentinel-2 Optical' : 'T1 Image'}
+                    className="w-full h-full object-cover block select-none"
+                  />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 text-xs">
                     <FileImage className="w-7 h-7 mb-2 opacity-40" />
-                    <span>Baseline Raster [Assam Brahmaputra Basin - Pre Flood]</span>
+                    <span>{targetMethod === 'opticalsar' ? 'Sentinel-2 Multispectral Swath' : 'Baseline Raster [Assam Brahmaputra Basin - Pre Flood]'}</span>
                   </div>
                 )}
                 <div className="absolute bottom-3 left-3 z-10 w-7 h-7 rounded-full bg-black/80 border border-slate-700/80 flex items-center justify-center text-white text-[11px] font-serif font-bold shadow">
@@ -2203,119 +2363,197 @@ export default function BhuViksanaApp() {
                 </div>
               </div>
 
-              {/* PANEL 2: T2 IMAGE */}
-              <div className="relative w-full h-full rounded-xl overflow-hidden border border-slate-800/80 bg-black flex flex-col shadow-2xl">
+              {/* PANEL 2: T2 / S1 IMAGE */}
+              <div className="relative w-full h-full rounded-xl overflow-hidden border border-slate-800/80 bg-slate-950 flex items-center justify-center shadow-2xl">
                 <div className="absolute top-3 left-3 z-20 bg-black/85 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-amber-300 border border-amber-800/60 flex items-center gap-1.5 shadow">
                   <span className="w-2 h-2 rounded-full bg-amber-400" />
-                  <span>T2 Image</span>
+                  <span>{targetMethod === 'opticalsar' ? 'Sentinel-1 (SAR VV)' : 'T2 Image'}</span>
                 </div>
                 {t2DataUrl || t1DataUrl ? (
-                  <img src={(t2DataUrl || t1DataUrl) ?? undefined} alt="T2 Post-Event" className="w-full h-full object-cover filter contrast-125" />
+                  <img
+                    src={(t2DataUrl || t1DataUrl) ?? undefined}
+                    alt={targetMethod === 'opticalsar' ? 'Sentinel-1 SAR' : 'T2 Image'}
+                    className="w-full h-full object-cover filter contrast-125 block select-none"
+                  />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 text-xs">
                     <FileImage className="w-7 h-7 mb-2 opacity-40" />
-                    <span>Target Raster [Assam Brahmaputra Basin - Inundated]</span>
+                    <span>{targetMethod === 'opticalsar' ? 'Sentinel-1 SAR Radar Swath' : 'Target Raster [Assam Brahmaputra Basin - Inundated]'}</span>
                   </div>
                 )}
               </div>
 
-              {/* PANEL 3: MASKING & BINARY MAP */}
-              <div className="relative w-full h-full rounded-xl overflow-hidden border border-rose-950/60 bg-black flex flex-col shadow-2xl">
-                <div className="absolute top-3 left-3 z-20 bg-rose-950/80 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-rose-400 border border-rose-800/80 flex items-center gap-1.5 shadow">
-                  <SlidersHorizontal className="w-3.5 h-3.5 text-rose-400" />
-                  <span>Masking</span>
+              {/* PANEL 3: MASKING & THEMATIC MAP */}
+              {targetMethod !== 'opticalsar' && (
+                <div className="relative w-full h-full rounded-xl overflow-hidden border border-rose-950/60 bg-slate-950 flex items-center justify-center shadow-2xl">
+                  <div className="absolute top-3 left-3 z-20 bg-rose-950/80 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-rose-400 border border-rose-800/80 flex items-center gap-1.5 shadow">
+                    <SlidersHorizontal className="w-3.5 h-3.5 text-rose-400" />
+                    <span>Masking</span>
+                  </div>
+
+                  {changeMaskUrl && (
+                    <div className="absolute bottom-3 left-3 z-20 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-mono border border-slate-700 flex items-center gap-3">
+                      <span className="flex items-center gap-1.5 text-slate-300">
+                        <span className="w-2.5 h-2.5 rounded-sm bg-black border border-slate-500" /> [0] Unchanged
+                      </span>
+                      <span className="flex items-center gap-1.5 text-rose-300 font-bold">
+                        <span className="w-2.5 h-2.5 rounded-sm bg-white border border-rose-500 shadow-[0_0_6px_rgba(255,255,255,0.8)]" /> [1] Inundation / Change
+                      </span>
+                    </div>
+                  )}
+
+                  {changeMaskUrl ? (
+                    <img
+                      src={changeMaskUrl}
+                      alt="Binary Mask"
+                      className="w-full h-full object-cover filter contrast-150 block select-none"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500 mb-3" />
+                      <span className="text-[11px] font-mono text-slate-400">
+                        Awaiting Siamese Mask from backend...
+                      </span>
+                      <span className="text-[9px] font-mono text-slate-600 mt-1">
+                        Send a query to initialize matrix generation
+                      </span>
+                    </div>
+                  )}
                 </div>
-
-                {changeMaskUrl && (
-                  <div className="absolute bottom-3 left-3 z-20 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-mono border border-slate-700 flex items-center gap-3">
-                    <span className="flex items-center gap-1.5 text-slate-300">
-                      <span className="w-2.5 h-2.5 rounded-sm bg-black border border-slate-500" /> [0] Unchanged
-                    </span>
-                    <span className="flex items-center gap-1.5 text-rose-300 font-bold">
-                      <span className="w-2.5 h-2.5 rounded-sm bg-white border border-rose-500 shadow-[0_0_6px_rgba(255,255,255,0.8)]" /> [1] Inundation / Change
-                    </span>
-                  </div>
-                )}
-
-                {changeMaskUrl ? (
-                  <img
-                    src={changeMaskUrl}
-                    alt="Binary Mask"
-                    className="w-full h-full object-cover filter contrast-150"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500 mb-3" />
-                    <span className="text-[11px] font-mono text-slate-400">
-                      Awaiting Siamese Mask from backend...
-                    </span>
-                    <span className="text-[9px] font-mono text-slate-600 mt-1">
-                      Send a query to initialize matrix generation
-                    </span>
-                  </div>
-                )}
-              </div>
+              )}
             </div>
           ) : t1DataUrl ? (
-            /* CONDITION 2: UPLOADED SINGLE/SWIPE RASTER CANVAS */
-            <div className="w-full h-full relative overflow-hidden flex items-center justify-center bg-black">
+            /* CONDITION 2: UPLOADED SINGLE/SWIPE RASTER CANVAS WITH ASPECT-RATIO PRESERVATION & ZOOM */
+            <div
+              className="w-full h-full relative overflow-hidden flex items-center justify-center bg-[#070b14] select-none"
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+            >
+              {/* Header Badge */}
               <div className="absolute top-3 left-3 z-20 bg-black/85 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-cyan-300 border border-cyan-800/60 flex items-center gap-1.5 shadow pointer-events-none">
                 <span className="w-2 h-2 rounded-full bg-cyan-400" />
                 <span>Single Satellite Imagery Viewport</span>
               </div>
 
-              <img
-                src={t2DataUrl || t1DataUrl}
-                alt="Post-Event"
-                className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
-                style={{
-                  filter: activeViewTool === 'swipe' && !t2DataUrl ? 'hue-rotate(90deg) contrast(1.2)' : 'none'
-                }}
-              />
-
-              <div
-                className="absolute inset-0 overflow-hidden pointer-events-none"
-                style={{ width: activeViewTool === 'swipe' ? `${swipePos}%` : '100%' }}
-              >
-                <img
-                  src={t1DataUrl}
-                  alt="Pre-Event"
-                  className="absolute inset-0 w-full h-full object-cover max-w-none"
-                  style={{
-                    width: containerRef.current ? `${containerRef.current.clientWidth}px` : '100vw',
-                    height: '100%'
-                  }}
-                />
+              {/* Floating Zoom, Fit, & BBox Controls Toolbar */}
+              <div className="absolute top-3 right-3 z-30 flex items-center gap-1.5 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-lg border border-slate-200">
+                <button
+                  type="button"
+                  onClick={handleZoomOut}
+                  title="Zoom Out (-)"
+                  className="p-1 hover:bg-slate-100 rounded-full text-slate-700 transition"
+                >
+                  <ZoomOut className="w-3.5 h-3.5" />
+                </button>
+                <span className="text-[11px] font-mono font-bold text-slate-800 px-1 min-w-[42px] text-center">
+                  {Math.round(imageZoom * 100)}%
+                </span>
+                <button
+                  type="button"
+                  onClick={handleZoomIn}
+                  title="Zoom In (+)"
+                  className="p-1 hover:bg-slate-100 rounded-full text-slate-700 transition"
+                >
+                  <ZoomIn className="w-3.5 h-3.5" />
+                </button>
+                <div className="w-[1px] h-3.5 bg-slate-300 mx-0.5" />
+                <button
+                  type="button"
+                  onClick={handleResetZoom}
+                  title="Reset to Fit View"
+                  className="px-2 py-0.5 hover:bg-slate-100 rounded-full text-slate-700 transition flex items-center gap-1 text-[10px] font-semibold"
+                >
+                  <Maximize2 className="w-3 h-3 text-[#1a73e8]" />
+                  <span>Fit</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowBBoxes(!showBBoxes)}
+                  title="Toggle Bounding Boxes"
+                  className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border transition ${
+                    showBBoxes ? 'bg-[#e8f0fe] border-[#1a73e8] text-[#1a73e8]' : 'bg-slate-100 border-slate-300 text-slate-500'
+                  }`}
+                >
+                  BBox: {showBBoxes ? 'ON' : 'OFF'}
+                </button>
               </div>
 
-              {activeViewTool === 'swipe' && (
-                <div
-                  className="absolute top-0 bottom-0 w-1 bg-white shadow-[0_0_12px_rgba(0,0,0,0.6)] cursor-ew-resize z-30 flex items-center justify-center"
-                  style={{ left: `${swipePos}%` }}
-                  onMouseDown={() => { isDraggingSwipe.current = true; }}
-                >
-                  <div className="w-8 h-8 rounded-full bg-white border border-[#dadce0] flex items-center justify-center shadow-lg text-[#1a73e8]">
-                    <MoveHorizontal className="w-4 h-4" />
-                  </div>
-                </div>
-              )}
+              {/* Aspect-Ratio Preserving Transformable Canvas with Smooth Pan */}
+              <div
+                className={`relative flex items-center justify-center max-w-full max-h-full ${
+                  isPanning ? 'cursor-grabbing' : imageZoom > 1 ? 'cursor-grab' : 'cursor-default'
+                }`}
+                style={{
+                  transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${imageZoom})`,
+                  transformOrigin: 'center center',
+                  transition: isPanning ? 'none' : 'transform 0.12s ease-out'
+                }}
+                onMouseDown={handleMouseDownPan}
+              >
+                {/* Image & Bounding Box Wrapper: tightly bounds the rendered raster */}
+                <div className="relative inline-block shadow-2xl rounded-xl overflow-visible border border-slate-800">
+                  <img
+                    src={t2DataUrl || t1DataUrl}
+                    alt="Satellite Imagery"
+                    className="h-[calc(100vh-72px)] max-h-[calc(100vh-72px)] max-w-[calc(100%-48px)] w-auto object-contain block select-none pointer-events-none rounded-xl"
+                    style={{
+                      filter: activeViewTool === 'swipe' && !t2DataUrl ? 'hue-rotate(90deg) contrast(1.2)' : 'none'
+                    }}
+                  />
 
-              {showBBoxes && entities.map((det, idx) => (
-                <div
-                  key={idx}
-                  className="absolute border-2 border-[#1a73e8] bg-[#1a73e8]/20 rounded pointer-events-none z-20 transition-all duration-300 shadow-[0_0_10px_rgba(26,115,232,0.4)]"
-                  style={{
-                    top: `${det.yPct != null ? det.yPct : 42 + (idx * 16)}%`,
-                    left: `${det.xPct != null ? det.xPct : 26 + (idx * 22)}%`,
-                    width: `${det.wPct != null ? det.wPct : 24}%`,
-                    height: `${det.hPct != null ? det.hPct : 18}%`
-                  }}
-                >
-                  <span className="absolute -top-6 left-0 text-[10px] font-sans font-medium px-2 py-0.5 bg-white text-[#1a73e8] border border-[#dadce0] rounded-full shadow whitespace-nowrap">
-                    {det.name} — {(det.confidence * 100).toFixed(1)}%
-                  </span>
+                  {/* Swipe Overlay Layer (only when Swipe Tool is active) */}
+                  {activeViewTool === 'swipe' && (
+                    <div
+                      className="absolute inset-0 overflow-hidden pointer-events-none rounded-xl"
+                      style={{ width: `${swipePos}%` }}
+                    >
+                      <img
+                        src={t1DataUrl}
+                        alt="Pre-Event"
+                        className="h-[calc(100vh-72px)] max-h-[calc(100vh-72px)] max-w-[calc(100%-48px)] w-auto object-contain block max-w-none select-none pointer-events-none rounded-xl"
+                      />
+                    </div>
+                  )}
+
+                  {/* Swipe Draggable Divider Handle */}
+                  {activeViewTool === 'swipe' && (
+                    <div
+                      className="absolute top-0 bottom-0 w-1 bg-white shadow-[0_0_12px_rgba(0,0,0,0.6)] cursor-ew-resize z-30 flex items-center justify-center"
+                      style={{ left: `${swipePos}%` }}
+                      onMouseDown={(e) => {
+                        e.stopPropagation();
+                        isDraggingSwipe.current = true;
+                      }}
+                    >
+                      <div className="w-8 h-8 rounded-full bg-white border border-[#dadce0] flex items-center justify-center shadow-lg text-[#1a73e8]">
+                        <MoveHorizontal className="w-4 h-4" />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Bounding Box Layer - EXACT 1:1 overlay spanning the image dimensions */}
+                  {showBBoxes && (
+                    <div className="absolute inset-0 pointer-events-none z-20">
+                      {entities.map((det, idx) => (
+                        <div
+                          key={idx}
+                          className="absolute border-2 border-[#1a73e8] bg-[#1a73e8]/20 rounded pointer-events-none transition-all duration-300 shadow-[0_0_10px_rgba(26,115,232,0.4)]"
+                          style={{
+                            top: `${det.yPct != null ? Math.max(0, Math.min(98, det.yPct)) : 20}%`,
+                            left: `${det.xPct != null ? Math.max(0, Math.min(98, det.xPct)) : 20}%`,
+                            width: `${det.wPct != null ? Math.max(2, Math.min(100, det.wPct)) : 15}%`,
+                            height: `${det.hPct != null ? Math.max(2, Math.min(100, det.hPct)) : 15}%`
+                          }}
+                        >
+                          <span className="absolute -top-5 left-0 text-[10px] font-sans font-medium px-1.5 py-0.5 bg-white text-[#1a73e8] border border-[#dadce0] rounded shadow whitespace-nowrap">
+                            {det.name} — {(det.confidence * 100).toFixed(1)}%
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              ))}
+              </div>
             </div>
           ) : (
             /* CONDITION 3: STANDARD SATELLITE LEAFLET MAP VIEWPORT */
@@ -2367,7 +2605,9 @@ export default function BhuViksanaApp() {
 
           {/* Bottom Coordinates Telemetry Stamp */}
           <div className="absolute bottom-2 right-4 z-[400] text-[11px] font-mono text-[#5f6368] bg-white/85 backdrop-blur-md px-2.5 py-0.5 rounded-full shadow-sm border border-[#dadce0]">
-            {liveCoords.lat.toFixed(4)}°N, {liveCoords.lng.toFixed(4)}°E • Zoom: {liveCoords.zoom}x
+            {t1DataUrl
+              ? `Optical Swath Active • Zoom: ${Math.round(imageZoom * 100)}% (${imageZoom === 1.0 ? 'Fit' : 'Custom'})`
+              : `${liveCoords.lat.toFixed(4)}°N, ${liveCoords.lng.toFixed(4)}°E • Zoom: ${liveCoords.zoom}x`}
           </div>
 
           {/* Floating Sidebar Toggle Handle */}
@@ -2403,7 +2643,7 @@ export default function BhuViksanaApp() {
                       : 'text-[#5f6368] border-transparent hover:text-[#202124]'
                   }`}
                 >
-                  Change Detection
+                  {targetMethod === 'opticalsar' ? 'Optical-SAR Fusion' : 'Change Detection'}
                 </button>
                 <button
                   onClick={() => setShowAuditModal(true)}
@@ -2429,10 +2669,74 @@ export default function BhuViksanaApp() {
               {/* Sidebar Content based on Active Tab */}
               {activeWorkstationTab === 'bitemporal' ? (
                 <div className="flex flex-col flex-1">
-                  <ChangeDetectionPanel
-                    changeMetrics={extractChangeMetrics(visualEvidenceData || {})}
-                    modelName="OPEN-CD (BI-TEMPORAL SIAMESE)"
-                  />
+                  {targetMethod === 'opticalsar' ? (
+                    <div className="p-4 space-y-3 font-sans text-xs">
+                      {/* Optical-SAR Synthesis Header */}
+                      <div className="bg-[#f8fafd] border border-[#dadce0] rounded-2xl p-4 space-y-3 shadow-sm">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold text-[#0284c7] flex items-center gap-1.5 font-sans">
+                            <Sparkles className="w-4 h-4 text-[#0284c7]" /> Multi-Sensor Fusion
+                          </span>
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#e0f2fe] text-[#0369a1] font-bold border border-[#bae6fd]">
+                            CROMA Dual-Modal
+                          </span>
+                        </div>
+
+                        {/* Classification Result Badge */}
+                        <div className="p-3 rounded-xl border bg-white flex items-center justify-between shadow-xs">
+                          <div>
+                            <div className="text-[10px] text-[#5f6368] uppercase font-mono font-medium">Classified Target State</div>
+                            <div className={`text-sm font-bold mt-0.5 ${
+                              visualEvidenceData?.classification === 'WATER' ? 'text-[#0284c7]' : 'text-[#ea580c]'
+                            }`}>
+                              {visualEvidenceData?.classification || 'WATER / LAND COVER'}
+                            </div>
+                          </div>
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${
+                            visualEvidenceData?.classification === 'WATER'
+                              ? 'bg-cyan-50 text-cyan-700 border border-cyan-200'
+                              : 'bg-amber-50 text-amber-700 border border-amber-200'
+                          }`}>
+                            {visualEvidenceData?.classification === 'WATER' ? 'Hydrological' : 'Structural'}
+                          </span>
+                        </div>
+
+                        {/* Dual Indices Grid */}
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div className="bg-white p-3 rounded-xl border border-[#dadce0]">
+                            <div className="text-[10px] text-[#5f6368] uppercase font-mono font-medium">SAR Mean VV</div>
+                            <div className="text-[#202124] font-semibold font-mono mt-0.5">
+                              {visualEvidenceData?.vv_db !== undefined ? `${visualEvidenceData.vv_db} dB` : '-15.80 dB'}
+                            </div>
+                            <div className="text-[9px] text-[#70757a] mt-0.5">Threshold: -10.9 dB</div>
+                          </div>
+                          <div className="bg-white p-3 rounded-xl border border-[#dadce0]">
+                            <div className="text-[10px] text-[#5f6368] uppercase font-mono font-medium">Sentinel-2 NDWI</div>
+                            <div className="text-[#202124] font-semibold font-mono mt-0.5">
+                              {visualEvidenceData?.ndwi !== undefined ? `${visualEvidenceData.ndwi > 0 ? '+' : ''}${visualEvidenceData.ndwi}` : '+0.655'}
+                            </div>
+                            <div className="text-[9px] text-[#70757a] mt-0.5">&gt;0: Water | &lt;0: Land</div>
+                          </div>
+                        </div>
+
+                        {/* CROMA Vector Info */}
+                        <div className="bg-white p-3 rounded-xl border border-[#dadce0] flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-2">
+                            <Layers className="w-3.5 h-3.5 text-[#5f6368]" />
+                            <span className="text-[#3c4043] font-medium text-[11px]">CROMA Latent Space</span>
+                          </div>
+                          <span className="font-mono text-[10px] font-bold text-[#188038] bg-[#e6f4ea] px-2 py-0.5 rounded-full">
+                            768-dim GAP
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <ChangeDetectionPanel
+                      changeMetrics={extractChangeMetrics(visualEvidenceData || {})}
+                      modelName="OPEN-CD (BI-TEMPORAL SIAMESE)"
+                    />
+                  )}
                   {/* Chat Messages Section in Change Detection Tab */}
                   <div className="p-4 border-t border-[#dadce0] space-y-3">
                     <span className="text-xs font-bold text-[#3c4043] uppercase tracking-wider block">
