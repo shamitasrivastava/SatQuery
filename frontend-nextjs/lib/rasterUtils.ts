@@ -70,3 +70,19 @@ export const processRaster = async (file: File): Promise<string> => {
   }
   return URL.createObjectURL(file);
 };
+
+/**
+ * Helper to extract and format change mask or thematic overlay from evidence dictionaries.
+ */
+export const extractMaskFromEvidence = (evidence?: Record<string, any> | null): string | null => {
+  if (!evidence) return null;
+  const raw =
+    evidence.mask_base64 ||
+    evidence.change_mask ||
+    evidence.change_mask_url ||
+    evidence.mask ||
+    evidence.binary_mask ||
+    evidence.overlay_base64 ||
+    evidence.evidence_base64;
+  return formatMediaUrl(raw);
+};

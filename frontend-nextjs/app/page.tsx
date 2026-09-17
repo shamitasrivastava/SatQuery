@@ -16,7 +16,7 @@ import {
   removeAuthToken
 } from '../lib/api';
 import { convertVisualEvidenceToEntities } from '../lib/adapters';
-import { formatMediaUrl, processRaster } from '../lib/rasterUtils';
+import { formatMediaUrl, processRaster, extractMaskFromEvidence } from '../lib/rasterUtils';
 import { exportBhuviksanaReportPdf } from '../lib/pdfExporter';
 import { useWorkstationViewport } from '../hooks/useWorkstationViewport';
 import { HistoryItem } from '../components/canvas/HistoryDrawer';
@@ -226,22 +226,13 @@ export default function BhuViksanaApp() {
     const rawEvidence = thread.visual_evidence || lastMsgWithEv?.visual_evidence;
     const rawT1 = rawEvidence?.s2_base64 || thread.image_t1_url || lastMsgWithT1?.image_t1_url;
     const rawT2 = rawEvidence?.s1_base64 || thread.image_t2_url || lastMsgWithT2?.image_t2_url;
-    const rawMask =
-      rawEvidence?.mask_base64 ||
-      rawEvidence?.change_mask ||
-      rawEvidence?.change_mask_url ||
-      rawEvidence?.overlay_base64 ||
-      rawEvidence?.evidence_base64 ||
-      thread.change_mask_url ||
-      lastMsgWithMask?.change_mask_url ||
-      lastMsgWithMask?.visual_evidence?.mask_base64 ||
-      lastMsgWithMask?.visual_evidence?.change_mask ||
-      lastMsgWithMask?.visual_evidence?.overlay_base64 ||
-      lastMsgWithMask?.visual_evidence?.evidence_base64;
-
     const formattedT1 = formatMediaUrl(rawT1);
     const formattedT2 = formatMediaUrl(rawT2);
-    const formattedMask = formatMediaUrl(rawMask);
+    const formattedMask =
+      extractMaskFromEvidence(rawEvidence) ||
+      thread.change_mask_url ||
+      lastMsgWithMask?.change_mask_url ||
+      extractMaskFromEvidence(lastMsgWithMask?.visual_evidence);
 
     if (isOpticalSar) {
       setTargetMethod('opticalsar');
@@ -542,15 +533,8 @@ export default function BhuViksanaApp() {
         setEntities(convertVisualEvidenceToEntities(res.visual_evidence));
         if (res.visual_evidence.s2_base64) setT1DataUrl(formatMediaUrl(res.visual_evidence.s2_base64));
         if (res.visual_evidence.s1_base64) setT2DataUrl(formatMediaUrl(res.visual_evidence.s1_base64));
-        const mask =
-          res.visual_evidence.mask_base64 ||
-          res.visual_evidence.change_mask ||
-          res.visual_evidence.change_mask_url ||
-          res.visual_evidence.mask ||
-          res.visual_evidence.binary_mask ||
-          res.visual_evidence.evidence_base64 ||
-          res.visual_evidence.overlay_base64;
-        if (mask) setChangeMaskUrl(formatMediaUrl(mask));
+        const mask = extractMaskFromEvidence(res.visual_evidence);
+        if (mask) setChangeMaskUrl(mask);
       }
 
       const isOpticalSarTask = res.task === 'optical_sar' || (res.model && res.model.toLowerCase().includes('optical-sar')) || effectiveMethod === 'opticalsar';
@@ -665,15 +649,8 @@ export default function BhuViksanaApp() {
       const aiReply = res.result || `Processed query: "${userQ}". Verified bounding coordinates.`;
       setChatMessages((prev) => [...prev, { sender: 'ai', text: aiReply }]);
 
-      const mask =
-        res.visual_evidence?.mask_base64 ||
-        res.visual_evidence?.change_mask ||
-        res.visual_evidence?.change_mask_url ||
-        res.visual_evidence?.mask ||
-        res.visual_evidence?.binary_mask ||
-        res.visual_evidence?.evidence_base64 ||
-        res.visual_evidence?.overlay_base64;
-      if (mask) setChangeMaskUrl(formatMediaUrl(mask));
+      const mask = extractMaskFromEvidence(res.visual_evidence);
+      if (mask) setChangeMaskUrl(mask);
 
       if (res.visual_evidence) {
         setVisualEvidenceData(res.visual_evidence);

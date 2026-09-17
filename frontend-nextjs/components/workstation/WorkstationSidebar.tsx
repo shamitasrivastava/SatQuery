@@ -9,14 +9,13 @@ import {
   Activity,
   FileDown,
   Sparkles,
-  Send,
-  Loader2
+  Send
 } from 'lucide-react';
 import { MapEntity } from '../../types/satquery';
 import { extractChangeMetrics } from '../../lib/adapters';
-import MarkdownRenderer from '../MarkdownRenderer';
 import ChangeDetectionPanel from '../ChangeDetectionPanel';
 import OpticalSarMetrics from './OpticalSarMetrics';
+import ChatFeed from './ChatFeed';
 
 interface WorkstationSidebarProps {
   isSidebarOpen: boolean;
@@ -127,66 +126,26 @@ export default function WorkstationSidebar({
                   />
                 )}
 
-                {/* Conversation feed for change detection */}
+                {/* Conversation Feed for Change Detection */}
                 <div className="p-4 border-t border-[#dadce0] space-y-3">
                   <span className="text-xs font-bold text-[#3c4043] uppercase tracking-wider block">
                     Analyst Conversation
                   </span>
-                  {chatMessages.map((msg, idx) => (
-                    <div
-                      key={idx}
-                      className={`text-xs leading-relaxed p-3 rounded-2xl border ${
-                        msg.sender === 'user'
-                          ? 'bg-[#e8f0fe] border-[#d2e3fc] text-[#174ea6] ml-6'
-                          : 'bg-[#f1f3f4] border-[#dadce0] text-[#202124] mr-4'
-                      }`}
-                    >
-                      <span className="font-semibold text-[11px] block mb-1">
-                        {msg.sender === 'user' ? 'Operator' : 'BhuViksana Assistant'}
-                      </span>
-                      {msg.sender === 'user' ? (
-                        <div className="whitespace-pre-wrap">{msg.text}</div>
-                      ) : (
-                        <MarkdownRenderer content={msg.text} />
-                      )}
-                    </div>
-                  ))}
-                  {isLoading && (
-                    <div className="flex items-center gap-2 text-xs font-mono text-[#1a73e8] p-2">
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" /> Querying Siamese Model Engine...
-                    </div>
-                  )}
+                  <ChatFeed
+                    messages={chatMessages}
+                    isLoading={isLoading}
+                    loadingLabel="Querying Siamese Model Engine..."
+                  />
                 </div>
               </div>
             ) : (
               /* Overview & Q&A Tab Content */
               <div className="p-4 space-y-4">
-                <div className="space-y-3">
-                  {chatMessages.map((msg, idx) => (
-                    <div
-                      key={idx}
-                      className={`text-xs leading-relaxed p-3 rounded-2xl border ${
-                        msg.sender === 'user'
-                          ? 'bg-[#e8f0fe] border-[#d2e3fc] text-[#174ea6] ml-6'
-                          : 'bg-[#f1f3f4] border-[#dadce0] text-[#202124] mr-4'
-                      }`}
-                    >
-                      <span className="font-semibold text-[11px] block mb-1">
-                        {msg.sender === 'user' ? 'Operator' : 'BhuViksana Assistant'}
-                      </span>
-                      {msg.sender === 'user' ? (
-                        <div className="whitespace-pre-wrap">{msg.text}</div>
-                      ) : (
-                        <MarkdownRenderer content={msg.text} />
-                      )}
-                    </div>
-                  ))}
-                  {isLoading && (
-                    <div className="flex items-center gap-2 text-xs font-mono text-[#1a73e8] p-2">
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" /> Querying Model Engine...
-                    </div>
-                  )}
-                </div>
+                <ChatFeed
+                  messages={chatMessages}
+                  isLoading={isLoading}
+                  loadingLabel="Querying Model Engine..."
+                />
 
                 {/* Grounded Entities List */}
                 <div className="pt-2">
