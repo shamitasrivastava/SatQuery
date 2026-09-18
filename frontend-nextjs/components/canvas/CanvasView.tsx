@@ -153,7 +153,7 @@ export default function CanvasView({
   return (
     <div className="flex h-screen w-screen overflow-hidden canvas-bg-mesh font-sans text-slate-800 select-none relative">
       {/* Left Dock */}
-      <aside className="w-[80px] h-full flex flex-col items-center justify-between py-6 border-r border-slate-200/70 bg-white/70 backdrop-blur-md z-30">
+      <aside className="w-[80px] h-full flex flex-col items-center justify-between py-6 border-r border-slate-200/30 bg-white/20 backdrop-blur-md z-30">
         <div className="flex flex-col items-center gap-6">
           <div className="w-11 h-11 relative flex items-center justify-center">
             <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain" />
@@ -169,7 +169,7 @@ export default function CanvasView({
               onClick={() => setIsHistoryDrawerOpen(!isHistoryDrawerOpen)}
               className={`p-3 rounded-2xl transition hover:scale-105 cursor-pointer ${isHistoryDrawerOpen
                   ? 'bg-[#1a73e8] text-white shadow-md'
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
+                  : 'text-slate-500 hover:text-slate-800 hover:bg-white/40'
                 }`}
               title="Telemetry & Query History"
             >
