@@ -155,10 +155,10 @@ export default function CanvasView({
       {/* Left Dock */}
       <aside className="w-[80px] h-full flex flex-col items-center justify-between py-6 border-r border-slate-200/30 bg-white/20 backdrop-blur-md z-30">
         <div className="flex flex-col items-center gap-6">
-          <div className="w-11 h-11 relative flex items-center justify-center">
-            <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain" />
+          <div className="w-14 h-14 relative flex items-center justify-center">
+            <img src="/logo.png" alt="Logo" className="w-12 h-12 object-contain" />
           </div>
-          <nav className="flex flex-col items-center gap-4 pt-4">
+          <nav className="flex flex-col items-center gap-4 pt-2">
             <button
               className="p-3 rounded-2xl text-white bg-[#0284c7] shadow-sm shadow-cyan-500/30 transition hover:scale-105 cursor-pointer"
               title="Home Setup"
@@ -168,7 +168,7 @@ export default function CanvasView({
             <button
               onClick={() => setIsHistoryDrawerOpen(!isHistoryDrawerOpen)}
               className={`p-3 rounded-2xl transition hover:scale-105 cursor-pointer ${isHistoryDrawerOpen
-                  ? 'bg-[#1a73e8] text-white shadow-md'
+                  ? 'bg-[#0284c7] text-white shadow-sm shadow-cyan-500/30'
                   : 'text-slate-500 hover:text-slate-800 hover:bg-white/40'
                 }`}
               title="Telemetry & Query History"
