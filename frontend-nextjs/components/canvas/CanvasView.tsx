@@ -152,10 +152,6 @@ export default function CanvasView({
 
   return (
     <div className="flex h-screen w-screen overflow-hidden canvas-bg-mesh font-sans text-slate-800 select-none relative">
-      <div className="absolute right-[-4vw] top-[5vh] w-[58vw] h-[90vh] pointer-events-none opacity-[0.045] z-0 flex items-center justify-center">
-        <img src="/logo.png" alt="Watermark" className="w-full h-full object-contain" />
-      </div>
-
       {/* Left Dock */}
       <aside className="w-[80px] h-full flex flex-col items-center justify-between py-6 border-r border-slate-200/70 bg-white/70 backdrop-blur-md z-30">
         <div className="flex flex-col items-center gap-6">
@@ -222,10 +218,6 @@ export default function CanvasView({
 
       {/* Main Canvas Workspace */}
       <main className="flex-1 flex flex-col justify-center items-center p-6 sm:p-10 relative z-10 overflow-y-auto">
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.035] transform scale-150">
-          <img src="/logo.png" alt="Watermark" className="w-[560px] h-[560px] object-contain" />
-        </div>
-
         <div className="w-full max-w-4xl mx-auto flex flex-col items-center relative z-10 space-y-6">
           <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-semibold tracking-tight text-center text-slate-900 leading-[1.18] mb-6 sm:mb-8">
             <span className="text-[#0284c7]">Good Afternoon,</span> What Satelite<br />

@@ -22,10 +22,11 @@ html, body {
 
 /* Ambient canvas background for Page 2 */
 .canvas-bg-mesh {
-  background-color: #f8fafc;
-  background-image: 
-    radial-gradient(circle at 8% 45%, rgba(147, 197, 253, 0.68) 0%, rgba(186, 230, 253, 0.45) 25%, rgba(255, 255, 255, 0) 55%),
-    radial-gradient(circle at 92% 50%, rgba(253, 186, 116, 0.68) 0%, rgba(254, 215, 170, 0.45) 25%, rgba(255, 255, 255, 0) 60%);
+  background-color: #fbfcfe;
+  background-image: url('/erghwehewh.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
   background-attachment: fixed;
 }
 
