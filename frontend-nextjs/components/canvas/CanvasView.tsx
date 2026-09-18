@@ -236,12 +236,12 @@ export default function CanvasView({
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            className={`w-full bg-white rounded-[28px] border shadow-[0_10px_35px_-10px_rgba(0,0,0,0.06)] px-6 py-5 space-y-3.5 transition-all ${isDragging ? 'border-[#0284c7] ring-4 ring-sky-100 bg-sky-50/20' : 'border-slate-200/90'
+            className={`w-full bg-white rounded-[28px] border shadow-[0_10px_35px_-10px_rgba(0,0,0,0.06)] px-6 py-5 sm:px-7 sm:py-5.5 space-y-3.5 transition-all ${isDragging ? 'border-[#0284c7] ring-4 ring-sky-100 bg-sky-50/20' : 'border-slate-200/90'
               }`}
           >
             {/* Uploaded Rasters Preview Strip */}
             {(fileT1 || fileT2) && (
-              <div className="flex items-center gap-3.5 pt-0.5 pb-1 overflow-x-auto">
+              <div className="flex items-center gap-3 pt-0.5 pb-1 overflow-x-auto">
                 {/* T1 Preview Card */}
                 {fileT1 && (
                   <div className="group relative flex-shrink-0">
@@ -253,7 +253,7 @@ export default function CanvasView({
                           title: fileT1.name
                         })
                       }
-                      className="w-24 h-32 sm:w-28 sm:h-36 rounded-2xl overflow-hidden border border-slate-200/90 shadow-2xs bg-slate-100 hover:border-[#0284c7] hover:shadow-md transition-all cursor-pointer relative flex items-center justify-center group-hover:scale-[1.02]"
+                      className="w-[7rem] h-[7rem] rounded-2xl overflow-hidden border border-slate-200/90 shadow-2xs bg-slate-100 hover:border-[#0284c7] hover:shadow-md transition-all cursor-pointer relative flex items-center justify-center group-hover:scale-[1.02]"
                       title={`Click to inspect: ${fileT1.name}`}
                     >
                       {t1DataUrl ? (
@@ -300,7 +300,7 @@ export default function CanvasView({
                           title: fileT2.name
                         })
                       }
-                      className="w-24 h-32 sm:w-28 sm:h-36 rounded-2xl overflow-hidden border border-slate-200/90 shadow-2xs bg-slate-100 hover:border-[#0284c7] hover:shadow-md transition-all cursor-pointer relative flex items-center justify-center group-hover:scale-[1.02]"
+                      className="w-[7rem] h-[7rem] rounded-2xl overflow-hidden border border-slate-200/90 shadow-2xs bg-slate-100 hover:border-[#0284c7] hover:shadow-md transition-all cursor-pointer relative flex items-center justify-center group-hover:scale-[1.02]"
                       title={`Click to inspect: ${fileT2.name}`}
                     >
                       {t2DataUrl ? (
@@ -338,19 +338,23 @@ export default function CanvasView({
               </div>
             )}
 
-            {/* Query Textarea (Compact without extra bottom void) */}
-            <div className="pt-0.5">
+            {/* Query Textarea (Vertically centered & compact) */}
+            <div className="flex items-center min-h-[44px] py-0.5">
               <textarea
                 value={queryText}
-                onChange={(e) => setQueryText(e.target.value)}
+                onChange={(e) => {
+                  setQueryText(e.target.value);
+                  e.target.style.height = 'auto';
+                  e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+                }}
                 rows={1}
                 placeholder="Ask Question or Analysis Requirements..."
-                className="w-full text-sm sm:text-base font-normal text-slate-800 placeholder-slate-400 bg-transparent border-none resize-none focus:outline-none focus:ring-0 leading-normal py-0.5"
+                className="w-full text-base sm:text-lg font-normal text-slate-800 placeholder-slate-400 bg-transparent border-none resize-none focus:outline-none focus:ring-0 leading-normal py-1"
               />
             </div>
 
             {/* Bottom Controls Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
+            <div className="flex flex-wrap items-center justify-between gap-4 pt-3.5 border-t border-slate-100">
               <div className="flex items-center gap-3">
                 {/* 1. Attach Image Button */}
                 <label
