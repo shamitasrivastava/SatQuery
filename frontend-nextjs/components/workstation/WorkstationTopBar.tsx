@@ -15,24 +15,19 @@ interface WorkstationTopBarProps {
 }
 
 export default function WorkstationTopBar({
-  activeScenario,
   onNavigateCanvas
 }: WorkstationTopBarProps) {
   return (
-    <div className="absolute top-4 left-4 z-[400] flex flex-col gap-2 pointer-events-auto max-w-[calc(100vw-32px)]">
-      {/* Search & Scenario Title */}
-      <div className="flex items-center h-12 bg-white rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.2)] border border-[#dadce0] px-3 gap-2 w-[360px] sm:w-[390px]">
-        <button
-          onClick={onNavigateCanvas}
-          className="p-1.5 rounded-full hover:bg-[#f1f3f4] text-[#5f6368] transition cursor-pointer"
-          title="Back to Setup Canvas"
-        >
-          <ArrowLeft className="w-4 h-4" />
-        </button>
-        <div className="flex-1 truncate text-xs font-semibold text-[#202124]">
-          {activeScenario}
-        </div>
-      </div>
+    <div className="absolute top-3 left-3 z-[400] pointer-events-auto">
+      <button
+        type="button"
+        onClick={onNavigateCanvas}
+        className="flex items-center justify-center w-8 h-8 rounded-full bg-white hover:bg-slate-100 text-[#5f6368] hover:text-[#202124] shadow-[0_2px_6px_rgba(0,0,0,0.2)] border border-[#dadce0] transition cursor-pointer"
+        title="Back to Setup Canvas"
+        aria-label="Back to Setup Canvas"
+      >
+        <ArrowLeft className="w-4 h-4" />
+      </button>
     </div>
   );
 }

@@ -16,30 +16,53 @@ export default function ChatFeed({
   loadingLabel = 'Querying Model Engine...'
 }: ChatFeedProps) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {messages.map((msg, idx) => (
         <div
           key={idx}
-          className={`text-xs leading-relaxed p-3 rounded-2xl border ${
-            msg.sender === 'user'
-              ? 'bg-[#e8f0fe] border-[#d2e3fc] text-[#174ea6] ml-6'
-              : 'bg-[#f1f3f4] border-[#dadce0] text-[#202124] mr-4'
-          }`}
+          className={`flex w-full ${msg.sender === 'user' ? 'justify-end pr-2 pl-6' : 'justify-start pl-2 pr-6'}`}
         >
-          <span className="font-semibold text-[11px] block mb-1">
-            {msg.sender === 'user' ? 'Operator' : 'BhuViksana Assistant'}
-          </span>
           {msg.sender === 'user' ? (
-            <div className="whitespace-pre-wrap">{msg.text}</div>
+            /* User Bubble: Soft Pastel Blue (#bdd8ef) with Vibrant Blue font (#256fa8) */
+            <div className="relative bg-[#bdd8ef] text-[#256fa8] px-4 py-3 rounded-2xl text-[13.5px] font-medium leading-snug max-w-[92%] shadow-sm">
+              <svg
+                className="absolute -top-[0px] -right-[9px] w-[10px] h-[12px] text-[#bdd8ef] pointer-events-none"
+                viewBox="0 0 10 12"
+                fill="currentColor"
+              >
+                <path d="M0 0 L10 0 C6 1.5 2 5 0 12 Z" />
+              </svg>
+              <div className="whitespace-pre-wrap">{msg.text}</div>
+            </div>
           ) : (
-            <MarkdownRenderer content={msg.text} />
+            /* AI Assistant Bubble: Soft Light Peach (#fde3d2) with Warm Terracotta font (#995535) */
+            <div className="relative bg-[#fde3d2] text-[#995535] px-4 py-3 rounded-2xl text-[13.5px] font-medium leading-snug max-w-[92%] shadow-sm">
+              <svg
+                className="absolute -top-[0px] -left-[9px] w-[10px] h-[12px] text-[#fde3d2] pointer-events-none"
+                viewBox="0 0 10 12"
+                fill="currentColor"
+              >
+                <path d="M10 0 L0 0 C4 1.5 8 5 10 12 Z" />
+              </svg>
+              <MarkdownRenderer content={msg.text} className="text-[#995535]" />
+            </div>
           )}
         </div>
       ))}
 
       {isLoading && (
-        <div className="flex items-center gap-2 text-xs font-mono text-[#1a73e8] p-2">
-          <Loader2 className="w-3.5 h-3.5 animate-spin" /> {loadingLabel}
+        <div className="flex justify-start pl-2 pr-6">
+          <div className="relative bg-[#fde3d2]/90 text-[#995535] px-4 py-3 rounded-2xl text-[13.5px] font-medium flex items-center gap-2 shadow-sm">
+            <svg
+              className="absolute -top-[0px] -left-[9px] w-[10px] h-[12px] text-[#fde3d2]/90 pointer-events-none"
+              viewBox="0 0 10 12"
+              fill="currentColor"
+            >
+              <path d="M10 0 L0 0 C4 1.5 8 5 10 12 Z" />
+            </svg>
+            <Loader2 className="w-4 h-4 animate-spin text-[#995535]" />
+            <span>{loadingLabel}</span>
+          </div>
         </div>
       )}
     </div>

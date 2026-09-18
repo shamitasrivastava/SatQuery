@@ -22,7 +22,7 @@ export default function TriPaneGrid({
     <div className={`w-full h-full grid ${isOpticalSar ? 'grid-cols-2' : 'grid-cols-3'} gap-1.5 bg-slate-950 p-2.5`}>
       {/* Panel 1: T1 / S2 Optical Image */}
       <div className="relative w-full h-full rounded-xl overflow-hidden border border-slate-800/80 bg-slate-950 flex items-center justify-center shadow-2xl">
-        <div className="absolute top-3 left-3 z-20 bg-black/85 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-cyan-300 border border-cyan-800/60 flex items-center gap-1.5 shadow">
+        <div className="absolute top-3 left-13 z-20 bg-black/85 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-cyan-300 border border-cyan-800/60 flex items-center gap-1.5 shadow">
           <span className="w-2 h-2 rounded-full bg-cyan-400" />
           <span>{isOpticalSar ? 'Sentinel-2 (Optical)' : 'T1 Image'}</span>
         </div>

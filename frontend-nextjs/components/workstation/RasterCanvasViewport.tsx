@@ -48,7 +48,7 @@ export default function RasterCanvasViewport({
       onMouseLeave={handleMouseUp}
     >
       {/* Header Badge */}
-      <div className="absolute top-3 left-3 z-20 bg-black/85 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-cyan-300 border border-cyan-800/60 flex items-center gap-1.5 shadow pointer-events-none">
+      <div className="absolute top-3 left-13 z-20 bg-black/85 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-cyan-300 border border-cyan-800/60 flex items-center gap-1.5 shadow pointer-events-none">
         <span className="w-2 h-2 rounded-full bg-cyan-400" />
         <span>Single Satellite Imagery Viewport</span>
       </div>

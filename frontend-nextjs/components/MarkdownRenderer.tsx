@@ -34,13 +34,13 @@ function renderInline(text: string): React.ReactNode[] {
       );
     } else if (token.startsWith('**') && token.endsWith('**')) {
       nodes.push(
-        <strong key={key} className="font-semibold text-slate-900">
+        <strong key={key} className="font-bold text-inherit">
           {token.slice(2, -2)}
         </strong>
       );
     } else if (token.startsWith('*') && token.endsWith('*')) {
       nodes.push(
-        <em key={key} className="italic text-slate-700">
+        <em key={key} className="italic text-inherit">
           {token.slice(1, -1)}
         </em>
       );
@@ -87,7 +87,7 @@ export default function MarkdownRenderer({ content, className = '' }: MarkdownRe
       const text = currentParagraph.join(' ').trim();
       if (text) {
         elements.push(
-          <p key={key} className="text-xs sm:text-sm text-slate-700 leading-relaxed my-2">
+          <p key={key} className="text-[13px] sm:text-sm text-inherit leading-relaxed my-1.5 font-medium">
             {renderInline(text)}
           </p>
         );
