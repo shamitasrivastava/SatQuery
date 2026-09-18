@@ -157,21 +157,21 @@ export default function CanvasView({
       </div>
 
       {/* Left Dock */}
-      <aside className="w-[72px] h-full flex flex-col items-center justify-between py-6 border-r border-slate-200/70 bg-white/70 backdrop-blur-md z-30">
+      <aside className="w-[80px] h-full flex flex-col items-center justify-between py-6 border-r border-slate-200/70 bg-white/70 backdrop-blur-md z-30">
         <div className="flex flex-col items-center gap-6">
-          <div className="w-10 h-10 relative flex items-center justify-center">
-            <img src="/logo.png" alt="Logo" className="w-9 h-9 object-contain" />
+          <div className="w-11 h-11 relative flex items-center justify-center">
+            <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain" />
           </div>
           <nav className="flex flex-col items-center gap-4 pt-4">
             <button
-              className="p-2.5 rounded-xl text-white bg-[#0284c7] shadow-sm shadow-cyan-500/30 transition hover:scale-105 cursor-pointer"
+              className="p-3 rounded-2xl text-white bg-[#0284c7] shadow-sm shadow-cyan-500/30 transition hover:scale-105 cursor-pointer"
               title="Home Setup"
             >
               <Home className="w-5 h-5" />
             </button>
             <button
               onClick={() => setIsHistoryDrawerOpen(!isHistoryDrawerOpen)}
-              className={`p-2.5 rounded-xl transition hover:scale-105 cursor-pointer ${
+              className={`p-3 rounded-2xl transition hover:scale-105 cursor-pointer ${
                 isHistoryDrawerOpen
                   ? 'bg-[#1a73e8] text-white shadow-md'
                   : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
@@ -196,7 +196,7 @@ export default function CanvasView({
 
           <button
             onClick={() => setShowUserPopover(!showUserPopover)}
-            className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#0284c7] to-cyan-500 text-white font-bold text-sm shadow-md hover:scale-105 active:scale-95 transition flex items-center justify-center ring-2 ring-white border border-cyan-300 cursor-pointer"
+            className="w-11 h-11 rounded-full bg-gradient-to-tr from-[#0284c7] to-cyan-500 text-white font-bold text-sm shadow-md hover:scale-105 active:scale-95 transition flex items-center justify-center ring-2 ring-white border border-cyan-300 cursor-pointer"
             title="User Account Profile"
           >
             {userInitial}
@@ -205,7 +205,7 @@ export default function CanvasView({
           <button
             onClick={onSignOut}
             title="Sign Out"
-            className="p-2 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition cursor-pointer"
+            className="p-2.5 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition cursor-pointer"
           >
             <LogOut className="w-5 h-5" />
           </button>
@@ -222,13 +222,13 @@ export default function CanvasView({
       />
 
       {/* Main Canvas Workspace */}
-      <main className="flex-1 flex flex-col justify-center items-center p-8 relative z-10 overflow-y-auto">
+      <main className="flex-1 flex flex-col justify-center items-center p-6 sm:p-10 relative z-10 overflow-y-auto">
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.035] transform scale-150">
-          <img src="/logo.png" alt="Watermark" className="w-[520px] h-[520px] object-contain" />
+          <img src="/logo.png" alt="Watermark" className="w-[560px] h-[560px] object-contain" />
         </div>
 
-        <div className="w-full max-w-3xl mx-auto flex flex-col items-center space-y-6 relative z-10">
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-center text-slate-900 leading-tight">
+        <div className="w-full max-w-4xl mx-auto flex flex-col items-center space-y-8 relative z-10">
+          <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-bold tracking-tight text-center text-slate-900 leading-[1.18]">
             <span className="text-[#0284c7]">Good Afternoon,</span> What Satelite<br />
             scene you would like to <span className="text-[#f37021]">Discover?</span>
           </h1>
@@ -237,7 +237,7 @@ export default function CanvasView({
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            className={`w-full bg-white rounded-[28px] border shadow-[0_10px_35px_-10px_rgba(0,0,0,0.06)] p-6 space-y-4 transition-all ${
+            className={`w-full bg-white rounded-[32px] border shadow-[0_12px_45px_-12px_rgba(0,0,0,0.07)] p-7 sm:p-8 space-y-5 transition-all ${
               isDragging ? 'border-[#0284c7] ring-4 ring-sky-100 bg-sky-50/20' : 'border-slate-200/90'
             }`}
           >
@@ -345,21 +345,21 @@ export default function CanvasView({
               <textarea
                 value={queryText}
                 onChange={(e) => setQueryText(e.target.value)}
-                rows={2}
+                rows={3}
                 placeholder="Ask Question or Analysis Requirements..."
-                className="w-full text-base font-normal text-slate-800 placeholder-slate-400 bg-transparent border-none resize-none focus:outline-none focus:ring-0 leading-relaxed"
+                className="w-full text-base sm:text-lg font-normal text-slate-800 placeholder-slate-400 bg-transparent border-none resize-none focus:outline-none focus:ring-0 leading-relaxed min-h-[76px]"
               />
             </div>
 
             {/* Bottom Controls Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-100">
+              <div className="flex items-center gap-3">
                 {/* 1. Attach Image Button */}
                 <label
-                  className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200/90 bg-slate-50/80 hover:bg-slate-100/90 text-slate-700 hover:text-slate-900 text-xs font-medium shadow-2xs hover:border-slate-300 transition cursor-pointer"
+                  className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/80 hover:bg-slate-100/90 text-slate-700 hover:text-slate-900 text-sm font-medium shadow-2xs hover:border-slate-300 transition cursor-pointer"
                   title="Attach Satellite Imagery (.tif, .png, .jpg)"
                 >
-                  <Upload className="w-4 h-4 text-slate-600" />
+                  <Upload className="w-4.5 h-4.5 text-slate-600" />
                   <span>Attach Image</span>
                   <input
                     ref={multiFileInputRef}
@@ -389,19 +389,19 @@ export default function CanvasView({
                   <button
                     type="button"
                     onClick={() => setIsModelDropdownOpen(!isModelDropdownOpen)}
-                    className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200/90 bg-slate-50/80 hover:bg-slate-100/90 text-slate-700 hover:text-slate-900 text-xs font-medium shadow-2xs hover:border-slate-300 transition cursor-pointer"
+                    className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50/80 hover:bg-slate-100/90 text-slate-700 hover:text-slate-900 text-sm font-medium shadow-2xs hover:border-slate-300 transition cursor-pointer"
                     title="Select Model Pipeline"
                   >
-                    <Settings className="w-4 h-4 text-slate-600" />
+                    <Settings className="w-4.5 h-4.5 text-slate-600" />
                     <span>
                       Model ({targetMethod === 'auto' ? 'Autodetect' : targetMethod === 'single' ? 'Single RS' : targetMethod === 'bitemporal' ? 'Bi-Temporal' : 'Optical-SAR'})
                     </span>
-                    <ChevronDown className={`w-3.5 h-3.5 text-slate-500 transition-transform ${isModelDropdownOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform ${isModelDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
 
                   {/* Compact Dropdown Menu Popover */}
                   {isModelDropdownOpen && (
-                    <div className="absolute bottom-full mb-1.5 left-0 sm:bottom-auto sm:top-full sm:mt-1.5 z-50 w-56 sm:w-60 bg-[#f8fafc] rounded-xl border border-slate-200/90 shadow-lg shadow-slate-300/30 p-1.5 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="absolute bottom-full mb-1.5 left-0 sm:bottom-auto sm:top-full sm:mt-1.5 z-50 w-60 sm:w-64 bg-[#f8fafc] rounded-xl border border-slate-200/90 shadow-lg shadow-slate-300/30 p-1.5 animate-in fade-in zoom-in-95 duration-150">
                       {/* Options with subtle dividers and active highlight */}
                       <div className="space-y-0.5">
                         {MODEL_OPTIONS.map((opt, idx) => {
@@ -416,7 +416,7 @@ export default function CanvasView({
                                   setIsModelDropdownOpen(false);
                                   autoDetectPipeline(fileT1, fileT2);
                                 }}
-                                className={`w-full py-1.5 px-2.5 rounded-lg text-xs font-medium text-center transition cursor-pointer block ${
+                                className={`w-full py-2 px-3 rounded-lg text-sm font-medium text-center transition cursor-pointer block ${
                                   isSelected
                                     ? 'bg-[#0284c7] text-white shadow-2xs'
                                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
@@ -437,7 +437,7 @@ export default function CanvasView({
               <button
                 onClick={handleLaunchWorkstation}
                 disabled={isLoading}
-                className={`flex items-center gap-2 px-6 py-2.5 rounded-full text-white text-sm font-semibold shadow-md active:scale-[0.98] transition-all disabled:opacity-50 cursor-pointer ${
+                className={`flex items-center gap-2.5 px-7 py-3 rounded-full text-white text-sm sm:text-base font-semibold shadow-md active:scale-[0.98] transition-all disabled:opacity-50 cursor-pointer ${
                   fileT1 || fileT2
                     ? 'bg-[#f37021] hover:bg-[#ea580c] shadow-orange-500/25'
                     : 'bg-gradient-to-r from-[#0284c7] to-[#0ea5e9] hover:from-[#0369a1] hover:to-[#0284c7] shadow-sky-500/25'
@@ -446,17 +446,17 @@ export default function CanvasView({
                 {isLoading ? (
                   <>
                     <span>Processing...</span>
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-4.5 h-4.5 animate-spin" />
                   </>
                 ) : fileT1 || fileT2 ? (
                   <>
                     <span>Launch Workstation</span>
-                    <Rocket className="w-4 h-4 fill-white" />
+                    <Rocket className="w-4.5 h-4.5 fill-white" />
                   </>
                 ) : (
                   <>
                     <span>Ask Gemini Assistant</span>
-                    <Sparkles className="w-4 h-4" />
+                    <Sparkles className="w-4.5 h-4.5" />
                   </>
                 )}
               </button>
