@@ -131,12 +131,6 @@ export default function WorkstationView({
       <WorkstationTopBar
         activeScenario={activeScenario}
         onNavigateCanvas={onNavigateCanvas}
-        activeViewTool={activeViewTool}
-        setActiveViewTool={setActiveViewTool}
-        setActiveWorkstationTab={setActiveWorkstationTab}
-        targetMethod={targetMethod}
-        baseMapType={baseMapType}
-        setBaseMapType={setBaseMapType}
       />
 
       {/* 2. Map & Raster Canvas Viewport */}
