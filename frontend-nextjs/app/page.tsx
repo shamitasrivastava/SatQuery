@@ -611,38 +611,6 @@ export default function BhuViksanaApp() {
     }
   };
 
-  const handleLoadScenario = (scenario: 'port' | 'flood') => {
-    handleClearFiles();
-    if (scenario === 'port') {
-      setActiveScenario('Visakhapatnam Port & Industrial Corridor');
-      setTargetMethod('single');
-      setActiveWorkstationTab('rsvqa');
-      setActiveViewTool('single');
-      setMapCenter([17.6965, 83.2980]);
-      setMapZoom(15);
-      setLiveCoords({ lat: 17.6965, lng: 83.2980, zoom: 15 });
-      setEntities([
-        { id: 1, name: 'Container Cargo Ship (Berth 4)', confidence: 0.990, area_m2: 6200, latMin: 17.6940, lngMin: 83.2930, latMax: 17.6985, lngMax: 83.2985, color: '#1a73e8' },
-        { id: 2, name: 'Bulk Carrier (Berth 2)', confidence: 0.978, area_m2: 4850, latMin: 17.6885, lngMin: 83.2875, latMax: 17.6930, lngMax: 83.2930, color: '#e37400' },
-        { id: 3, name: 'Harbor Breakwater Wall', confidence: 0.968, area_m2: 5400, latMin: 17.6820, lngMin: 83.3000, latMax: 17.6850, lngMax: 83.3130, color: '#188038' }
-      ]);
-      setChatMessages([{ sender: 'ai', text: 'Visual Question Answering initialized with GeoChat-7B. Grounded 3 maritime assets in target viewport.' }]);
-    } else {
-      setActiveScenario('Brahmaputra Basin, Assam (Flood Inundation)');
-      setTargetMethod('bitemporal');
-      setActiveWorkstationTab('bitemporal');
-      setActiveViewTool('tripane');
-      setMapCenter([26.1900, 91.7300]);
-      setMapZoom(14);
-      setLiveCoords({ lat: 26.1900, lng: 91.7300, zoom: 14 });
-      setEntities([
-        { id: 1, name: 'Submerged Highway NH-27 Corridor', confidence: 0.992, area_m2: 24500, latMin: 26.1850, lngMin: 91.7200, latMax: 26.1980, lngMax: 91.7450, color: '#d93025' }
-      ]);
-      setChatMessages([{ sender: 'ai', text: 'Flood Inundation Analysis loaded for Brahmaputra Basin. Displaying high-resolution satellite imagery & Open-CD Siamese Change Mask.' }]);
-    }
-    navigateTo('workstation');
-  };
-
   const handleSendMessage = async () => {
     if (!chatInput.trim() || isLoading) return;
     const userQ = chatInput.trim();
@@ -790,7 +758,6 @@ export default function BhuViksanaApp() {
         canvasResponse={canvasResponse}
         setCanvasResponse={setCanvasResponse}
         onNavigateWorkstation={() => navigateTo('workstation')}
-        handleLoadScenario={handleLoadScenario}
         autoDetectPipeline={autoDetectPipeline}
       />
     );
@@ -800,7 +767,6 @@ export default function BhuViksanaApp() {
     <WorkstationView
       activeScenario={activeScenario}
       onNavigateCanvas={() => navigateTo('canvas')}
-      handleLoadScenario={handleLoadScenario}
       activeViewTool={activeViewTool}
       setActiveViewTool={setActiveViewTool}
       activeWorkstationTab={activeWorkstationTab}

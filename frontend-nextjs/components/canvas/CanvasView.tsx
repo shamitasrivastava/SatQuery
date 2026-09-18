@@ -11,8 +11,6 @@ import {
   Rocket,
   Sparkles,
   Loader2,
-  Anchor,
-  CloudRain,
   Maximize2,
   Plus
 } from 'lucide-react';
@@ -52,7 +50,6 @@ interface CanvasViewProps {
   canvasResponse: any;
   setCanvasResponse: (val: any) => void;
   onNavigateWorkstation: () => void;
-  handleLoadScenario: (scenario: 'port' | 'flood') => void;
   autoDetectPipeline: (f1: File | null, f2: File | null) => void;
 }
 
@@ -88,7 +85,6 @@ export default function CanvasView({
   canvasResponse,
   setCanvasResponse,
   onNavigateWorkstation,
-  handleLoadScenario,
   autoDetectPipeline
 }: CanvasViewProps) {
   const multiFileInputRef = useRef<HTMLInputElement>(null);
@@ -468,29 +464,6 @@ export default function CanvasView({
             onNavigateWorkstation={onNavigateWorkstation}
             onDismiss={() => setCanvasResponse(null)}
           />
-
-          {/* Benchmark Use Cases */}
-          <div className="w-full flex flex-col items-center space-y-3 pt-2">
-            <span className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
-              Explore Real-World Remote-Sensing Use Cases
-            </span>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => handleLoadScenario('port')}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white/80 hover:bg-white text-xs font-medium text-slate-700 shadow-sm transition hover:scale-105 cursor-pointer"
-              >
-                <Anchor className="w-3.5 h-3.5 text-[#0284c7]" />
-                <span>Visakhapatnam Port</span>
-              </button>
-              <button
-                onClick={() => handleLoadScenario('flood')}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white/80 hover:bg-white text-xs font-medium text-slate-700 shadow-sm transition hover:scale-105 cursor-pointer"
-              >
-                <CloudRain className="w-3.5 h-3.5 text-[#f37021]" />
-                <span>Assam Flood Inundation</span>
-              </button>
-            </div>
-          </div>
         </div>
       </main>
 

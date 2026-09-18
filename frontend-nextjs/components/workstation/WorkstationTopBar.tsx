@@ -3,9 +3,6 @@
 import React from 'react';
 import {
   ArrowLeft,
-  SlidersHorizontal,
-  Anchor,
-  CloudRain,
   Columns3,
   MoveHorizontal,
   Globe,
@@ -15,7 +12,6 @@ import {
 interface WorkstationTopBarProps {
   activeScenario: string;
   onNavigateCanvas: () => void;
-  handleLoadScenario: (scenario: 'port' | 'flood') => void;
   activeViewTool: 'single' | 'swipe' | 'tripane';
   setActiveViewTool: (tool: 'single' | 'swipe' | 'tripane') => void;
   setActiveWorkstationTab: (tab: 'rsvqa' | 'bitemporal' | 'audittrace') => void;
@@ -27,7 +23,6 @@ interface WorkstationTopBarProps {
 export default function WorkstationTopBar({
   activeScenario,
   onNavigateCanvas,
-  handleLoadScenario,
   activeViewTool,
   setActiveViewTool,
   setActiveWorkstationTab,
@@ -49,41 +44,10 @@ export default function WorkstationTopBar({
         <div className="flex-1 truncate text-xs font-semibold text-[#202124]">
           {activeScenario}
         </div>
-        <button
-          onClick={() => handleLoadScenario(activeScenario.includes('Visakhapatnam') ? 'flood' : 'port')}
-          className="p-1.5 rounded-full hover:bg-[#f1f3f4] text-[#1a73e8] transition cursor-pointer"
-          title="Quick Switch Scenario"
-        >
-          <SlidersHorizontal className="w-4 h-4" />
-        </button>
       </div>
 
-      {/* View Mode & Scenario Chips */}
+      {/* View Mode Tools */}
       <div className="flex items-center gap-1.5 overflow-x-auto py-0.5 no-scrollbar">
-        <button
-          onClick={() => handleLoadScenario('port')}
-          className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium shadow-[0_1px_4px_rgba(0,0,0,0.15)] transition whitespace-nowrap cursor-pointer ${
-            activeScenario.includes('Visakhapatnam') && activeViewTool === 'single'
-              ? 'bg-[#1a73e8] text-white'
-              : 'bg-white text-[#3c4043] hover:bg-[#f8f9fa] border border-[#dadce0]'
-          }`}
-        >
-          <Anchor className="w-3.5 h-3.5" />
-          <span>Port Recon</span>
-        </button>
-
-        <button
-          onClick={() => handleLoadScenario('flood')}
-          className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium shadow-[0_1px_4px_rgba(0,0,0,0.15)] transition whitespace-nowrap cursor-pointer ${
-            activeScenario.includes('Assam') && activeViewTool === 'single'
-              ? 'bg-[#1a73e8] text-white'
-              : 'bg-white text-[#3c4043] hover:bg-[#f8f9fa] border border-[#dadce0]'
-          }`}
-        >
-          <CloudRain className="w-3.5 h-3.5" />
-          <span>Flood Analysis</span>
-        </button>
-
         <button
           onClick={() => {
             setActiveViewTool(activeViewTool === 'tripane' ? 'single' : 'tripane');
@@ -112,29 +76,27 @@ export default function WorkstationTopBar({
         </button>
       </div>
 
-      {/* Map Style Toggle for Benchmark Scenarios */}
-      {(activeScenario.includes('Visakhapatnam') || activeScenario.includes('Assam')) && (
-        <div className="flex items-center bg-white/95 backdrop-blur-md rounded-full shadow-md border border-slate-200 p-0.5 w-fit">
-          <button
-            onClick={() => setBaseMapType('esri')}
-            className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold transition cursor-pointer ${
-              baseMapType === 'esri' ? 'bg-[#1a73e8] text-white' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Globe className="w-3 h-3" />
-            <span>Satellite View</span>
-          </button>
-          <button
-            onClick={() => setBaseMapType('osm')}
-            className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold transition cursor-pointer ${
-              baseMapType === 'osm' ? 'bg-[#1a73e8] text-white' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <MapIcon className="w-3 h-3" />
-            <span>Street Map View</span>
-          </button>
-        </div>
-      )}
+      {/* Map Style Toggle */}
+      <div className="flex items-center bg-white/95 backdrop-blur-md rounded-full shadow-md border border-slate-200 p-0.5 w-fit">
+        <button
+          onClick={() => setBaseMapType('esri')}
+          className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold transition cursor-pointer ${
+            baseMapType === 'esri' ? 'bg-[#1a73e8] text-white' : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          <Globe className="w-3 h-3" />
+          <span>Satellite View</span>
+        </button>
+        <button
+          onClick={() => setBaseMapType('osm')}
+          className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold transition cursor-pointer ${
+            baseMapType === 'osm' ? 'bg-[#1a73e8] text-white' : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          <MapIcon className="w-3 h-3" />
+          <span>Street Map View</span>
+        </button>
+      </div>
     </div>
   );
 }

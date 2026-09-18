@@ -24,7 +24,6 @@ const WorkstationMap = dynamic(() => import('../WorkstationMap'), {
 interface WorkstationViewProps {
   activeScenario: string;
   onNavigateCanvas: () => void;
-  handleLoadScenario: (scenario: 'port' | 'flood') => void;
   activeViewTool: 'single' | 'swipe' | 'tripane';
   setActiveViewTool: (tool: 'single' | 'swipe' | 'tripane') => void;
   activeWorkstationTab: 'rsvqa' | 'bitemporal' | 'audittrace';
@@ -75,7 +74,6 @@ interface WorkstationViewProps {
 export default function WorkstationView({
   activeScenario,
   onNavigateCanvas,
-  handleLoadScenario,
   activeViewTool,
   setActiveViewTool,
   activeWorkstationTab,
@@ -133,7 +131,6 @@ export default function WorkstationView({
       <WorkstationTopBar
         activeScenario={activeScenario}
         onNavigateCanvas={onNavigateCanvas}
-        handleLoadScenario={handleLoadScenario}
         activeViewTool={activeViewTool}
         setActiveViewTool={setActiveViewTool}
         setActiveWorkstationTab={setActiveWorkstationTab}
