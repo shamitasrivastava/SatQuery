@@ -384,7 +384,7 @@ export default function CanvasView({
                   />
                 </label>
 
-                {/* 2. Custom Model Selection Dropdown (Matches Screenshot) */}
+                {/* 2. Custom Model Selection Dropdown (Compact & Sleek) */}
                 <div className="relative" ref={modelDropdownRef}>
                   <button
                     type="button"
@@ -399,27 +399,16 @@ export default function CanvasView({
                     <ChevronDown className={`w-3.5 h-3.5 text-slate-500 transition-transform ${isModelDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
 
-                  {/* Dropdown Menu Popover matching media_1789731507955.png */}
+                  {/* Compact Dropdown Menu Popover */}
                   {isModelDropdownOpen && (
-                    <div className="absolute bottom-full mb-2 left-0 sm:bottom-auto sm:top-full sm:mt-2 z-50 w-72 bg-[#f8fafc] rounded-2xl border border-slate-200/90 shadow-xl shadow-slate-300/40 p-2 animate-in fade-in zoom-in-95 duration-150">
-                      {/* Header inside popover */}
-                      <div className="flex items-center justify-between px-3 py-2 border-b border-slate-200/70 mb-1.5">
-                        <div className="flex items-center gap-2 text-slate-600">
-                          <Settings className="w-4 h-4 text-slate-500" />
-                          <span className="text-sm font-semibold text-slate-700">
-                            Model ({targetMethod === 'auto' ? 'Autodetect' : targetMethod === 'single' ? 'Single RS' : targetMethod === 'bitemporal' ? 'Bi-Temporal' : 'Optical-SAR'})
-                          </span>
-                        </div>
-                        <ChevronDown className="w-4 h-4 text-slate-400" />
-                      </div>
-
+                    <div className="absolute bottom-full mb-1.5 left-0 sm:bottom-auto sm:top-full sm:mt-1.5 z-50 w-56 sm:w-60 bg-[#f8fafc] rounded-xl border border-slate-200/90 shadow-lg shadow-slate-300/30 p-1.5 animate-in fade-in zoom-in-95 duration-150">
                       {/* Options with subtle dividers and active highlight */}
-                      <div className="space-y-1">
+                      <div className="space-y-0.5">
                         {MODEL_OPTIONS.map((opt, idx) => {
                           const isSelected = targetMethod === opt.value;
                           return (
                             <React.Fragment key={opt.value}>
-                              {idx > 0 && <div className="border-t border-slate-200/60 my-0.5" />}
+                              {idx > 0 && <div className="border-t border-slate-200/50 my-0.5" />}
                               <button
                                 type="button"
                                 onClick={() => {
@@ -427,9 +416,9 @@ export default function CanvasView({
                                   setIsModelDropdownOpen(false);
                                   autoDetectPipeline(fileT1, fileT2);
                                 }}
-                                className={`w-full py-2.5 px-3 rounded-xl text-[13.5px] font-medium text-center transition cursor-pointer block ${
+                                className={`w-full py-1.5 px-2.5 rounded-lg text-xs font-medium text-center transition cursor-pointer block ${
                                   isSelected
-                                    ? 'bg-[#0284c7] text-white shadow-xs'
+                                    ? 'bg-[#0284c7] text-white shadow-2xs'
                                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
                                 }`}
                               >
