@@ -22,10 +22,10 @@ html, body {
 
 /* Ambient canvas background for Page 2 */
 .canvas-bg-mesh {
-  background-color: #fbfcfe;
+  background-color: #f8fafc;
   background-image: 
-    radial-gradient(circle at 10% 45%, rgba(186, 230, 253, 0.45) 0%, rgba(255, 255, 255, 0) 45%),
-    radial-gradient(circle at 88% 50%, rgba(254, 215, 170, 0.45) 0%, rgba(255, 255, 255, 0) 50%);
+    radial-gradient(circle at 8% 45%, rgba(147, 197, 253, 0.68) 0%, rgba(186, 230, 253, 0.45) 25%, rgba(255, 255, 255, 0) 55%),
+    radial-gradient(circle at 92% 50%, rgba(253, 186, 116, 0.68) 0%, rgba(254, 215, 170, 0.45) 25%, rgba(255, 255, 255, 0) 60%);
   background-attachment: fixed;
 }
 
