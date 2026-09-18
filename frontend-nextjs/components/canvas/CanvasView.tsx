@@ -171,11 +171,10 @@ export default function CanvasView({
             </button>
             <button
               onClick={() => setIsHistoryDrawerOpen(!isHistoryDrawerOpen)}
-              className={`p-3 rounded-2xl transition hover:scale-105 cursor-pointer ${
-                isHistoryDrawerOpen
+              className={`p-3 rounded-2xl transition hover:scale-105 cursor-pointer ${isHistoryDrawerOpen
                   ? 'bg-[#1a73e8] text-white shadow-md'
                   : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
-              }`}
+                }`}
               title="Telemetry & Query History"
             >
               <History className="w-5 h-5" />
@@ -228,7 +227,7 @@ export default function CanvasView({
         </div>
 
         <div className="w-full max-w-4xl mx-auto flex flex-col items-center relative z-10 space-y-6">
-          <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-bold tracking-tight text-center text-slate-900 leading-[1.18] mb-6 sm:mb-8">
+          <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-semibold tracking-tight text-center text-slate-900 leading-[1.18] mb-6 sm:mb-8">
             <span className="text-[#0284c7]">Good Afternoon,</span> What Satelite<br />
             scene you would like to <span className="text-[#f37021]">Discover?</span>
           </h1>
@@ -237,9 +236,8 @@ export default function CanvasView({
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            className={`w-full bg-white rounded-[32px] border shadow-[0_12px_45px_-12px_rgba(0,0,0,0.07)] p-7 sm:p-8 space-y-5 transition-all ${
-              isDragging ? 'border-[#0284c7] ring-4 ring-sky-100 bg-sky-50/20' : 'border-slate-200/90'
-            }`}
+            className={`w-full bg-white rounded-[32px] border shadow-[0_12px_45px_-12px_rgba(0,0,0,0.07)] p-7 sm:p-8 space-y-5 transition-all ${isDragging ? 'border-[#0284c7] ring-4 ring-sky-100 bg-sky-50/20' : 'border-slate-200/90'
+              }`}
           >
             {/* Uploaded Rasters Preview Strip */}
             {(fileT1 || fileT2) && (
@@ -416,11 +414,10 @@ export default function CanvasView({
                                   setIsModelDropdownOpen(false);
                                   autoDetectPipeline(fileT1, fileT2);
                                 }}
-                                className={`w-full py-2 px-3 rounded-lg text-sm font-medium text-center transition cursor-pointer block ${
-                                  isSelected
+                                className={`w-full py-2 px-3 rounded-lg text-sm font-medium text-center transition cursor-pointer block ${isSelected
                                     ? 'bg-[#0284c7] text-white shadow-2xs'
                                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
-                                }`}
+                                  }`}
                               >
                                 {opt.label}
                               </button>
@@ -437,11 +434,10 @@ export default function CanvasView({
               <button
                 onClick={handleLaunchWorkstation}
                 disabled={isLoading}
-                className={`flex items-center gap-2.5 px-7 py-3 rounded-full text-white text-sm sm:text-base font-semibold shadow-md active:scale-[0.98] transition-all disabled:opacity-50 cursor-pointer ${
-                  fileT1 || fileT2
+                className={`flex items-center gap-2.5 px-7 py-3 rounded-full text-white text-sm sm:text-base font-semibold shadow-md active:scale-[0.98] transition-all disabled:opacity-50 cursor-pointer ${fileT1 || fileT2
                     ? 'bg-[#f37021] hover:bg-[#ea580c] shadow-orange-500/25'
                     : 'bg-gradient-to-r from-[#0284c7] to-[#0ea5e9] hover:from-[#0369a1] hover:to-[#0284c7] shadow-sky-500/25'
-                }`}
+                  }`}
               >
                 {isLoading ? (
                   <>
