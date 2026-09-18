@@ -12,7 +12,9 @@ import {
   Sparkles,
   Loader2,
   Maximize2,
-  Plus
+  Plus,
+  Upload,
+  Settings
 } from 'lucide-react';
 import UserProfilePopover from '../modals/UserProfilePopover';
 import HistoryDrawer, { HistoryItem } from './HistoryDrawer';
@@ -204,8 +206,8 @@ export default function CanvasView({
         </div>
 
         <div className="w-full max-w-3xl mx-auto flex flex-col items-center space-y-6 relative z-10">
-          <h1 className="text-4xl font-semibold tracking-tight text-center text-slate-900 leading-snug">
-            <span className="text-[#0284c7]">Good Afternoon,</span> What Satellite<br />
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-center text-slate-900 leading-tight">
+            <span className="text-[#0284c7]">Good Afternoon,</span> What Satelite<br />
             scene you would like to <span className="text-[#f37021]">Discover?</span>
           </h1>
 
@@ -213,50 +215,13 @@ export default function CanvasView({
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            className={`w-full bg-white rounded-[24px] border shadow-[0_12px_40px_-15px_rgba(0,0,0,0.08)] p-6 space-y-4 transition-all ${
-              isDragging ? 'border-[#0284c7] ring-4 ring-sky-100 bg-sky-50/20' : 'border-slate-200/80'
+            className={`w-full bg-white rounded-[28px] border shadow-[0_10px_35px_-10px_rgba(0,0,0,0.06)] p-6 space-y-4 transition-all ${
+              isDragging ? 'border-[#0284c7] ring-4 ring-sky-100 bg-sky-50/20' : 'border-slate-200/90'
             }`}
           >
-            <div className="flex justify-end">
-              <div className="relative w-[340px]">
-                <select
-                  value={targetMethod}
-                  onChange={(e) => {
-                    const val = e.target.value as any;
-                    setTargetMethod(val);
-                    if (val === 'opticalsar' && (!queryText.trim() || queryText === 'Analyze target raster scene and ground key features.' || queryText.toLowerCase().includes('change'))) {
-                      setQueryText('Classify the water vs built-up areas using optical and SAR fusion.');
-                    }
-                    autoDetectPipeline(fileT1, fileT2);
-                  }}
-                  className="w-full text-sm font-semibold text-slate-900 bg-slate-50 border border-slate-400/80 rounded-xl px-4 py-2.5 pr-10 outline-none focus:border-[#0284c7] focus:bg-white transition appearance-none cursor-pointer shadow-sm"
-                >
-                  <option value="auto">Autodetect</option>
-                  <option value="single">Single Satellite Imagery</option>
-                  <option value="bitemporal">Bi-Temporal (Change Detection)</option>
-                  <option value="opticalsar">Optical and SAR Fusion</option>
-                </select>
-                <ChevronDown className="w-4 h-4 text-slate-500 absolute right-3.5 top-3.5 pointer-events-none" />
-              </div>
-            </div>
-
-            {/* Smart Router Verdict Banner */}
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#f8fafd] border border-[#d2e3fc] text-xs">
-              <div className="flex items-center gap-2">
-                <Cpu className="w-4 h-4 text-[#1a73e8]" />
-                <span className="text-slate-700 font-medium">Smart Router Verdict:</span>
-                <span className="text-[#1a73e8] font-semibold">{detectedPipeline}</span>
-              </div>
-              {(fileT1 || fileT2) && (
-                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
-                  {fileT1 && fileT2 ? '2 RASTERS LOADED' : '1 RASTER LOADED'}
-                </span>
-              )}
-            </div>
-
-            {/* Uploaded Rasters Preview Strip (ChatGPT-style thumbnail) */}
+            {/* Uploaded Rasters Preview Strip */}
             {(fileT1 || fileT2) && (
-              <div className="flex items-center gap-3 pt-2 pb-1 overflow-x-auto">
+              <div className="flex items-center gap-3 pt-1 pb-1 overflow-x-auto">
                 {/* T1 Preview Card */}
                 {fileT1 && (
                   <div className="group relative flex-shrink-0">
@@ -265,12 +230,11 @@ export default function CanvasView({
                         t1DataUrl &&
                         setPreviewModalImg({
                           url: t1DataUrl,
-                          title: fileT1.name,
-                          label: fileT2 ? 'Swath T1 (Baseline)' : 'Satellite Swath'
+                          title: fileT1.name
                         })
                       }
-                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border border-slate-200/90 shadow-sm bg-slate-100 hover:border-[#0284c7] hover:shadow-md transition-all cursor-pointer relative flex items-center justify-center group-hover:scale-[1.02]"
-                      title={`Click to inspect raster: ${fileT1.name}`}
+                      className="w-20 h-20 rounded-2xl overflow-hidden border border-slate-200/90 shadow-2xs bg-slate-100 hover:border-[#0284c7] hover:shadow-md transition-all cursor-pointer relative flex items-center justify-center group-hover:scale-[1.02]"
+                      title={`Click to inspect: ${fileT1.name}`}
                     >
                       {t1DataUrl ? (
                         <>
@@ -279,7 +243,7 @@ export default function CanvasView({
                             alt={fileT1.name}
                             className="w-full h-full object-cover"
                           />
-                          <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <Maximize2 className="w-4 h-4 text-white drop-shadow" />
                           </div>
                         </>
@@ -289,21 +253,16 @@ export default function CanvasView({
                           <span className="text-[9px] font-medium">Processing</span>
                         </div>
                       )}
-                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-transparent py-0.5 px-1 flex items-center justify-center">
-                        <span className="text-[9px] font-semibold text-white truncate max-w-[62px]">
-                          {fileT2 ? 'Swath T1' : 'Swath 1'}
-                        </span>
-                      </div>
                     </div>
-                    {/* Delete / Remove X button floating top right */}
+                    {/* Delete / Remove X button */}
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         onRemoveT1();
                       }}
-                      className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-slate-900/85 hover:bg-rose-600 text-white flex items-center justify-center shadow-md transition-all hover:scale-110 cursor-pointer z-10"
-                      title="Remove Swath T1"
+                      className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 hover:bg-rose-600 text-white flex items-center justify-center shadow-md transition-all hover:scale-110 cursor-pointer z-10"
+                      title="Remove Image"
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -318,12 +277,11 @@ export default function CanvasView({
                         t2DataUrl &&
                         setPreviewModalImg({
                           url: t2DataUrl,
-                          title: fileT2.name,
-                          label: 'Swath T2 (Target)'
+                          title: fileT2.name
                         })
                       }
-                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border border-slate-200/90 shadow-sm bg-slate-100 hover:border-[#0284c7] hover:shadow-md transition-all cursor-pointer relative flex items-center justify-center group-hover:scale-[1.02]"
-                      title={`Click to inspect raster: ${fileT2.name}`}
+                      className="w-20 h-20 rounded-2xl overflow-hidden border border-slate-200/90 shadow-2xs bg-slate-100 hover:border-[#0284c7] hover:shadow-md transition-all cursor-pointer relative flex items-center justify-center group-hover:scale-[1.02]"
+                      title={`Click to inspect: ${fileT2.name}`}
                     >
                       {t2DataUrl ? (
                         <>
@@ -332,7 +290,7 @@ export default function CanvasView({
                             alt={fileT2.name}
                             className="w-full h-full object-cover"
                           />
-                          <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <Maximize2 className="w-4 h-4 text-white drop-shadow" />
                           </div>
                         </>
@@ -342,40 +300,20 @@ export default function CanvasView({
                           <span className="text-[9px] font-medium">Processing</span>
                         </div>
                       )}
-                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-transparent py-0.5 px-1 flex items-center justify-center">
-                        <span className="text-[9px] font-semibold text-white truncate max-w-[62px]">
-                          Swath T2
-                        </span>
-                      </div>
                     </div>
-                    {/* Delete / Remove X button floating top right */}
+                    {/* Delete / Remove X button */}
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         onRemoveT2();
                       }}
-                      className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-slate-900/85 hover:bg-rose-600 text-white flex items-center justify-center shadow-md transition-all hover:scale-110 cursor-pointer z-10"
-                      title="Remove Swath T2"
+                      className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 hover:bg-rose-600 text-white flex items-center justify-center shadow-md transition-all hover:scale-110 cursor-pointer z-10"
+                      title="Remove Image"
                     >
                       <X className="w-3 h-3" />
                     </button>
                   </div>
-                )}
-
-                {/* Optional + Attach 2nd Swath button if only 1 swath is present */}
-                {fileT1 && !fileT2 && (
-                  <button
-                    type="button"
-                    onClick={() => fileInputT2Ref.current?.click()}
-                    className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-2 border-dashed border-slate-300 hover:border-[#0284c7] bg-slate-50/60 hover:bg-sky-50/50 flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-[#0284c7] transition-all cursor-pointer flex-shrink-0"
-                    title="Attach 2nd Swath for Change Detection or SAR Fusion"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span className="text-[9px] font-semibold tracking-tight text-center leading-tight px-1">
-                      + 2nd Swath
-                    </span>
-                  </button>
                 )}
               </div>
             )}
@@ -385,70 +323,89 @@ export default function CanvasView({
               <textarea
                 value={queryText}
                 onChange={(e) => setQueryText(e.target.value)}
-                rows={3}
-                placeholder={
-                  targetMethod === 'opticalsar'
-                    ? 'Classify the water vs built-up areas using optical and SAR fusion.'
-                    : "Ask Question or Analysis Requirements (e.g., 'Detect changes in urban infrastructure' or 'Identify all cargo vessels')..."
-                }
-                className="w-full text-sm text-slate-800 placeholder-slate-400 bg-transparent border-none resize-none focus:outline-none focus:ring-0 leading-relaxed"
+                rows={2}
+                placeholder="Ask Question or Analysis Requirements..."
+                className="w-full text-base font-normal text-slate-800 placeholder-slate-400 bg-transparent border-none resize-none focus:outline-none focus:ring-0 leading-relaxed"
               />
             </div>
 
             {/* Bottom Controls Bar */}
-            <div className="flex items-center justify-between gap-3 pt-3 border-t border-slate-100">
-              <label
-                className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50 hover:bg-slate-100/80 text-slate-700 hover:text-slate-900 text-xs font-semibold shadow-2xs hover:border-slate-300 transition cursor-pointer"
-                title="Add satellite imagery (.tif, .png, .jpg)"
-              >
-                <Plus className="w-4 h-4 text-[#0284c7]" />
-                <span>Add Image</span>
-                <input
-                  ref={multiFileInputRef}
-                  type="file"
-                  multiple
-                  className="hidden"
-                  accept=".tif,.tiff,.png,.jpg,.jpeg"
-                  onChange={(e) => {
-                    handleMultiFileUpload(e);
-                    e.target.value = '';
-                  }}
-                />
-                <input
-                  ref={fileInputT2Ref}
-                  type="file"
-                  className="hidden"
-                  accept=".tif,.tiff,.png,.jpg,.jpeg"
-                  onChange={(e) => {
-                    handleFileT2Change(e);
-                    e.target.value = '';
-                  }}
-                />
-              </label>
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
+              <div className="flex items-center gap-2">
+                {/* 1. Attach Image Button */}
+                <label
+                  className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200/90 bg-slate-50/80 hover:bg-slate-100/90 text-slate-700 hover:text-slate-900 text-xs font-medium shadow-2xs hover:border-slate-300 transition cursor-pointer"
+                  title="Attach Satellite Imagery (.tif, .png, .jpg)"
+                >
+                  <Upload className="w-4 h-4 text-slate-600" />
+                  <span>Attach Image</span>
+                  <input
+                    ref={multiFileInputRef}
+                    type="file"
+                    multiple
+                    className="hidden"
+                    accept=".tif,.tiff,.png,.jpg,.jpeg"
+                    onChange={(e) => {
+                      handleMultiFileUpload(e);
+                      e.target.value = '';
+                    }}
+                  />
+                  <input
+                    ref={fileInputT2Ref}
+                    type="file"
+                    className="hidden"
+                    accept=".tif,.tiff,.png,.jpg,.jpeg"
+                    onChange={(e) => {
+                      handleFileT2Change(e);
+                      e.target.value = '';
+                    }}
+                  />
+                </label>
 
+                {/* 2. Model Selection Pill */}
+                <div className="relative inline-flex items-center">
+                  <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200/90 bg-slate-50/80 hover:bg-slate-100/90 text-slate-700 hover:text-slate-900 text-xs font-medium shadow-2xs hover:border-slate-300 transition cursor-pointer">
+                    <Settings className="w-4 h-4 text-slate-600" />
+                    <span>
+                      Model ({targetMethod === 'auto' ? 'Autodetect' : targetMethod === 'single' ? 'Single RS' : targetMethod === 'bitemporal' ? 'Bi-Temporal' : 'Optical-SAR'})
+                    </span>
+                  </div>
+                  <select
+                    value={targetMethod}
+                    onChange={(e) => {
+                      const val = e.target.value as any;
+                      setTargetMethod(val);
+                      if (val === 'opticalsar' && (!queryText.trim() || queryText.toLowerCase().includes('change'))) {
+                        setQueryText('Classify the water vs built-up areas using optical and SAR fusion.');
+                      }
+                      autoDetectPipeline(fileT1, fileT2);
+                    }}
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    title="Select Model Pipeline"
+                  >
+                    <option value="auto">Model (Autodetect)</option>
+                    <option value="single">Model (Single Satellite Imagery)</option>
+                    <option value="bitemporal">Model (Bi-Temporal Change Detection)</option>
+                    <option value="opticalsar">Model (Optical & SAR Fusion)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Right Action Button */}
               <button
                 onClick={handleLaunchWorkstation}
                 disabled={isLoading}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-xs font-semibold shadow-md active:scale-[0.98] transition disabled:opacity-50 cursor-pointer ${
-                  fileT1
-                    ? 'bg-gradient-to-r from-[#f37021] to-[#f97316] hover:from-[#ea580c] hover:to-[#f37021]'
-                    : 'bg-gradient-to-r from-[#0284c7] to-[#0ea5e9] hover:from-[#0369a1] hover:to-[#0284c7]'
-                }`}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-white text-xs font-semibold shadow-md active:scale-[0.98] transition disabled:opacity-50 cursor-pointer bg-gradient-to-r from-[#f37021] to-[#f97316] hover:from-[#ea580c] hover:to-[#f37021]"
               >
                 {isLoading ? (
                   <>
                     <span>Processing...</span>
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
                   </>
-                ) : fileT1 ? (
+                ) : (
                   <>
                     <span>Launch Workstation</span>
                     <Rocket className="w-3.5 h-3.5 fill-white" />
-                  </>
-                ) : (
-                  <>
-                    <span>Ask Gemini Assistant</span>
-                    <Sparkles className="w-3.5 h-3.5" />
                   </>
                 )}
               </button>
