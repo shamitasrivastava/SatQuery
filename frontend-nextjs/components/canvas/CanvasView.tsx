@@ -227,8 +227,8 @@ export default function CanvasView({
           <img src="/logo.png" alt="Watermark" className="w-[560px] h-[560px] object-contain" />
         </div>
 
-        <div className="w-full max-w-4xl mx-auto flex flex-col items-center space-y-8 relative z-10">
-          <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-bold tracking-tight text-center text-slate-900 leading-[1.18]">
+        <div className="w-full max-w-4xl mx-auto flex flex-col items-center relative z-10 space-y-6">
+          <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-bold tracking-tight text-center text-slate-900 leading-[1.18] mb-6 sm:mb-8">
             <span className="text-[#0284c7]">Good Afternoon,</span> What Satelite<br />
             scene you would like to <span className="text-[#f37021]">Discover?</span>
           </h1>
