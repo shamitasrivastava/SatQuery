@@ -375,9 +375,6 @@ export default function CanvasView({
                     onChange={(e) => {
                       const val = e.target.value as any;
                       setTargetMethod(val);
-                      if (val === 'opticalsar' && (!queryText.trim() || queryText.toLowerCase().includes('change'))) {
-                        setQueryText('Classify the water vs built-up areas using optical and SAR fusion.');
-                      }
                       autoDetectPipeline(fileT1, fileT2);
                     }}
                     className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
@@ -391,21 +388,30 @@ export default function CanvasView({
                 </div>
               </div>
 
-              {/* Right Action Button */}
+              {/* Right Action Button: Orange Launch Workstation with images, Blue Ask Gemini Assistant without images */}
               <button
                 onClick={handleLaunchWorkstation}
                 disabled={isLoading}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-white text-xs font-semibold shadow-md active:scale-[0.98] transition disabled:opacity-50 cursor-pointer bg-gradient-to-r from-[#f37021] to-[#f97316] hover:from-[#ea580c] hover:to-[#f37021]"
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-white text-xs font-semibold shadow-md active:scale-[0.98] transition disabled:opacity-50 cursor-pointer ${
+                  fileT1 || fileT2
+                    ? 'bg-gradient-to-r from-[#f37021] to-[#f97316] hover:from-[#ea580c] hover:to-[#f37021]'
+                    : 'bg-gradient-to-r from-[#0284c7] to-[#0ea5e9] hover:from-[#0369a1] hover:to-[#0284c7]'
+                }`}
               >
                 {isLoading ? (
                   <>
                     <span>Processing...</span>
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
                   </>
-                ) : (
+                ) : fileT1 || fileT2 ? (
                   <>
                     <span>Launch Workstation</span>
                     <Rocket className="w-3.5 h-3.5 fill-white" />
+                  </>
+                ) : (
+                  <>
+                    <span>Ask Gemini Assistant</span>
+                    <Sparkles className="w-3.5 h-3.5" />
                   </>
                 )}
               </button>
@@ -424,40 +430,33 @@ export default function CanvasView({
         </div>
       </main>
 
-      {/* Lightbox High-Resolution Raster Preview Modal */}
+      {/* Lightbox High-Resolution Raster Preview Modal: Wraps tightly around the image size */}
       {previewModalImg && (
         <div
-          className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8 animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200"
           onClick={() => setPreviewModalImg(null)}
         >
           <div
-            className="relative max-w-4xl w-full max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col"
+            className="relative inline-flex flex-col max-w-[90vw] max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-slate-50">
-              <div className="flex items-center gap-2.5">
-                <span className="text-xs font-semibold text-slate-800 truncate max-w-[320px] sm:max-w-md">
-                  {previewModalImg.title}
-                </span>
-                {previewModalImg.label && (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-800 font-bold">
-                    {previewModalImg.label}
-                  </span>
-                )}
-              </div>
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-slate-200 bg-slate-50 gap-4">
+              <span className="text-xs font-semibold text-slate-800 truncate max-w-[280px] sm:max-w-md">
+                {previewModalImg.title}
+              </span>
               <button
                 onClick={() => setPreviewModalImg(null)}
                 className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition cursor-pointer"
                 title="Close preview (Esc)"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="p-4 flex items-center justify-center bg-slate-950 overflow-auto max-h-[calc(90vh-60px)]">
+            <div className="p-2 bg-slate-950 flex items-center justify-center overflow-auto max-h-[calc(90vh-48px)]">
               <img
                 src={previewModalImg.url}
                 alt={previewModalImg.title}
-                className="max-h-[72vh] w-auto max-w-full object-contain rounded-lg shadow-lg"
+                className="max-h-[75vh] max-w-[85vw] w-auto h-auto object-contain rounded-lg shadow-md block"
               />
             </div>
           </div>

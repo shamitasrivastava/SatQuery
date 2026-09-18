@@ -346,9 +346,6 @@ export default function BhuViksanaApp() {
       if (nameCheck.includes('sar') || nameCheck.includes('sentinel-1') || nameCheck.includes('s1') || nameCheck.includes('radar')) {
         setDetectedPipeline('SAR + Optical Swaths detected → Routed to Cross-Attention Optical-SAR Fusion');
         setTargetMethod('opticalsar');
-        if (!queryText.trim() || queryText === 'Analyze target raster scene and ground key features.' || queryText.toLowerCase().includes('change')) {
-          setQueryText('Classify the water vs built-up areas using optical and SAR fusion.');
-        }
       } else {
         setDetectedPipeline('Dual Temporal Swaths detected (Pre/Post) → Routed to Open-CD Bi-Temporal Siamese');
         if (targetMethod === 'opticalsar') setTargetMethod('bitemporal');
