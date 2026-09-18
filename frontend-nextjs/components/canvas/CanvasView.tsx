@@ -7,7 +7,6 @@ import {
   LogOut,
   ChevronDown,
   Cpu,
-  UploadCloud,
   X,
   Rocket,
   Sparkles,
@@ -400,57 +399,36 @@ export default function CanvasView({
               />
             </div>
 
-            {/* Multi-Image Upload Engine */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
-              <div className="flex items-center gap-2">
-                <label
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs font-semibold shadow-sm transition cursor-pointer ${
-                    fileT1 || fileT2
-                      ? 'bg-[#1a73e8] border-[#1a73e8] text-white shadow-md'
-                      : 'bg-slate-50 border-slate-300 text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  <UploadCloud className={`w-4 h-4 ${fileT1 || fileT2 ? 'text-white' : 'text-[#0284c7]'}`} />
-                  <span>
-                    {fileT1 && fileT2
-                      ? `${fileT1.name.slice(0, 10)}... + ${fileT2.name.slice(0, 10)}...`
-                      : fileT1
-                      ? fileT1.name.slice(0, 18) + '...'
-                      : 'Upload 1 or 2 Satellite Swaths'}
-                  </span>
-                  <input
-                    ref={multiFileInputRef}
-                    type="file"
-                    multiple
-                    className="hidden"
-                    accept=".tif,.tiff,.png,.jpg,.jpeg"
-                    onChange={handleMultiFileUpload}
-                  />
-                </label>
-
-                {fileT1 && !fileT2 && (
-                  <label className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-dashed border-slate-300 bg-white hover:bg-slate-50 cursor-pointer text-xs font-medium text-slate-600 transition">
-                    <span>+ Attach 2nd Swath for Change Detection</span>
-                    <input
-                      ref={fileInputT2Ref}
-                      type="file"
-                      className="hidden"
-                      accept=".tif,.tiff,.png,.jpg,.jpeg"
-                      onChange={handleFileT2Change}
-                    />
-                  </label>
-                )}
-
-                {(fileT1 || fileT2) && (
-                  <button
-                    onClick={handleClearFiles}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition cursor-pointer"
-                    title="Clear attached files"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
+            {/* Bottom Controls Bar */}
+            <div className="flex items-center justify-between gap-3 pt-3 border-t border-slate-100">
+              <label
+                className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-slate-200/90 bg-slate-50 hover:bg-slate-100/80 text-slate-700 hover:text-slate-900 text-xs font-semibold shadow-2xs hover:border-slate-300 transition cursor-pointer"
+                title="Add satellite imagery (.tif, .png, .jpg)"
+              >
+                <Plus className="w-4 h-4 text-[#0284c7]" />
+                <span>Add Image</span>
+                <input
+                  ref={multiFileInputRef}
+                  type="file"
+                  multiple
+                  className="hidden"
+                  accept=".tif,.tiff,.png,.jpg,.jpeg"
+                  onChange={(e) => {
+                    handleMultiFileUpload(e);
+                    e.target.value = '';
+                  }}
+                />
+                <input
+                  ref={fileInputT2Ref}
+                  type="file"
+                  className="hidden"
+                  accept=".tif,.tiff,.png,.jpg,.jpeg"
+                  onChange={(e) => {
+                    handleFileT2Change(e);
+                    e.target.value = '';
+                  }}
+                />
+              </label>
 
               <button
                 onClick={handleLaunchWorkstation}

@@ -375,13 +375,20 @@ export default function BhuViksanaApp() {
 
       if (files.length === 1) {
         const f1 = files[0];
-        setFileT1(f1);
-        setFileT2(null);
-        setT2DataUrl(null);
-        setChangeMaskUrl(null);
-        const url1 = await processRaster(f1);
-        setT1DataUrl(url1);
-        autoDetectPipeline(f1, null);
+        if (fileT1 && !fileT2) {
+          setFileT2(f1);
+          const url2 = await processRaster(f1);
+          setT2DataUrl(url2);
+          autoDetectPipeline(fileT1, f1, queryText);
+        } else {
+          setFileT1(f1);
+          setFileT2(null);
+          setT2DataUrl(null);
+          setChangeMaskUrl(null);
+          const url1 = await processRaster(f1);
+          setT1DataUrl(url1);
+          autoDetectPipeline(f1, null, queryText);
+        }
       } else if (files.length >= 2) {
         const f1 = files[0];
         const f2 = files[1];
@@ -391,7 +398,7 @@ export default function BhuViksanaApp() {
         const url2 = await processRaster(f2);
         setT1DataUrl(url1);
         setT2DataUrl(url2);
-        autoDetectPipeline(f1, f2);
+        autoDetectPipeline(f1, f2, queryText);
       }
     }
   };
