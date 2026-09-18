@@ -55,6 +55,13 @@ interface CanvasViewProps {
   autoDetectPipeline: (f1: File | null, f2: File | null) => void;
 }
 
+const MODEL_OPTIONS: { value: 'auto' | 'single' | 'bitemporal' | 'opticalsar'; label: string }[] = [
+  { value: 'auto', label: 'Model (Autodetect)' },
+  { value: 'single', label: 'Model (Single Satellite Imagery)' },
+  { value: 'bitemporal', label: 'Model (Bi-Temporal Change Detection)' },
+  { value: 'opticalsar', label: 'Model (Optical & SAR Fusion)' }
+];
+
 export default function CanvasView({
   loginEmail,
   agencyCode,
@@ -91,18 +98,33 @@ export default function CanvasView({
 }: CanvasViewProps) {
   const multiFileInputRef = useRef<HTMLInputElement>(null);
   const fileInputT2Ref = useRef<HTMLInputElement>(null);
+  const modelDropdownRef = useRef<HTMLDivElement>(null);
+  const [isModelDropdownOpen, setIsModelDropdownOpen] = React.useState(false);
   const [previewModalImg, setPreviewModalImg] = React.useState<{ url: string; title: string; label?: string } | null>(null);
   const [isDragging, setIsDragging] = React.useState(false);
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setPreviewModalImg(null);
+      if (e.key === 'Escape') {
+        setPreviewModalImg(null);
+        setIsModelDropdownOpen(false);
+      }
     };
-    if (previewModalImg) {
-      window.addEventListener('keydown', handleKeyDown);
-      return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (modelDropdownRef.current && !modelDropdownRef.current.contains(event.target as Node)) {
+        setIsModelDropdownOpen(false);
+      }
+    };
+    if (isModelDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
     }
-  }, [previewModalImg]);
+  }, [isModelDropdownOpen]);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -362,29 +384,63 @@ export default function CanvasView({
                   />
                 </label>
 
-                {/* 2. Model Selection Pill */}
-                <div className="relative inline-flex items-center">
-                  <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200/90 bg-slate-50/80 hover:bg-slate-100/90 text-slate-700 hover:text-slate-900 text-xs font-medium shadow-2xs hover:border-slate-300 transition cursor-pointer">
+                {/* 2. Custom Model Selection Dropdown (Matches Screenshot) */}
+                <div className="relative" ref={modelDropdownRef}>
+                  <button
+                    type="button"
+                    onClick={() => setIsModelDropdownOpen(!isModelDropdownOpen)}
+                    className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200/90 bg-slate-50/80 hover:bg-slate-100/90 text-slate-700 hover:text-slate-900 text-xs font-medium shadow-2xs hover:border-slate-300 transition cursor-pointer"
+                    title="Select Model Pipeline"
+                  >
                     <Settings className="w-4 h-4 text-slate-600" />
                     <span>
                       Model ({targetMethod === 'auto' ? 'Autodetect' : targetMethod === 'single' ? 'Single RS' : targetMethod === 'bitemporal' ? 'Bi-Temporal' : 'Optical-SAR'})
                     </span>
-                  </div>
-                  <select
-                    value={targetMethod}
-                    onChange={(e) => {
-                      const val = e.target.value as any;
-                      setTargetMethod(val);
-                      autoDetectPipeline(fileT1, fileT2);
-                    }}
-                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                    title="Select Model Pipeline"
-                  >
-                    <option value="auto">Model (Autodetect)</option>
-                    <option value="single">Model (Single Satellite Imagery)</option>
-                    <option value="bitemporal">Model (Bi-Temporal Change Detection)</option>
-                    <option value="opticalsar">Model (Optical & SAR Fusion)</option>
-                  </select>
+                    <ChevronDown className={`w-3.5 h-3.5 text-slate-500 transition-transform ${isModelDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {/* Dropdown Menu Popover matching media_1789731507955.png */}
+                  {isModelDropdownOpen && (
+                    <div className="absolute bottom-full mb-2 left-0 sm:bottom-auto sm:top-full sm:mt-2 z-50 w-72 bg-[#f8fafc] rounded-2xl border border-slate-200/90 shadow-xl shadow-slate-300/40 p-2 animate-in fade-in zoom-in-95 duration-150">
+                      {/* Header inside popover */}
+                      <div className="flex items-center justify-between px-3 py-2 border-b border-slate-200/70 mb-1.5">
+                        <div className="flex items-center gap-2 text-slate-600">
+                          <Settings className="w-4 h-4 text-slate-500" />
+                          <span className="text-sm font-semibold text-slate-700">
+                            Model ({targetMethod === 'auto' ? 'Autodetect' : targetMethod === 'single' ? 'Single RS' : targetMethod === 'bitemporal' ? 'Bi-Temporal' : 'Optical-SAR'})
+                          </span>
+                        </div>
+                        <ChevronDown className="w-4 h-4 text-slate-400" />
+                      </div>
+
+                      {/* Options with subtle dividers and active highlight */}
+                      <div className="space-y-1">
+                        {MODEL_OPTIONS.map((opt, idx) => {
+                          const isSelected = targetMethod === opt.value;
+                          return (
+                            <React.Fragment key={opt.value}>
+                              {idx > 0 && <div className="border-t border-slate-200/60 my-0.5" />}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setTargetMethod(opt.value);
+                                  setIsModelDropdownOpen(false);
+                                  autoDetectPipeline(fileT1, fileT2);
+                                }}
+                                className={`w-full py-2.5 px-3 rounded-xl text-[13.5px] font-medium text-center transition cursor-pointer block ${
+                                  isSelected
+                                    ? 'bg-[#0284c7] text-white shadow-xs'
+                                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
+                                }`}
+                              >
+                                {opt.label}
+                              </button>
+                            </React.Fragment>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -392,26 +448,26 @@ export default function CanvasView({
               <button
                 onClick={handleLaunchWorkstation}
                 disabled={isLoading}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-white text-xs font-semibold shadow-md active:scale-[0.98] transition disabled:opacity-50 cursor-pointer ${
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-full text-white text-sm font-semibold shadow-md active:scale-[0.98] transition-all disabled:opacity-50 cursor-pointer ${
                   fileT1 || fileT2
-                    ? 'bg-gradient-to-r from-[#f37021] to-[#f97316] hover:from-[#ea580c] hover:to-[#f37021]'
-                    : 'bg-gradient-to-r from-[#0284c7] to-[#0ea5e9] hover:from-[#0369a1] hover:to-[#0284c7]'
+                    ? 'bg-[#f37021] hover:bg-[#ea580c] shadow-orange-500/25'
+                    : 'bg-gradient-to-r from-[#0284c7] to-[#0ea5e9] hover:from-[#0369a1] hover:to-[#0284c7] shadow-sky-500/25'
                 }`}
               >
                 {isLoading ? (
                   <>
                     <span>Processing...</span>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                   </>
                 ) : fileT1 || fileT2 ? (
                   <>
                     <span>Launch Workstation</span>
-                    <Rocket className="w-3.5 h-3.5 fill-white" />
+                    <Rocket className="w-4 h-4 fill-white" />
                   </>
                 ) : (
                   <>
                     <span>Ask Gemini Assistant</span>
-                    <Sparkles className="w-3.5 h-3.5" />
+                    <Sparkles className="w-4 h-4" />
                   </>
                 )}
               </button>
