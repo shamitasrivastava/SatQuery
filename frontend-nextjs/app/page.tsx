@@ -409,6 +409,26 @@ export default function BhuViksanaApp() {
     }
   };
 
+  const handleRemoveT1 = () => {
+    if (fileT2) {
+      setFileT1(fileT2);
+      setT1DataUrl(t2DataUrl);
+      setFileT2(null);
+      setT2DataUrl(null);
+      setChangeMaskUrl(null);
+      autoDetectPipeline(fileT2, null, queryText);
+    } else {
+      handleClearFiles();
+    }
+  };
+
+  const handleRemoveT2 = () => {
+    setFileT2(null);
+    setT2DataUrl(null);
+    setChangeMaskUrl(null);
+    autoDetectPipeline(fileT1, null, queryText);
+  };
+
   const handleClearFiles = () => {
     setFileT1(null);
     setFileT2(null);
@@ -751,6 +771,10 @@ export default function BhuViksanaApp() {
         setQueryText={setQueryText}
         fileT1={fileT1}
         fileT2={fileT2}
+        t1DataUrl={t1DataUrl}
+        t2DataUrl={t2DataUrl}
+        onRemoveT1={handleRemoveT1}
+        onRemoveT2={handleRemoveT2}
         handleMultiFileUpload={handleMultiFileUpload}
         handleFileT2Change={handleFileT2Change}
         handleClearFiles={handleClearFiles}

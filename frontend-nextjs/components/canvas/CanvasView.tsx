@@ -13,7 +13,9 @@ import {
   Sparkles,
   Loader2,
   Anchor,
-  CloudRain
+  CloudRain,
+  Maximize2,
+  Plus
 } from 'lucide-react';
 import UserProfilePopover from '../modals/UserProfilePopover';
 import HistoryDrawer, { HistoryItem } from './HistoryDrawer';
@@ -39,6 +41,10 @@ interface CanvasViewProps {
   setQueryText: (text: string) => void;
   fileT1: File | null;
   fileT2: File | null;
+  t1DataUrl?: string | null;
+  t2DataUrl?: string | null;
+  onRemoveT1: () => void;
+  onRemoveT2: () => void;
   handleMultiFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleFileT2Change: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleClearFiles: () => void;
@@ -71,6 +77,10 @@ export default function CanvasView({
   setQueryText,
   fileT1,
   fileT2,
+  t1DataUrl,
+  t2DataUrl,
+  onRemoveT1,
+  onRemoveT2,
   handleMultiFileUpload,
   handleFileT2Change,
   handleClearFiles,
@@ -84,6 +94,42 @@ export default function CanvasView({
 }: CanvasViewProps) {
   const multiFileInputRef = useRef<HTMLInputElement>(null);
   const fileInputT2Ref = useRef<HTMLInputElement>(null);
+  const [previewModalImg, setPreviewModalImg] = React.useState<{ url: string; title: string; label?: string } | null>(null);
+  const [isDragging, setIsDragging] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setPreviewModalImg(null);
+    };
+    if (previewModalImg) {
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [previewModalImg]);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const fakeEvent = {
+        target: { files: e.dataTransfer.files }
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
+      handleMultiFileUpload(fakeEvent);
+    }
+  };
 
   return (
     <div className="flex h-screen w-screen overflow-hidden canvas-bg-mesh font-sans text-slate-800 select-none relative">
@@ -168,7 +214,14 @@ export default function CanvasView({
             scene you would like to <span className="text-[#f37021]">Discover?</span>
           </h1>
 
-          <div className="w-full bg-white rounded-[24px] border border-slate-200/80 shadow-[0_12px_40px_-15px_rgba(0,0,0,0.08)] p-6 space-y-4">
+          <div
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={`w-full bg-white rounded-[24px] border shadow-[0_12px_40px_-15px_rgba(0,0,0,0.08)] p-6 space-y-4 transition-all ${
+              isDragging ? 'border-[#0284c7] ring-4 ring-sky-100 bg-sky-50/20' : 'border-slate-200/80'
+            }`}
+          >
             <div className="flex justify-end">
               <div className="relative w-[340px]">
                 <select
@@ -205,6 +258,132 @@ export default function CanvasView({
                 </span>
               )}
             </div>
+
+            {/* Uploaded Rasters Preview Strip (ChatGPT-style thumbnail) */}
+            {(fileT1 || fileT2) && (
+              <div className="flex items-center gap-3 pt-2 pb-1 overflow-x-auto">
+                {/* T1 Preview Card */}
+                {fileT1 && (
+                  <div className="group relative flex-shrink-0">
+                    <div
+                      onClick={() =>
+                        t1DataUrl &&
+                        setPreviewModalImg({
+                          url: t1DataUrl,
+                          title: fileT1.name,
+                          label: fileT2 ? 'Swath T1 (Baseline)' : 'Satellite Swath'
+                        })
+                      }
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border border-slate-200/90 shadow-sm bg-slate-100 hover:border-[#0284c7] hover:shadow-md transition-all cursor-pointer relative flex items-center justify-center group-hover:scale-[1.02]"
+                      title={`Click to inspect raster: ${fileT1.name}`}
+                    >
+                      {t1DataUrl ? (
+                        <>
+                          <img
+                            src={t1DataUrl}
+                            alt={fileT1.name}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <Maximize2 className="w-4 h-4 text-white drop-shadow" />
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center p-2 text-center text-slate-400">
+                          <Loader2 className="w-4 h-4 animate-spin text-[#0284c7] mb-1" />
+                          <span className="text-[9px] font-medium">Processing</span>
+                        </div>
+                      )}
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-transparent py-0.5 px-1 flex items-center justify-center">
+                        <span className="text-[9px] font-semibold text-white truncate max-w-[62px]">
+                          {fileT2 ? 'Swath T1' : 'Swath 1'}
+                        </span>
+                      </div>
+                    </div>
+                    {/* Delete / Remove X button floating top right */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRemoveT1();
+                      }}
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-slate-900/85 hover:bg-rose-600 text-white flex items-center justify-center shadow-md transition-all hover:scale-110 cursor-pointer z-10"
+                      title="Remove Swath T1"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
+
+                {/* T2 Preview Card */}
+                {fileT2 && (
+                  <div className="group relative flex-shrink-0">
+                    <div
+                      onClick={() =>
+                        t2DataUrl &&
+                        setPreviewModalImg({
+                          url: t2DataUrl,
+                          title: fileT2.name,
+                          label: 'Swath T2 (Target)'
+                        })
+                      }
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border border-slate-200/90 shadow-sm bg-slate-100 hover:border-[#0284c7] hover:shadow-md transition-all cursor-pointer relative flex items-center justify-center group-hover:scale-[1.02]"
+                      title={`Click to inspect raster: ${fileT2.name}`}
+                    >
+                      {t2DataUrl ? (
+                        <>
+                          <img
+                            src={t2DataUrl}
+                            alt={fileT2.name}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <Maximize2 className="w-4 h-4 text-white drop-shadow" />
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center p-2 text-center text-slate-400">
+                          <Loader2 className="w-4 h-4 animate-spin text-[#0284c7] mb-1" />
+                          <span className="text-[9px] font-medium">Processing</span>
+                        </div>
+                      )}
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-transparent py-0.5 px-1 flex items-center justify-center">
+                        <span className="text-[9px] font-semibold text-white truncate max-w-[62px]">
+                          Swath T2
+                        </span>
+                      </div>
+                    </div>
+                    {/* Delete / Remove X button floating top right */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRemoveT2();
+                      }}
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-slate-900/85 hover:bg-rose-600 text-white flex items-center justify-center shadow-md transition-all hover:scale-110 cursor-pointer z-10"
+                      title="Remove Swath T2"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
+
+                {/* Optional + Attach 2nd Swath button if only 1 swath is present */}
+                {fileT1 && !fileT2 && (
+                  <button
+                    type="button"
+                    onClick={() => fileInputT2Ref.current?.click()}
+                    className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-2 border-dashed border-slate-300 hover:border-[#0284c7] bg-slate-50/60 hover:bg-sky-50/50 flex flex-col items-center justify-center gap-1 text-slate-500 hover:text-[#0284c7] transition-all cursor-pointer flex-shrink-0"
+                    title="Attach 2nd Swath for Change Detection or SAR Fusion"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span className="text-[9px] font-semibold tracking-tight text-center leading-tight px-1">
+                      + 2nd Swath
+                    </span>
+                  </button>
+                )}
+              </div>
+            )}
 
             {/* Query Textarea */}
             <div className="pt-1">
@@ -336,6 +515,46 @@ export default function CanvasView({
           </div>
         </div>
       </main>
+
+      {/* Lightbox High-Resolution Raster Preview Modal */}
+      {previewModalImg && (
+        <div
+          className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8 animate-in fade-in duration-200"
+          onClick={() => setPreviewModalImg(null)}
+        >
+          <div
+            className="relative max-w-4xl w-full max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-slate-50">
+              <div className="flex items-center gap-2.5">
+                <span className="text-xs font-semibold text-slate-800 truncate max-w-[320px] sm:max-w-md">
+                  {previewModalImg.title}
+                </span>
+                {previewModalImg.label && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-800 font-bold">
+                    {previewModalImg.label}
+                  </span>
+                )}
+              </div>
+              <button
+                onClick={() => setPreviewModalImg(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition cursor-pointer"
+                title="Close preview (Esc)"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4 flex items-center justify-center bg-slate-950 overflow-auto max-h-[calc(90vh-60px)]">
+              <img
+                src={previewModalImg.url}
+                alt={previewModalImg.title}
+                className="max-h-[72vh] w-auto max-w-full object-contain rounded-lg shadow-lg"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
